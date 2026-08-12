@@ -124,3 +124,42 @@
   </div>
 
 </div>
+
+
+
+
+    const fictionFields =
+      document.getElementById("fiction-fields");
+
+    const nonfictionFields =
+      document.getElementById("nonfiction-fields");
+
+    const genreSelect =
+      document.getElementById("book-genre");
+
+    fictionFields.style.display =
+      type === "fiction" ? "block" : "none";
+
+    nonfictionFields.style.display =
+      type === "non-fiction" ? "block" : "none";
+
+    genreSelect.innerHTML =
+      '<option value="">Select a genre</option>';
+
+    const genres =
+      type === "fiction"
+        ? fictionGenres
+        : nonfictionGenres;
+
+    genres.forEach(function (genre) {
+
+      const option =
+        document.createElement("option");
+
+      option.value = genre;
+
+      option.textContent = genre;
+
+      genreSelect.appendChild(option);
+
+    });
