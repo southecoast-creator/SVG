@@ -1,0 +1,58 @@
+<!-- CREATE BOOK MODAL -->
+
+<div id="create-book-modal" class="book-modal" style="display:none;">
+
+  <div class="book-modal-box">
+
+    <button id="close-book-modal" class="close-modal" type="button">
+      ×
+    </button>
+
+    <p class="dashboard-label">NEW BOOK</p>
+
+    <h2 id="book-type-heading">Create Book</h2>
+
+    <form id="create-book-form">
+
+      <label for="book-title">Book title</label>
+
+      <input
+        id="book-title"
+        type="text"
+        placeholder="Enter your book title"
+        required
+      >
+
+      <label for="book-description">Blurb</label>
+
+      <textarea
+        id="book-description"
+        placeholder="Tell readers what your book is about"
+      ></textarea>
+
+      <label for="book-genre">Genre</label>
+
+      <select id="book-genre">
+        <option value="">Select a genre</option>
+      </select>
+
+      <div id="fiction-fields"></div>
+
+      <div id="nonfiction-fields"></div>
+
+      <input
+        id="selected-book-type"
+        type="hidden"
+      >
+
+      <button id="save-book-button" type="submit">
+        Create Draft
+      </button>
+
+      <p id="create-book-message"></p>
+
+    </form>
+
+  </div>
+
+</div>
