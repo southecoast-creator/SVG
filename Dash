@@ -56,3 +56,71 @@
   </div>
 
 </div>
+
+
+
+<div id="fiction-fields">
+
+  <div class="type-field-group">
+
+    <label for="age-rating">Age Rating</label>
+
+    <select id="age-rating">
+      <option value="">Select age rating</option>
+      <option value="all-ages">All Ages</option>
+      <option value="13+">13+</option>
+      <option value="16+">16+</option>
+      <option value="18+">18+</option>
+    </select>
+
+    <label for="fiction-tags">Tags</label>
+
+    <input
+      id="fiction-tags"
+      type="text"
+      placeholder="e.g. romance, billionaire, enemies-to-lovers"
+    >
+
+  </div>
+
+</div>
+
+<div id="nonfiction-fields">
+
+  <div class="type-field-group">
+
+    <label for="nonfiction-subgenre">Subgenre / Niche</label>
+
+    <input
+      id="nonfiction-subgenre"
+      type="text"
+      placeholder="e.g. study guide, self-development"
+    >
+
+    <label for="nonfiction-audience">Intended Reader</label>
+
+    <input
+      id="nonfiction-audience"
+      type="text"
+      placeholder="Who is this book written for?"
+    >
+
+    <label for="nonfiction-content-level">Content Level</label>
+
+    <select id="nonfiction-content-level">
+      <option value="">Select content level</option>
+      <option value="medium">Medium-content</option>
+      <option value="high">High-content</option>
+    </select>
+
+    <label for="nonfiction-tags">Tags</label>
+
+    <input
+      id="nonfiction-tags"
+      type="text"
+      placeholder="e.g. anatomy, medical students, study skills"
+    >
+
+  </div>
+
+</div>
