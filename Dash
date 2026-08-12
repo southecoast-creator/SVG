@@ -163,3 +163,107 @@
       genreSelect.appendChild(option);
 
     });
+
+
+
+
+
+const nonfictionNiches = {
+
+  "Education": [
+    "Study Skills",
+    "Exam Preparation",
+    "Teaching Methods",
+    "Academic Success",
+    "Learning Strategies"
+  ],
+
+  "Health & Medicine": [
+    "Nutrition",
+    "Public Health",
+    "Medical Education",
+    "Fitness & Wellness",
+    "Health Education"
+  ],
+
+  "Self-Development": [
+    "Motivation",
+    "Confidence",
+    "Productivity",
+    "Personal Growth",
+    "Habits & Discipline"
+  ],
+
+  "Business": [
+    "Entrepreneurship",
+    "Marketing",
+    "Leadership",
+    "Management",
+    "Career Development"
+  ],
+
+  "Finance": [
+    "Personal Finance",
+    "Budgeting",
+    "Investing",
+    "Financial Literacy",
+    "Money Management"
+  ],
+
+  "Psychology": [
+    "Human Behavior",
+    "Relationships",
+    "Child Psychology",
+    "Social Psychology",
+    "Mental Processes"
+  ],
+
+  "Science": [
+    "Biology",
+    "Chemistry",
+    "Physics",
+    "Environmental Science",
+    "Life Sciences"
+  ],
+
+  "Technology": [
+    "Programming",
+    "Artificial Intelligence",
+    "Web Development",
+    "Cybersecurity",
+    "Digital Skills"
+  ],
+
+  "History": [
+    "World History",
+    "African History",
+    "Nigerian History",
+    "Ancient History",
+    "Modern History"
+  ],
+
+  "Biography & Memoir": [
+    "Autobiography",
+    "Memoir",
+    "Personal Stories",
+    "Professional Biography",
+    "Life Experiences"
+  ],
+
+  "Religion & Spirituality": [
+    "Faith & Spiritual Growth",
+    "Bible Study",
+    "Prayer",
+    "Christian Living",
+    "Spirituality"
+  ],
+
+  "Lifestyle": [
+    "Parenting",
+    "Relationships",
+    "Travel",
+    "Food & Nutrition",
+    "Home & Living"
+  ]
+
+};
