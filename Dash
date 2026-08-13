@@ -267,3 +267,61 @@ const nonfictionNiches = {
   ]
 
 };
+
+
+coverInput.addEventListener("change", function () {
+
+  const file = coverInput.files[0];
+
+  coverMessage.textContent = "";
+
+  if (!file) {
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+
+    coverMessage.textContent =
+      "Cover must be under 5 MB.";
+
+    coverInput.value = "";
+
+    return;
+  }
+
+  const image =
+    new Image();
+
+  image.onload = function () {
+
+    if (
+      image.width !== 600 ||
+      image.height !== 800
+    ) {
+
+      coverMessage.textContent =
+        "Cover must be exactly 600 × 800 px.";
+
+      coverInput.value = "";
+
+      return;
+    }
+
+    coverMessage.textContent =
+      "Cover accepted ✓";
+
+  };
+
+  image.onerror = function () {
+
+    coverMessage.textContent =
+      "Please select a valid image.";
+
+    coverInput.value = "";
+
+  };
+
+  image.src =
+    URL.createObjectURL(file);
+
+});
