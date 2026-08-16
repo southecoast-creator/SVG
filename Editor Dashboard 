@@ -526,6 +526,122 @@
 
 }
 
+
+
+/* =========================
+   REVIEW BUTTON
+========================= */
+
+.editor-review-button {
+
+  margin-top: 12px;
+
+  padding: 9px 15px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  background: #5d334b;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================
+   REVIEW PANEL
+========================= */
+
+.editor-review-panel {
+
+  position: fixed;
+
+  z-index: 9999;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  width: min(
+    700px,
+    calc(100% - 30px)
+  );
+
+  max-height: 85vh;
+
+  overflow-y: auto;
+
+  padding: 30px;
+
+  border-radius: 25px;
+
+  background: #ffffff;
+
+  border: 1px solid #eadbe3;
+
+  box-shadow:
+    0 25px 70px
+    rgba(0, 0, 0, 0.25);
+}
+
+
+.editor-review-panel h2 {
+
+  margin: 0 0 8px;
+
+  color: #392831;
+
+}
+
+
+.editor-review-panel > p {
+
+  color: #806b76;
+
+}
+
+
+#review-book-details {
+
+  margin-top: 25px;
+
+  line-height: 1.7;
+
+  color: #594852;
+}
+
+
+.editor-review-close {
+
+  position: absolute;
+
+  top: 15px;
+  right: 18px;
+
+  width: 35px;
+  height: 35px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #f5e9ef;
+
+  color: #65394f;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
 </style>
 
 
