@@ -485,3 +485,328 @@
 }
 
 </style>
+
+
+<script>
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async function () {
+
+    /* =========================
+       SUPABASE
+    ========================== */
+
+    const SUPABASE_URL =
+      "https://uniecvgkxhcbedppadgx.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_UhqP7y8Cjyiv8RebOSMUDA_lBj0QuTE";
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        }
+      );
+
+
+    /* =========================
+       DASHBOARD ELEMENTS
+    ========================== */
+
+    const booksList =
+      document.getElementById(
+        "editor-books-list"
+      );
+
+    const bookCount =
+      document.getElementById(
+        "editor-book-count"
+      );
+
+    const pendingCount =
+      document.getElementById(
+        "editor-pending-count"
+      );
+
+
+    /* =========================
+       CHECK LOGIN
+    ========================== */
+
+    const {
+      data: {
+        session
+      },
+      error: sessionError
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (
+      sessionError ||
+      !session
+    ) {
+
+      console.error(
+        "EDITOR DASHBOARD SESSION ERROR:",
+        sessionError
+      );
+
+      booksList.innerHTML =
+        "<p class='editor-empty-state'>" +
+        "Please log in to access the Editor Dashboard." +
+        "</p>";
+
+      return;
+
+    }
+
+
+    /* =========================
+       LOAD BOOK SUBMISSIONS
+    ========================== */
+
+    booksList.innerHTML =
+      "<p class='editor-empty-state'>" +
+      "Loading book submissions..." +
+      "</p>";
+
+
+    const {
+      data: submissions,
+      error: submissionsError
+    } =
+      await supabaseClient
+        .from("book_submissions")
+        .select(
+          "id,author_id,book_id,title,description,genre,cover_url,status,created_at,submitted_at,subgenre,book_outline,protagonist,antagonist,additional_details,author_details"
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
+
+
+    /* =========================
+       HANDLE ERROR
+    ========================== */
+
+    if (
+      submissionsError
+    ) {
+
+      console.error(
+        "EDITOR SUBMISSIONS ERROR:",
+        submissionsError
+      );
+
+      booksList.innerHTML =
+        "<p class='editor-empty-state'>" +
+        "We could not load the book submissions." +
+        "</p>";
+
+      return;
+
+    }
+
+
+    /* =========================
+       COUNTS
+    ========================== */
+
+    const allSubmissions =
+      submissions || [];
+
+
+    bookCount.textContent =
+      allSubmissions.length;
+
+
+    const pendingSubmissions =
+      allSubmissions.filter(
+        function (submission) {
+
+          return (
+            submission.status ===
+            "pending"
+          );
+
+        }
+      );
+
+
+    pendingCount.textContent =
+      pendingSubmissions.length;
+
+
+    /* =========================
+       NO BOOKS
+    ========================== */
+
+    if (
+      allSubmissions.length === 0
+    ) {
+
+      booksList.innerHTML =
+        "<p class='editor-empty-state'>" +
+        "No book submissions yet." +
+        "</p>";
+
+      return;
+
+    }
+
+
+    /* =========================
+       DISPLAY BOOKS
+    ========================== */
+
+    booksList.innerHTML = "";
+
+
+    allSubmissions.forEach(
+      function (submission) {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+        card.className =
+          "editor-book-card";
+
+
+        const cover =
+          document.createElement(
+            "div"
+          );
+
+        cover.className =
+          "editor-book-cover";
+
+
+        if (
+          submission.cover_url
+        ) {
+
+          cover.style.backgroundImage =
+            "url('" +
+            submission.cover_url +
+            "')";
+
+        }
+
+
+        const content =
+          document.createElement(
+            "div"
+          );
+
+        content.className =
+          "editor-book-content";
+
+
+        const title =
+          document.createElement(
+            "h3"
+          );
+
+        title.textContent =
+          submission.title ||
+          "Untitled Book";
+
+
+        const genre =
+          document.createElement(
+            "p"
+          );
+
+        genre.textContent =
+          submission.genre ||
+          "Genre not provided";
+
+
+        const status =
+          document.createElement(
+            "span"
+          );
+
+        status.className =
+          "editor-book-status";
+
+
+        status.textContent =
+          submission.status ||
+          "pending";
+
+
+        const authorDetails =
+          submission.author_details ||
+          {};
+
+
+        const author =
+          document.createElement(
+            "p"
+          );
+
+        author.className =
+          "editor-book-author";
+
+
+        author.textContent =
+          "Author: " +
+          (
+            authorDetails.pen_name ||
+            authorDetails.full_name ||
+            "Unknown author"
+          );
+
+
+        content.appendChild(
+          title
+        );
+
+        content.appendChild(
+          author
+        );
+
+        content.appendChild(
+          genre
+        );
+
+        content.appendChild(
+          status
+        );
+
+
+        card.appendChild(
+          cover
+        );
+
+        card.appendChild(
+          content
+        );
+
+
+        booksList.appendChild(
+          card
+        );
+
+      }
+    );
+
+  }
+);
+
+</script>
