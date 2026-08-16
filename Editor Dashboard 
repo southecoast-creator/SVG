@@ -205,6 +205,48 @@
 
 
 
+<!-- =====================================================
+     EDITOR BOOK REVIEW PANEL
+====================================================== -->
+
+<div
+  id="editor-book-review"
+  class="editor-review-panel"
+  style="display:none;"
+>
+
+  <button
+    id="close-editor-book-review"
+    type="button"
+    class="editor-review-close"
+  >
+    ×
+  </button>
+
+  <p class="editor-eyebrow">
+    BOOK REVIEW
+  </p>
+
+  <h2 id="review-book-title">
+    —
+  </h2>
+
+  <p id="review-book-author">
+    —
+  </p>
+
+  <div id="review-book-details">
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
 <style>
 
 /* =====================================================
