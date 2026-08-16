@@ -1702,3 +1702,104 @@ function openEditorBookReview(
     "block";
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.editor-review-section {
+
+  margin-top: 25px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #eee1e8;
+
+}
+
+
+.editor-review-section h3 {
+
+  margin: 0 0 15px;
+
+  color: #5d334b;
+
+  font-size: 16px;
+
+}
+
+
+.editor-review-field {
+
+  margin-bottom: 16px;
+
+}
+
+
+.editor-review-field-label {
+
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #927c87;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: .5px;
+
+  text-transform: uppercase;
+
+}
+
+
+.editor-review-field-value {
+
+  padding: 11px 13px;
+
+  border-radius: 12px;
+
+  background: #faf6f8;
+
+  color: #493740;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+  white-space: pre-wrap;
+
+}
+
+
+.editor-review-cover {
+
+  display: block;
+
+  width: 150px;
+
+  max-width: 100%;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 10px 25px
+    rgba(60, 35, 48, .15);
+
+}
