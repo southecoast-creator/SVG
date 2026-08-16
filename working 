@@ -1591,3 +1591,154 @@ textarea:focus {
 
 }
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function checkPublicationEligibility(
+  book,
+  applyButton
+) {
+
+  /* =========================
+     ALREADY SUBMITTED?
+  ========================== */
+
+  const {
+    data: existingSubmission,
+    error: submissionCheckError
+  } =
+    await supabaseClient
+      .from("book_submissions")
+      .select("id,status")
+      .eq(
+        "book_id",
+        book.id
+      )
+      .limit(1);
+
+
+  if (submissionCheckError) {
+
+    console.error(
+      "PUBLICATION SUBMISSION CHECK ERROR:",
+      submissionCheckError
+    );
+
+    applyButton.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  /* =========================
+     HIDE AFTER SUBMISSION
+  ========================== */
+
+  if (
+    existingSubmission &&
+    existingSubmission.length > 0
+  ) {
+
+    applyButton.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  /* =========================
+     ALREADY PUBLISHED?
+  ========================== */
+
+  if (
+    book.status === "published"
+  ) {
+
+    applyButton.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  /* =========================
+     CHECK WORD COUNT
+  ========================== */
+
+  const {
+    data: chapters,
+    error
+  } = await supabaseClient
+    .from("chapters")
+    .select("word_count")
+    .eq(
+      "book_id",
+      book.id
+    );
+
+
+  if (error) {
+
+    console.error(
+      "PUBLICATION WORD COUNT ERROR:",
+      error
+    );
+
+    applyButton.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  const totalWords =
+    (chapters || []).reduce(
+      function (total, chapter) {
+
+        return total +
+          (
+            Number(
+              chapter.word_count
+            ) || 0
+          );
+
+      },
+      0
+    );
+
+
+  if (
+    totalWords >= 5000
+  ) {
+
+    applyButton.style.display =
+      "inline-flex";
+
+  } else {
+
+    applyButton.style.display =
+      "none";
+
+  }
+
+}
