@@ -410,3 +410,469 @@ if (publicationApplicationForm) {
   );
 
 }
+
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   PUBLICATION APPLICATION SUBMISSION
+===================================================== */
+
+const publicationApplicationForm =
+  document.getElementById(
+    "publication-application-form"
+  );
+
+if (publicationApplicationForm) {
+
+  publicationApplicationForm.addEventListener(
+    "submit",
+    async function (event) {
+
+      event.preventDefault();
+
+      const message =
+        document.getElementById(
+          "publication-application-message"
+        );
+
+      message.textContent =
+        "Submitting your application...";
+
+      /* =========================
+         CHECK CURRENT BOOK
+      ========================= */
+
+      const book =
+        window.currentPublicationBook;
+
+      if (
+        !book ||
+        !book.id
+      ) {
+
+        message.textContent =
+          "The book being submitted could not be identified.";
+
+        console.error(
+          "PUBLICATION: current book missing",
+          book
+        );
+
+        return;
+      }
+
+      const bookId =
+        book.id;
+
+
+      /* =========================
+         GET CURRENT SESSION
+      ========================= */
+
+      let sessionResult;
+
+      try {
+
+        sessionResult =
+          await Promise.race([
+
+            supabaseClient.auth.getSession(),
+
+            new Promise(function (
+              resolve
+            ) {
+
+              setTimeout(
+                function () {
+
+                  resolve({
+                    data: {
+                      session: null
+                    },
+                    error: {
+                      message:
+                        "Session request timed out."
+                    }
+                  });
+
+                },
+                10000
+              );
+
+            })
+
+          ]);
+
+      } catch (error) {
+
+        console.error(
+          "PUBLICATION SESSION ERROR:",
+          error
+        );
+
+        message.textContent =
+          "We could not verify your login session.";
+
+        return;
+      }
+
+
+      const session =
+        sessionResult &&
+        sessionResult.data
+          ? sessionResult.data.session
+          : null;
+
+
+      if (!session) {
+
+        console.error(
+          "PUBLICATION: No active session."
+        );
+
+        message.textContent =
+          "Your login session could not be verified.";
+
+        return;
+      }
+
+
+      const user =
+        session.user;
+
+
+      /* =========================
+         AUTHOR INFORMATION
+      ========================= */
+
+      const fullName =
+        document.getElementById(
+          "publication-full-name"
+        ).value.trim();
+
+      const penName =
+        document.getElementById(
+          "publication-pen-name"
+        ).value.trim();
+
+      const email =
+        document.getElementById(
+          "publication-email"
+        ).value.trim();
+
+      const phone =
+        document.getElementById(
+          "publication-phone"
+        ).value.trim();
+
+      const bio =
+        document.getElementById(
+          "publication-bio"
+        ).value.trim();
+
+
+      const authorDetails = {
+
+        full_name:
+          fullName,
+
+        pen_name:
+          penName,
+
+        email:
+          email,
+
+        phone:
+          phone,
+
+        bio:
+          bio
+
+      };
+
+
+      /* =========================
+         PAYMENT INFORMATION
+      ========================= */
+
+      const bankName =
+        document.getElementById(
+          "publication-bank-name"
+        ).value.trim();
+
+      const accountName =
+        document.getElementById(
+          "publication-account-name"
+        ).value.trim();
+
+      const accountNumber =
+        document.getElementById(
+          "publication-account-number"
+        ).value.trim();
+
+
+      const additionalDetails = {
+
+        bank_name:
+          bankName,
+
+        account_name:
+          accountName,
+
+        account_number:
+          accountNumber
+
+      };
+
+
+      /* =========================
+         BOOK INFORMATION
+      ========================= */
+
+      const genre =
+        document.getElementById(
+          "publication-genre"
+        ).value;
+
+      const description =
+        document.getElementById(
+          "publication-description"
+        ).value.trim();
+
+      const outline =
+        document.getElementById(
+          "publication-outline"
+        ).value.trim();
+
+
+      /* =========================
+         FICTION INFORMATION
+      ========================= */
+
+      let protagonist = {};
+      let antagonist = {};
+
+
+      if (
+        book.book_type === "fiction"
+      ) {
+
+        const protagonistName =
+          document.getElementById(
+            "protagonist-name"
+          ).value.trim();
+
+        const protagonistProfile =
+          document.getElementById(
+            "protagonist-profile"
+          ).value.trim();
+
+        const protagonistTraits =
+          document.getElementById(
+            "protagonist-traits"
+          ).value.trim();
+
+
+        protagonist = {
+
+          name:
+            protagonistName,
+
+          profile:
+            protagonistProfile,
+
+          traits:
+            protagonistTraits
+
+        };
+
+
+        const antagonistName =
+          document.getElementById(
+            "antagonist-name"
+          ).value.trim();
+
+        const antagonistProfile =
+          document.getElementById(
+            "antagonist-profile"
+          ).value.trim();
+
+        const antagonistTraits =
+          document.getElementById(
+            "antagonist-traits"
+          ).value.trim();
+
+
+        antagonist = {
+
+          name:
+            antagonistName,
+
+          profile:
+            antagonistProfile,
+
+          traits:
+            antagonistTraits
+
+        };
+
+      }
+
+
+      /* =========================
+         CREATE SUBMISSION
+      ========================= */
+
+      message.textContent =
+        "Sending your application for review...";
+
+
+      let submissionResult;
+
+      try {
+
+        submissionResult =
+          await Promise.race([
+
+            supabaseClient
+              .from("book_submissions")
+              .insert({
+
+                author_id:
+                  user.id,
+
+                book_id:
+                  bookId,
+
+                title:
+                  book.title ||
+                  null,
+
+                description:
+                  description ||
+                  book.description ||
+                  null,
+
+                genre:
+                  genre ||
+                  book.genre ||
+                  null,
+
+                cover_url:
+                  book.cover_url ||
+                  null,
+
+                status:
+                  "pending",
+
+                submitted_at:
+                  new Date().toISOString(),
+
+                book_outline:
+                  outline ||
+                  null,
+
+                protagonist:
+                  protagonist,
+
+                antagonist:
+                  antagonist,
+
+                author_details:
+                  authorDetails,
+
+                additional_details:
+                  additionalDetails
+
+              })
+              .select(
+                "id,book_id,status,submitted_at"
+              )
+              .single(),
+
+            new Promise(function (
+              resolve
+            ) {
+
+              setTimeout(
+                function () {
+
+                  resolve({
+
+                    data: null,
+
+                    error: {
+                      message:
+                        "Submission request timed out. Please check your connection and try again."
+                    }
+
+                  });
+
+                },
+                15000
+              );
+
+            })
+
+          ]);
+
+      } catch (error) {
+
+        console.error(
+          "PUBLICATION INSERT ERROR:",
+          error
+        );
+
+        message.textContent =
+          "The submission could not be completed.";
+
+        return;
+      }
+
+
+      /* =========================
+         HANDLE SUBMISSION ERROR
+      ========================= */
+
+      if (
+        submissionResult.error
+      ) {
+
+        console.error(
+          "PUBLICATION SUBMISSION ERROR:",
+          submissionResult.error
+        );
+
+        message.textContent =
+          "Your application could not be submitted: " +
+          submissionResult.error.message;
+
+        return;
+      }
+
+
+      /* =========================
+         SUCCESS
+      ========================= */
+
+      console.log(
+        "PUBLICATION SUBMISSION CREATED:",
+        submissionResult.data
+      );
+
+
+      message.textContent =
+        "Your book has been submitted for review successfully.";
+
+    }
+  );
+
+}
