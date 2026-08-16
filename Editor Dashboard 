@@ -1,0 +1,200 @@
+<!-- =====================================================
+     LITDOM — EDITOR DASHBOARD
+====================================================== -->
+
+<div id="editor-dashboard">
+
+  <!-- HEADER -->
+
+  <header class="editor-dashboard-header">
+
+    <div>
+      <p class="editor-dashboard-label">
+        LITDOM EDITORIAL
+      </p>
+
+      <h1>
+        Editor Dashboard
+      </h1>
+
+      <p class="editor-dashboard-subtitle">
+        Review books, monitor new chapters,
+        and manage publication.
+      </p>
+    </div>
+
+  </header>
+
+
+  <!-- OVERVIEW -->
+
+  <section
+    id="editor-overview"
+    class="editor-section"
+  >
+
+    <div class="editor-section-heading">
+
+      <div>
+        <p class="editor-eyebrow">
+          OVERVIEW
+        </p>
+
+        <h2>
+          Editorial Activity
+        </h2>
+      </div>
+
+    </div>
+
+
+    <div class="editor-stat-grid">
+
+      <div class="editor-stat-card">
+
+        <span>
+          Books
+        </span>
+
+        <strong id="editor-book-count">
+          0
+        </strong>
+
+      </div>
+
+
+      <div class="editor-stat-card">
+
+        <span>
+          Pending Reviews
+        </span>
+
+        <strong id="editor-pending-count">
+          0
+        </strong>
+
+      </div>
+
+
+      <div class="editor-stat-card">
+
+        <span>
+          Recent Chapters
+        </span>
+
+        <strong id="editor-chapter-count">
+          0
+        </strong>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- BOOKS -->
+
+  <section
+    id="editor-books-section"
+    class="editor-section"
+  >
+
+    <div class="editor-section-heading">
+
+      <div>
+
+        <p class="editor-eyebrow">
+          BOOKS
+        </p>
+
+        <h2>
+          Books Requiring Attention
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <div id="editor-books-list">
+
+      <p class="editor-empty-state">
+        No books to display yet.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- RECENT CHAPTERS -->
+
+  <section
+    id="editor-recent-chapters-section"
+    class="editor-section"
+  >
+
+    <div class="editor-section-heading">
+
+      <div>
+
+        <p class="editor-eyebrow">
+          CHAPTERS
+        </p>
+
+        <h2>
+          Recent Chapters
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <div id="editor-recent-chapters-list">
+
+      <p class="editor-empty-state">
+        No recent chapters to display yet.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- FUTURE UPDATES -->
+
+  <section
+    id="editor-updates-section"
+    class="editor-section"
+  >
+
+    <div class="editor-section-heading">
+
+      <div>
+
+        <p class="editor-eyebrow">
+          LIVE UPDATES
+        </p>
+
+        <h2>
+          New & Updated Chapters
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <div id="editor-updates-list">
+
+      <p class="editor-empty-state">
+        New chapter updates will appear here.
+      </p>
+
+    </div>
+
+  </section>
+
+</div>
