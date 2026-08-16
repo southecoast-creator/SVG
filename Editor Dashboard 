@@ -1803,3 +1803,210 @@ function openEditorBookReview(
     rgba(60, 35, 48, .15);
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+  /* =========================
+     LOAD BOOK CHAPTERS
+  ========================== */
+
+  const chaptersSection =
+    addReviewSection(
+      "Book Chapters"
+    );
+
+
+  if (
+    !submission.book_id
+  ) {
+
+    addReviewField(
+      chaptersSection,
+      "Chapters",
+      "This submission is not connected to a book."
+    );
+
+  } else {
+
+    const {
+      data: chapters,
+      error: chaptersError
+    } =
+      await supabaseClient
+        .from("chapters")
+        .select(
+          "id,book_id,chapter_number,title,content,status,word_count,is_locked,unlock_cost,updated_at,created_at,published_at,submitted_at,reviewed_at,reviewed_by,deletion_requested"
+        )
+        .eq(
+          "book_id",
+          submission.book_id
+        )
+        .order(
+          "chapter_number",
+          {
+            ascending: true
+          }
+        );
+
+
+    if (
+      chaptersError
+    ) {
+
+      console.error(
+        "EDITOR CHAPTERS LOAD ERROR:",
+        chaptersError
+      );
+
+      addReviewField(
+        chaptersSection,
+        "Chapters",
+        "We could not load this book's chapters."
+      );
+
+    } else if (
+      !chapters ||
+      chapters.length === 0
+    ) {
+
+      addReviewField(
+        chaptersSection,
+        "Chapters",
+        "No chapters have been added to this book yet."
+      );
+
+    } else {
+
+      chapters.forEach(
+        function (chapter) {
+
+          const chapterBox =
+            document.createElement(
+              "div"
+            );
+
+          chapterBox.className =
+            "editor-review-chapter";
+
+
+          const chapterHeading =
+            document.createElement(
+              "h4"
+            );
+
+          chapterHeading.textContent =
+            "Chapter " +
+            (
+              chapter.chapter_number ??
+              "—"
+            ) +
+            " — " +
+            (
+              chapter.title ||
+              "Untitled Chapter"
+            );
+
+
+          chapterBox.appendChild(
+            chapterHeading
+          );
+
+
+          addReviewField(
+            chapterBox,
+            "Status",
+            chapter.status
+          );
+
+
+          addReviewField(
+            chapterBox,
+            "Word Count",
+            String(
+              chapter.word_count || 0
+            )
+          );
+
+
+          addReviewField(
+            chapterBox,
+            "Locked",
+            chapter.is_locked
+              ? "Yes"
+              : "No"
+          );
+
+
+          addReviewField(
+            chapterBox,
+            "Unlock Cost",
+            String(
+              chapter.unlock_cost || 0
+            )
+          );
+
+
+          addReviewField(
+            chapterBox,
+            "Updated",
+            chapter.updated_at
+              ? new Date(
+                  chapter.updated_at
+                ).toLocaleString()
+              : "Not available"
+          );
+
+
+          const contentLabel =
+            document.createElement(
+              "span"
+            );
+
+          contentLabel.className =
+            "editor-review-field-label";
+
+          contentLabel.textContent =
+            "Chapter Content";
+
+
+          const content =
+            document.createElement(
+              "div"
+            );
+
+          content.className =
+            "editor-review-chapter-content";
+
+          content.textContent =
+            chapter.content ||
+            "No chapter content available.";
+
+
+          chapterBox.appendChild(
+            contentLabel
+          );
+
+          chapterBox.appendChild(
+            content
+          );
+
+
+          chaptersSection.appendChild(
+            chapterBox
+          );
+
+        }
+      );
+
+    }
+
+  }
