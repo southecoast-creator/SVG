@@ -1209,3 +1209,496 @@ if (closeReviewButton) {
   text-transform: capitalize;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function openEditorBookReview(
+  submission
+) {
+
+  const reviewPanel =
+    document.getElementById(
+      "editor-book-review"
+    );
+
+  const reviewTitle =
+    document.getElementById(
+      "review-book-title"
+    );
+
+  const reviewAuthor =
+    document.getElementById(
+      "review-book-author"
+    );
+
+  const reviewDetails =
+    document.getElementById(
+      "review-book-details"
+    );
+
+
+  /* =========================
+     SAFETY
+  ========================== */
+
+  if (
+    !reviewPanel ||
+    !reviewTitle ||
+    !reviewAuthor ||
+    !reviewDetails
+  ) {
+
+    console.error(
+      "EDITOR REVIEW PANEL ELEMENTS NOT FOUND."
+    );
+
+    return;
+
+  }
+
+
+  /* =========================
+     DATA
+  ========================== */
+
+  const authorDetails =
+    submission.author_details ||
+    {};
+
+  const additionalDetails =
+    submission.additional_details ||
+    {};
+
+  const protagonist =
+    submission.protagonist ||
+    {};
+
+  const antagonist =
+    submission.antagonist ||
+    {};
+
+
+  /* =========================
+     TITLE + AUTHOR
+  ========================== */
+
+  reviewTitle.textContent =
+    submission.title ||
+    "Untitled Book";
+
+
+  reviewAuthor.textContent =
+    "Author: " +
+    (
+      authorDetails.pen_name ||
+      authorDetails.full_name ||
+      "Unknown author"
+    );
+
+
+  /* =========================
+     CLEAR OLD CONTENT
+  ========================== */
+
+  reviewDetails.innerHTML = "";
+
+
+  /* =========================
+     HELPER
+  ========================== */
+
+  function addReviewSection(
+    heading
+  ) {
+
+    const section =
+      document.createElement(
+        "div"
+      );
+
+    section.className =
+      "editor-review-section";
+
+
+    const title =
+      document.createElement(
+        "h3"
+      );
+
+    title.textContent =
+      heading;
+
+
+    section.appendChild(
+      title
+    );
+
+
+    reviewDetails.appendChild(
+      section
+    );
+
+
+    return section;
+
+  }
+
+
+  function addReviewField(
+    section,
+    label,
+    value
+  ) {
+
+    const field =
+      document.createElement(
+        "div"
+      );
+
+    field.className =
+      "editor-review-field";
+
+
+    const fieldLabel =
+      document.createElement(
+        "span"
+      );
+
+    fieldLabel.className =
+      "editor-review-field-label";
+
+    fieldLabel.textContent =
+      label;
+
+
+    const fieldValue =
+      document.createElement(
+        "div"
+      );
+
+    fieldValue.className =
+      "editor-review-field-value";
+
+    fieldValue.textContent =
+      value ||
+      "Not provided";
+
+
+    field.appendChild(
+      fieldLabel
+    );
+
+    field.appendChild(
+      fieldValue
+    );
+
+
+    section.appendChild(
+      field
+    );
+
+  }
+
+
+  /* =========================
+     STATUS
+  ========================== */
+
+  const statusSection =
+    addReviewSection(
+      "Submission Status"
+    );
+
+
+  addReviewField(
+    statusSection,
+    "Current Status",
+    submission.status ||
+      "pending"
+  );
+
+
+  /* =========================
+     BOOK INFORMATION
+  ========================== */
+
+  const bookSection =
+    addReviewSection(
+      "Book Information"
+    );
+
+
+  addReviewField(
+    bookSection,
+    "Genre",
+    submission.genre
+  );
+
+
+  addReviewField(
+    bookSection,
+    "Subgenre",
+    submission.subgenre
+  );
+
+
+  addReviewField(
+    bookSection,
+    "Description / Blurb",
+    submission.description
+  );
+
+
+  addReviewField(
+    bookSection,
+    "Book Outline",
+    submission.book_outline
+  );
+
+
+  /* =========================
+     COVER
+  ========================== */
+
+  if (
+    submission.cover_url
+  ) {
+
+    const coverSection =
+      addReviewSection(
+        "Book Cover"
+      );
+
+
+    const cover =
+      document.createElement(
+        "img"
+      );
+
+    cover.src =
+      submission.cover_url;
+
+    cover.alt =
+      submission.title ||
+      "Book cover";
+
+    cover.className =
+      "editor-review-cover";
+
+
+    coverSection.appendChild(
+      cover
+    );
+
+  }
+
+
+  /* =========================
+     AUTHOR INFORMATION
+  ========================== */
+
+  const authorSection =
+    addReviewSection(
+      "Author Information"
+    );
+
+
+  addReviewField(
+    authorSection,
+    "Full Name",
+    authorDetails.full_name
+  );
+
+
+  addReviewField(
+    authorSection,
+    "Pen Name",
+    authorDetails.pen_name
+  );
+
+
+  addReviewField(
+    authorSection,
+    "Email",
+    authorDetails.email
+  );
+
+
+  addReviewField(
+    authorSection,
+    "Phone",
+    authorDetails.phone
+  );
+
+
+  addReviewField(
+    authorSection,
+    "Author Bio",
+    authorDetails.bio
+  );
+
+
+  /* =========================
+     FICTION INFORMATION
+  ========================== */
+
+  if (
+    Object.keys(
+      protagonist
+    ).length > 0 ||
+    Object.keys(
+      antagonist
+    ).length > 0
+  ) {
+
+    const fictionSection =
+      addReviewSection(
+        "Fiction Information"
+      );
+
+
+    addReviewField(
+      fictionSection,
+      "Protagonist",
+      protagonist.name
+    );
+
+
+    addReviewField(
+      fictionSection,
+      "Protagonist Profile",
+      protagonist.profile
+    );
+
+
+    addReviewField(
+      fictionSection,
+      "Protagonist Traits",
+      protagonist.traits
+    );
+
+
+    addReviewField(
+      fictionSection,
+      "Antagonist",
+      antagonist.name
+    );
+
+
+    addReviewField(
+      fictionSection,
+      "Antagonist Profile",
+      antagonist.profile
+    );
+
+
+    addReviewField(
+      fictionSection,
+      "Antagonist Traits",
+      antagonist.traits
+    );
+
+  }
+
+
+  /* =========================
+     PAYMENT INFORMATION
+  ========================== */
+
+  const paymentSection =
+    addReviewSection(
+      "Payment Information"
+    );
+
+
+  addReviewField(
+    paymentSection,
+    "Bank Name",
+    additionalDetails.bank_name
+  );
+
+
+  addReviewField(
+    paymentSection,
+    "Account Name",
+    additionalDetails.account_name
+  );
+
+
+  addReviewField(
+    paymentSection,
+    "Account Number",
+    additionalDetails.account_number
+  );
+
+
+  /* =========================
+     SUBMISSION DATE
+  ========================== */
+
+  const submissionSection =
+    addReviewSection(
+      "Submission"
+    );
+
+
+  const submittedDate =
+    submission.submitted_at ||
+    submission.created_at;
+
+
+  let formattedDate =
+    "Not available";
+
+
+  if (
+    submittedDate
+  ) {
+
+    const date =
+      new Date(
+        submittedDate
+      );
+
+
+    if (
+      !Number.isNaN(
+        date.getTime()
+      )
+    ) {
+
+      formattedDate =
+        date.toLocaleString();
+
+    }
+
+  }
+
+
+  addReviewField(
+    submissionSection,
+    "Submitted",
+    formattedDate
+  );
+
+
+  /* =========================
+     OPEN REVIEW PANEL
+  ========================== */
+
+  reviewPanel.style.display =
+    "block";
+
+}
