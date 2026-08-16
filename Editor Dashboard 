@@ -851,6 +851,136 @@ document.addEventListener(
   }
 );
 
+
+
+
+
+
+
+function openEditorBookReview(
+  submission
+) {
+
+  const reviewPanel =
+    document.getElementById(
+      "editor-book-review"
+    );
+
+  const reviewTitle =
+    document.getElementById(
+      "review-book-title"
+    );
+
+  const reviewAuthor =
+    document.getElementById(
+      "review-book-author"
+    );
+
+  const reviewDetails =
+    document.getElementById(
+      "review-book-details"
+    );
+
+
+  const authorDetails =
+    submission.author_details ||
+    {};
+
+
+  reviewTitle.textContent =
+    submission.title ||
+    "Untitled Book";
+
+
+  reviewAuthor.textContent =
+    "Author: " +
+    (
+      authorDetails.pen_name ||
+      authorDetails.full_name ||
+      "Unknown author"
+    );
+
+
+  reviewDetails.innerHTML = "";
+
+
+  const description =
+    document.createElement(
+      "p"
+    );
+
+  description.textContent =
+    submission.description ||
+    "No description provided.";
+
+
+  const genre =
+    document.createElement(
+      "p"
+    );
+
+  genre.textContent =
+    "Genre: " +
+    (
+      submission.genre ||
+      "Not provided"
+    );
+
+
+  const status =
+    document.createElement(
+      "p"
+    );
+
+  status.textContent =
+    "Status: " +
+    (
+      submission.status ||
+      "pending"
+    );
+
+
+  reviewDetails.appendChild(
+    description
+  );
+
+  reviewDetails.appendChild(
+    genre
+  );
+
+  reviewDetails.appendChild(
+    status
+  );
+
+
+  reviewPanel.style.display =
+    "block";
+
+}
+
+
+const closeReviewButton =
+  document.getElementById(
+    "close-editor-book-review"
+  );
+
+
+if (closeReviewButton) {
+
+  closeReviewButton.addEventListener(
+    "click",
+    function () {
+
+      document.getElementById(
+        "editor-book-review"
+      ).style.display =
+        "none";
+
+    }
+  );
+
+}
+
 </script>
 
 
