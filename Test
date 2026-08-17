@@ -1299,6 +1299,9 @@ document.addEventListener(
 
 
 
+
+
+
       /* ===================================================
          LOAD AUTHOR PAYOUT ACCOUNT
       =================================================== */
@@ -1449,3 +1452,239 @@ document.addEventListener(
   </div>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   BOOK APPROVAL
+===================================================== */
+
+approveBookButton.addEventListener(
+  "click",
+  async function () {
+
+    if (!currentReviewBook) {
+      alert("No book is currently selected.");
+      return;
+    }
+
+    const confirmed =
+      confirm(
+        "Approve this book for publication?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    approveBookButton.disabled = true;
+    rejectBookButton.disabled = true;
+
+    const now =
+      new Date().toISOString();
+
+    const {
+      error: submissionError
+    } =
+      await supabaseClient
+        .from("book_submissions")
+        .update({
+          status: "approved",
+          reviewed_at: now,
+          reviewed_by: session.user.id
+        })
+        .eq(
+          "id",
+          currentReviewBook.id
+        );
+
+    if (submissionError) {
+
+      console.error(
+        "BOOK SUBMISSION APPROVAL ERROR:",
+        submissionError
+      );
+
+      alert(
+        "The book could not be approved."
+      );
+
+      approveBookButton.disabled = false;
+      rejectBookButton.disabled = false;
+
+      return;
+    }
+
+
+    const {
+      error: bookError
+    } =
+      await supabaseClient
+        .from("books")
+        .update({
+          status: "published",
+          submission_status: "approved",
+          published_at: now,
+          updated_at: now
+        })
+        .eq(
+          "id",
+          currentReviewBook.book_id
+        );
+
+
+    if (bookError) {
+
+      console.error(
+        "BOOK APPROVAL ERROR:",
+        bookError
+      );
+
+      alert(
+        "The submission was approved, but the book itself could not be updated."
+      );
+
+      approveBookButton.disabled = false;
+      rejectBookButton.disabled = false;
+
+      return;
+    }
+
+
+    alert(
+      "Book approved and published."
+    );
+
+
+    reviewPanel.style.display =
+      "none";
+
+
+    window.location.reload();
+
+  }
+);
+
+
+/* =====================================================
+   BOOK REJECTION
+===================================================== */
+
+rejectBookButton.addEventListener(
+  "click",
+  async function () {
+
+    if (!currentReviewBook) {
+      alert("No book is currently selected.");
+      return;
+    }
+
+    const confirmed =
+      confirm(
+        "Reject this book?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    approveBookButton.disabled = true;
+    rejectBookButton.disabled = true;
+
+    const now =
+      new Date().toISOString();
+
+
+    const {
+      error: submissionError
+    } =
+      await supabaseClient
+        .from("book_submissions")
+        .update({
+          status: "rejected",
+          reviewed_at: now,
+          reviewed_by: session.user.id
+        })
+        .eq(
+          "id",
+          currentReviewBook.id
+        );
+
+
+    if (submissionError) {
+
+      console.error(
+        "BOOK SUBMISSION REJECTION ERROR:",
+        submissionError
+      );
+
+      alert(
+        "The book could not be rejected."
+      );
+
+      approveBookButton.disabled = false;
+      rejectBookButton.disabled = false;
+
+      return;
+    }
+
+
+    const {
+      error: bookError
+    } =
+      await supabaseClient
+        .from("books")
+        .update({
+          status: "rejected",
+          submission_status: "rejected",
+          updated_at: now
+        })
+        .eq(
+          "id",
+          currentReviewBook.book_id
+        );
+
+
+    if (bookError) {
+
+      console.error(
+        "BOOK REJECTION ERROR:",
+        bookError
+      );
+
+      alert(
+        "The submission was rejected, but the book itself could not be updated."
+      );
+
+      approveBookButton.disabled = false;
+      rejectBookButton.disabled = false;
+
+      return;
+    }
+
+
+    alert(
+      "Book rejected."
+    );
+
+
+    reviewPanel.style.display =
+      "none";
+
+
+    window.location.reload();
+
+  }
+);
