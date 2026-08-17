@@ -1,0 +1,1265 @@
+<!-- =========================================================
+     LITDOM — EDITOR DASHBOARD — PHASE 1
+========================================================= -->
+
+<div id="litdom-editor-dashboard">
+
+  <div class="led-header">
+    <div>
+      <div class="led-eyebrow">LITDOM EDITORIAL</div>
+      <h1>Editor Dashboard</h1>
+      <p>Review submitted books and their chapters.</p>
+    </div>
+  </div>
+
+
+  <!-- BOOK LIST -->
+
+  <section class="led-section">
+
+    <div class="led-section-title">
+      <div>
+        <div class="led-eyebrow">SUBMISSIONS</div>
+        <h2>All Books</h2>
+      </div>
+
+      <div id="led-book-count" class="led-count">
+        0
+      </div>
+    </div>
+
+    <div id="led-books">
+      <div class="led-message">
+        Loading books...
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- =========================================================
+     BOOK REVIEW PANEL
+========================================================= -->
+
+<div
+  id="led-review-panel"
+  class="led-review-panel"
+  style="display:none;"
+>
+
+  <button
+    type="button"
+    id="led-close-review"
+    class="led-close"
+  >
+    ×
+  </button>
+
+
+  <div class="led-eyebrow">
+    BOOK REVIEW
+  </div>
+
+  <h2 id="led-review-title">
+    —
+  </h2>
+
+  <p id="led-review-author">
+    —
+  </p>
+
+
+  <div id="led-review-details">
+  </div>
+
+
+  <!-- CHAPTERS -->
+
+  <div class="led-chapters-area">
+
+    <div class="led-eyebrow">
+      CHAPTERS
+    </div>
+
+    <h3>
+      Book Chapters
+    </h3>
+
+    <div id="led-review-chapters">
+      Select a book to view its chapters.
+    </div>
+
+  </div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+#litdom-editor-dashboard {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 20px;
+  font-family: inherit;
+  color: #342731;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.led-header {
+  padding: 32px;
+  margin-bottom: 25px;
+
+  border-radius: 25px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2d2029,
+      #59354b
+    );
+
+  color: white;
+
+  box-shadow:
+    0 18px 45px
+    rgba(50, 30, 42, .18);
+}
+
+.led-header h1 {
+  margin: 5px 0 8px;
+  font-size: 36px;
+}
+
+.led-header p {
+  margin: 0;
+  color: #eadce3;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.led-eyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #a45b82;
+}
+
+.led-header .led-eyebrow {
+  color: #e8b7d0;
+}
+
+
+/* =========================================================
+   SECTION
+========================================================= */
+
+.led-section {
+  padding: 25px;
+
+  border-radius: 23px;
+
+  background: #fff;
+
+  border: 1px solid #eadde5;
+
+  box-shadow:
+    0 10px 30px
+    rgba(70, 40, 55, .06);
+}
+
+
+.led-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+}
+
+.led-section-title h2 {
+  margin: 4px 0 0;
+  font-size: 22px;
+}
+
+
+.led-count {
+  min-width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f4e5ed;
+
+  color: #66394f;
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.led-message {
+  padding: 25px;
+
+  border-radius: 16px;
+
+  background: #faf6f8;
+
+  border: 1px dashed #decbd6;
+
+  text-align: center;
+
+  color: #927c87;
+}
+
+
+/* =========================================================
+   BOOK CARD
+========================================================= */
+
+.led-book-card {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  padding: 17px;
+
+  margin-bottom: 13px;
+
+  border-radius: 18px;
+
+  background: #fffafd;
+
+  border: 1px solid #eee0e8;
+}
+
+
+.led-book-cover {
+  width: 65px;
+  height: 90px;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ead4df,
+      #f8edf3
+    );
+
+  background-size: cover;
+  background-position: center;
+}
+
+
+.led-book-info {
+  flex: 1;
+  min-width: 0;
+}
+
+
+.led-book-info h3 {
+  margin: 0 0 5px;
+
+  font-size: 18px;
+
+  color: #432d39;
+}
+
+
+.led-book-info p {
+  margin: 3px 0;
+
+  color: #897581;
+
+  font-size: 13px;
+}
+
+
+.led-status {
+  display: inline-block;
+
+  margin-top: 7px;
+
+  padding: 5px 10px;
+
+  border-radius: 999px;
+
+  background: #f3e5ec;
+
+  color: #814d69;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  text-transform: capitalize;
+}
+
+
+.led-review-button {
+  flex-shrink: 0;
+
+  padding: 10px 15px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  background: #5d334b;
+
+  color: white;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   REVIEW PANEL
+========================================================= */
+
+.led-review-panel {
+  position: fixed;
+
+  z-index: 99999;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  width: min(
+    750px,
+    calc(100% - 25px)
+  );
+
+  max-height: 88vh;
+
+  overflow-y: auto;
+
+  padding: 30px;
+
+  border-radius: 25px;
+
+  background: white;
+
+  border: 1px solid #eadde5;
+
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.30);
+}
+
+
+.led-review-panel h2 {
+  margin: 5px 0;
+
+  color: #392831;
+}
+
+
+#led-review-author {
+  color: #806b76;
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.led-close {
+  position: absolute;
+
+  top: 14px;
+  right: 15px;
+
+  width: 36px;
+  height: 36px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #f5e9ef;
+
+  color: #65394f;
+
+  font-size: 23px;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+#led-review-details {
+  margin-top: 20px;
+}
+
+
+.led-detail {
+  padding: 13px 0;
+
+  border-bottom:
+    1px solid #f0e5eb;
+}
+
+
+.led-detail-label {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #9a8290;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+}
+
+
+.led-detail-value {
+  white-space: pre-wrap;
+
+  color: #55434d;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   CHAPTERS
+========================================================= */
+
+.led-chapters-area {
+  margin-top: 30px;
+
+  padding-top: 25px;
+
+  border-top:
+    1px solid #eadde5;
+}
+
+
+.led-chapters-area h3 {
+  margin: 5px 0 18px;
+
+  color: #432d39;
+}
+
+
+.led-chapter {
+  margin-bottom: 15px;
+
+  padding: 18px;
+
+  border-radius: 18px;
+
+  background: #fffafd;
+
+  border: 1px solid #eadde5;
+}
+
+
+.led-chapter h4 {
+  margin: 0 0 10px;
+
+  color: #432d39;
+
+  font-size: 17px;
+}
+
+
+.led-chapter-meta {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 7px;
+
+  margin-bottom: 13px;
+}
+
+
+.led-chapter-badge {
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  background: #f3e5ec;
+
+  color: #75455f;
+
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+
+.led-chapter-content {
+  padding: 15px;
+
+  border-radius: 12px;
+
+  background: #faf7f9;
+
+  white-space: pre-wrap;
+
+  line-height: 1.7;
+
+  color: #51414a;
+
+  max-height: 400px;
+
+  overflow-y: auto;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+  #litdom-editor-dashboard {
+    padding: 12px;
+  }
+
+  .led-header {
+    padding: 25px 20px;
+  }
+
+  .led-header h1 {
+    font-size: 29px;
+  }
+
+  .led-section {
+    padding: 18px;
+  }
+
+  .led-book-card {
+    align-items: flex-start;
+  }
+
+  .led-book-cover {
+    width: 55px;
+    height: 78px;
+  }
+
+  .led-review-button {
+    padding: 9px 11px;
+  }
+
+  .led-review-panel {
+    padding: 23px 18px;
+  }
+
+}
+
+</style>
+
+
+<script>
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async function () {
+
+    /* =====================================================
+       SUPABASE
+    ===================================================== */
+
+    const SUPABASE_URL =
+      "https://uniecvgkxhcbedppadgx.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_UhqP7y8Cjyiv8RebOSMUDA_lBj0QuTE";
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        }
+      );
+
+
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
+
+    const booksContainer =
+      document.getElementById(
+        "led-books"
+      );
+
+    const bookCount =
+      document.getElementById(
+        "led-book-count"
+      );
+
+    const reviewPanel =
+      document.getElementById(
+        "led-review-panel"
+      );
+
+    const closeReview =
+      document.getElementById(
+        "led-close-review"
+      );
+
+
+    /* =====================================================
+       CHECK LOGIN
+    ===================================================== */
+
+    const {
+      data: {
+        session
+      }
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (!session) {
+
+      booksContainer.innerHTML =
+        "<div class='led-message'>" +
+        "Please log in to use the Editor Dashboard." +
+        "</div>";
+
+      return;
+    }
+
+
+    /* =====================================================
+       LOAD ALL BOOK SUBMISSIONS
+    ===================================================== */
+
+    booksContainer.innerHTML =
+      "<div class='led-message'>" +
+      "Loading books..." +
+      "</div>";
+
+
+    const {
+      data: submissions,
+      error
+    } =
+      await supabaseClient
+        .from("book_submissions")
+        .select(
+          "id,author_id,book_id,title,description,genre,cover_url,status,created_at,submitted_at,subgenre,book_outline,protagonist,antagonist,additional_details,author_details"
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
+
+
+    if (error) {
+
+      console.error(
+        "EDITOR BOOK LOAD ERROR:",
+        error
+      );
+
+      booksContainer.innerHTML =
+        "<div class='led-message'>" +
+        "Could not load book submissions." +
+        "</div>";
+
+      return;
+    }
+
+
+    const books =
+      submissions || [];
+
+
+    bookCount.textContent =
+      books.length;
+
+
+    if (books.length === 0) {
+
+      booksContainer.innerHTML =
+        "<div class='led-message'>" +
+        "No book submissions yet." +
+        "</div>";
+
+      return;
+    }
+
+
+    /* =====================================================
+       DISPLAY BOOKS
+    ===================================================== */
+
+    booksContainer.innerHTML = "";
+
+
+    books.forEach(
+      function (book) {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+        card.className =
+          "led-book-card";
+
+
+        const cover =
+          document.createElement(
+            "div"
+          );
+
+        cover.className =
+          "led-book-cover";
+
+
+        if (book.cover_url) {
+
+          cover.style.backgroundImage =
+            "url('" +
+            book.cover_url +
+            "')";
+
+        }
+
+
+        const info =
+          document.createElement(
+            "div"
+          );
+
+        info.className =
+          "led-book-info";
+
+
+        const title =
+          document.createElement(
+            "h3"
+          );
+
+        title.textContent =
+          book.title ||
+          "Untitled Book";
+
+
+        const author =
+          document.createElement(
+            "p"
+          );
+
+        const authorDetails =
+          book.author_details ||
+          {};
+
+        author.textContent =
+          "Author: " +
+          (
+            authorDetails.pen_name ||
+            authorDetails.full_name ||
+            "Unknown"
+          );
+
+
+        const genre =
+          document.createElement(
+            "p"
+          );
+
+        genre.textContent =
+          "Genre: " +
+          (
+            book.genre ||
+            "Not specified"
+          );
+
+
+        const status =
+          document.createElement(
+            "span"
+          );
+
+        status.className =
+          "led-status";
+
+        status.textContent =
+          book.status ||
+          "draft";
+
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+        button.type =
+          "button";
+
+        button.className =
+          "led-review-button";
+
+        button.textContent =
+          "Open Review";
+
+
+        button.addEventListener(
+          "click",
+          function () {
+
+            openBookReview(
+              book
+            );
+
+          }
+        );
+
+
+        info.appendChild(title);
+        info.appendChild(author);
+        info.appendChild(genre);
+        info.appendChild(status);
+
+        card.appendChild(cover);
+        card.appendChild(info);
+        card.appendChild(button);
+
+        booksContainer.appendChild(card);
+
+      }
+    );
+
+
+    /* =====================================================
+       OPEN BOOK REVIEW
+    ===================================================== */
+
+    async function openBookReview(
+      book
+    ) {
+
+      const title =
+        document.getElementById(
+          "led-review-title"
+        );
+
+      const author =
+        document.getElementById(
+          "led-review-author"
+        );
+
+      const details =
+        document.getElementById(
+          "led-review-details"
+        );
+
+      const chapters =
+        document.getElementById(
+          "led-review-chapters"
+        );
+
+
+      title.textContent =
+        book.title ||
+        "Untitled Book";
+
+
+      const authorDetails =
+        book.author_details ||
+        {};
+
+
+      author.textContent =
+        "Author: " +
+        (
+          authorDetails.pen_name ||
+          authorDetails.full_name ||
+          "Unknown author"
+        );
+
+
+      details.innerHTML = "";
+
+
+      addDetail(
+        details,
+        "Status",
+        book.status ||
+        "Not provided"
+      );
+
+
+      addDetail(
+        details,
+        "Genre",
+        book.genre
+      );
+
+
+      addDetail(
+        details,
+        "Subgenre",
+        book.subgenre
+      );
+
+
+      addDetail(
+        details,
+        "Description",
+        book.description
+      );
+
+
+      addDetail(
+        details,
+        "Book Outline",
+        book.book_outline
+      );
+
+
+      addDetail(
+        details,
+        "Author Name",
+        authorDetails.full_name
+      );
+
+
+      addDetail(
+        details,
+        "Pen Name",
+        authorDetails.pen_name
+      );
+
+
+      addDetail(
+        details,
+        "Author Bio",
+        authorDetails.bio
+      );
+
+
+      chapters.innerHTML =
+        "<div class='led-message'>" +
+        "Loading chapters..." +
+        "</div>";
+
+
+      reviewPanel.style.display =
+        "block";
+
+
+      /* ===================================================
+         LOAD CHAPTERS FOR THIS BOOK
+      =================================================== */
+
+      if (!book.book_id) {
+
+        chapters.innerHTML =
+          "<div class='led-message'>" +
+          "This submission is not connected to a book yet." +
+          "</div>";
+
+        return;
+      }
+
+
+      const {
+        data: chapterRows,
+        error: chapterError
+      } =
+        await supabaseClient
+          .from("chapters")
+          .select(
+            "id,book_id,chapter_number,title,content,status,word_count,is_locked,unlock_cost,updated_at,created_at,published_at,submitted_at,reviewed_at,reviewed_by,deletion_requested"
+          )
+          .eq(
+            "book_id",
+            book.book_id
+          )
+          .order(
+            "chapter_number",
+            {
+              ascending: true
+            }
+          );
+
+
+      if (chapterError) {
+
+        console.error(
+          "EDITOR CHAPTER LOAD ERROR:",
+          chapterError
+        );
+
+        chapters.innerHTML =
+          "<div class='led-message'>" +
+          "Could not load the chapters for this book." +
+          "</div>";
+
+        return;
+      }
+
+
+      const rows =
+        chapterRows || [];
+
+
+      if (rows.length === 0) {
+
+        chapters.innerHTML =
+          "<div class='led-message'>" +
+          "No chapters have been added to this book yet." +
+          "</div>";
+
+        return;
+      }
+
+
+      chapters.innerHTML = "";
+
+
+      rows.forEach(
+        function (chapter) {
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+          card.className =
+            "led-chapter";
+
+
+          const heading =
+            document.createElement(
+              "h4"
+            );
+
+          heading.textContent =
+            "Chapter " +
+            (
+              chapter.chapter_number ??
+              "—"
+            ) +
+            " — " +
+            (
+              chapter.title ||
+              "Untitled Chapter"
+            );
+
+
+          const meta =
+            document.createElement(
+              "div"
+            );
+
+          meta.className =
+            "led-chapter-meta";
+
+
+          addChapterBadge(
+            meta,
+            "Status: " +
+            (
+              chapter.status ||
+              "draft"
+            )
+          );
+
+
+          addChapterBadge(
+            meta,
+            "Words: " +
+            (
+              chapter.word_count ||
+              0
+            )
+          );
+
+
+          addChapterBadge(
+            meta,
+            "Locked: " +
+            (
+              chapter.is_locked
+                ? "Yes"
+                : "No"
+            )
+          );
+
+
+          if (
+            chapter.unlock_cost !==
+            null &&
+            chapter.unlock_cost !==
+            undefined
+          ) {
+
+            addChapterBadge(
+              meta,
+              "Unlock: " +
+              chapter.unlock_cost
+            );
+
+          }
+
+
+          const content =
+            document.createElement(
+              "div"
+            );
+
+          content.className =
+            "led-chapter-content";
+
+          content.textContent =
+            chapter.content ||
+            "No chapter content available.";
+
+
+          card.appendChild(
+            heading
+          );
+
+          card.appendChild(
+            meta
+          );
+
+          card.appendChild(
+            content
+          );
+
+          chapters.appendChild(
+            card
+          );
+
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       CLOSE REVIEW
+    ===================================================== */
+
+    closeReview.addEventListener(
+      "click",
+      function () {
+
+        reviewPanel.style.display =
+          "none";
+
+      }
+    );
+
+
+    /* =====================================================
+       HELPER: BOOK DETAIL
+    ===================================================== */
+
+    function addDetail(
+      container,
+      label,
+      value
+    ) {
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+      row.className =
+        "led-detail";
+
+
+      const labelElement =
+        document.createElement(
+          "span"
+        );
+
+      labelElement.className =
+        "led-detail-label";
+
+      labelElement.textContent =
+        label;
+
+
+      const valueElement =
+        document.createElement(
+          "div"
+        );
+
+      valueElement.className =
+        "led-detail-value";
+
+      valueElement.textContent =
+        value ||
+        "Not provided";
+
+
+      row.appendChild(
+        labelElement
+      );
+
+      row.appendChild(
+        valueElement
+      );
+
+
+      container.appendChild(
+        row
+      );
+
+    }
+
+
+    /* =====================================================
+       HELPER: CHAPTER BADGE
+    ===================================================== */
+
+    function addChapterBadge(
+      container,
