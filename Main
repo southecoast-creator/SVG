@@ -1,0 +1,75 @@
+if (!session) {
+
+  const popup =
+    document.createElement("div");
+
+  popup.className =
+    "litdom-auth-popup";
+
+  popup.innerHTML = `
+    <div class="litdom-auth-box">
+
+      <button
+        type="button"
+        class="litdom-auth-close"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      <h3>
+        Continue Reading
+      </h3>
+
+      <p>
+        Sign in or create a free Litdom account
+        to continue reading this book.
+      </p>
+
+      <a
+        href="/p/sign-up-for-litdom.html"
+        class="litdom-auth-button"
+      >
+        Sign In / Create Account
+      </a>
+
+    </div>
+  `;
+
+  document.body.appendChild(
+    popup
+  );
+
+
+  popup
+    .querySelector(
+      ".litdom-auth-close"
+    )
+    .addEventListener(
+      "click",
+      function () {
+
+        popup.remove();
+
+      }
+    );
+
+
+  popup.addEventListener(
+    "click",
+    function (event) {
+
+      if (
+        event.target === popup
+      ) {
+
+        popup.remove();
+
+      }
+
+    }
+  );
+
+
+  return;
+}
