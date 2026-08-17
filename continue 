@@ -306,3 +306,204 @@
 .litdom-chapter-action:hover {
   transform: scale(1.06);
 }
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   REAL CHAPTER LIKE
+===================================================== */
+
+async function loadChapterLikeState() {
+
+  const {
+    data: existingLike,
+    error: likeError
+  } =
+    await client
+      .from("chapter_likes")
+      .select("id")
+      .eq(
+        "chapter_id",
+        chapter.id
+      )
+      .eq(
+        "user_id",
+        session.user.id
+      )
+      .maybeSingle();
+
+
+  if (likeError) {
+
+    console.error(
+      "LIKE CHECK ERROR:",
+      likeError
+    );
+
+    return;
+
+  }
+
+
+  if (existingLike) {
+
+    likeButton.classList.add(
+      "liked"
+    );
+
+  }
+
+}
+
+
+async function loadChapterLikeCount() {
+
+  const {
+    count,
+    error: countError
+  } =
+    await client
+      .from("chapter_likes")
+      .select(
+        "id",
+        {
+          count: "exact",
+          head: true
+        }
+      )
+      .eq(
+        "chapter_id",
+        chapter.id
+      );
+
+
+  if (countError) {
+
+    console.error(
+      "LIKE COUNT ERROR:",
+      countError
+    );
+
+    return;
+
+  }
+
+
+  likeCount.textContent =
+    count || 0;
+
+}
+
+
+likeButton.addEventListener(
+  "click",
+  async function () {
+
+    if (
+      likeButton.dataset.busy ===
+      "true"
+    ) {
+
+      return;
+
+    }
+
+
+    likeButton.dataset.busy =
+      "true";
+
+
+    const isLiked =
+      likeButton.classList.contains(
+        "liked"
+      );
+
+
+    if (isLiked) {
+
+      /* REMOVE LIKE */
+
+      const {
+        error
+      } =
+        await client
+          .from("chapter_likes")
+          .delete()
+          .eq(
+            "chapter_id",
+            chapter.id
+          )
+          .eq(
+            "user_id",
+            session.user.id
+          );
+
+
+      if (error) {
+
+        console.error(
+          "UNLIKE ERROR:",
+          error
+        );
+
+      } else {
+
+        likeButton.classList.remove(
+          "liked"
+        );
+
+      }
+
+    } else {
+
+      /* ADD LIKE */
+
+      const {
+        error
+      } =
+        await client
+          .from("chapter_likes")
+          .insert({
+            chapter_id:
+              chapter.id,
+
+            user_id:
+              session.user.id
+          });
+
+
+      if (error) {
+
+        console.error(
+          "LIKE ERROR:",
+          error
+        );
+
+      } else {
+
+        likeButton.classList.add(
+          "liked"
+        );
+
+      }
+
+    }
+
+
+    await loadChapterLikeCount();
+
+    likeButton.dataset.busy =
+      "false";
+
+  }
+);
+
+
+await loadChapterLikeState();
