@@ -1263,3 +1263,27 @@ document.addEventListener(
 
     function addChapterBadge(
       container,
+      label
+    ) {
+
+      const badge =
+        document.createElement(
+          "span"
+        );
+
+      badge.className =
+        "led-chapter-badge";
+
+      badge.textContent =
+        label;
+
+      container.appendChild(
+        badge
+      );
+
+    }
+
+  }
+);
+
+</script>
