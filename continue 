@@ -236,3 +236,73 @@
 .litdom-chapter-action:hover {
   transform: scale(1.06);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+.litdom-chapter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+
+  margin: 32px 0 48px;
+  padding: 18px 0;
+
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.litdom-chapter-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border: 0;
+  background: transparent;
+
+  padding: 8px;
+
+  color: #555;
+
+  cursor: pointer;
+
+  font-size: 12px;
+}
+
+.litdom-chapter-action svg {
+  width: 24px;
+  height: 24px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.litdom-chapter-action.liked {
+  color: #f2c94c;
+}
+
+.litdom-chapter-action.liked svg {
+  fill: #f2c94c;
+  stroke: #f2c94c;
+}
+
+.litdom-chapter-action:hover {
+  transform: scale(1.06);
+}
