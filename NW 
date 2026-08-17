@@ -1,0 +1,108 @@
+/* =====================================================
+   CONTINUE READING
+===================================================== */
+
+const continueReading =
+  document.getElementById(
+    "litdom-continue-reading"
+  );
+
+if (continueReading) {
+
+  continueReading.addEventListener(
+    "click",
+    async function () {
+
+      /* CHECK CURRENT SESSION */
+
+      const {
+        data: {
+          session
+        }
+      } =
+        await client.auth.getSession();
+
+
+      /* NOT SIGNED IN */
+
+      if (!session) {
+
+        alert(
+          "Please sign in or create a free account to continue reading."
+        );
+
+        return;
+      }
+
+
+      /* SIGNED IN */
+
+      const {
+        data: firstChapter,
+        error: chapterError
+      } =
+        await client
+          .from("chapters")
+          .select(`
+            id,
+            chapter_number
+          `)
+          .eq(
+            "book_id",
+            book.id
+          )
+          .eq(
+            "status",
+            "published"
+          )
+          .order(
+            "chapter_number",
+            {
+              ascending: true
+            }
+          )
+          .limit(1)
+          .maybeSingle();
+
+
+      if (chapterError) {
+
+        console.error(
+          "CONTINUE READING ERROR:",
+          chapterError
+        );
+
+        alert(
+          "We couldn't open the chapter right now."
+        );
+
+        return;
+      }
+
+
+      if (!firstChapter) {
+
+        alert(
+          "This book doesn't have a published chapter yet."
+        );
+
+        return;
+      }
+
+
+      /* OPEN READER */
+
+      window.location.href =
+        "/p/reader.html?book=" +
+        encodeURIComponent(
+          book.id
+        ) +
+        "&chapter=" +
+        encodeURIComponent(
+          firstChapter.id
+        );
+
+    }
+  );
+
+}
