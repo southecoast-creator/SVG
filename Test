@@ -1287,3 +1287,89 @@ document.addEventListener(
 );
 
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+      /* ===================================================
+         LOAD AUTHOR PAYOUT ACCOUNT
+      =================================================== */
+
+      const {
+        data: payoutAccount,
+        error: payoutError
+      } =
+        await supabaseClient
+          .from("payout_accounts")
+          .select(
+            "account_name,bank_name,account_number,is_primary"
+          )
+          .eq(
+            "author_id",
+            book.author_id
+          )
+          .eq(
+            "is_primary",
+            true
+          )
+          .maybeSingle();
+
+
+      if (payoutError) {
+
+        console.error(
+          "EDITOR PAYOUT ACCOUNT LOAD ERROR:",
+          payoutError
+        );
+
+        addDetail(
+          details,
+          "Bank Account",
+          "Could not load payout information."
+        );
+
+      } else if (payoutAccount) {
+
+        addDetail(
+          details,
+          "Account Name",
+          payoutAccount.account_name
+        );
+
+        addDetail(
+          details,
+          "Bank Name",
+          payoutAccount.bank_name
+        );
+
+        addDetail(
+          details,
+          "Account Number",
+          payoutAccount.account_number
+        );
+
+        addDetail(
+          details,
+          "Primary Account",
+          payoutAccount.is_primary
+            ? "Yes"
+            : "No"
+        );
+
+      } else {
+
+        addDetail(
+          details,
+          "Bank Account",
+          "No primary payout account has been added."
+        );
+
+      }
