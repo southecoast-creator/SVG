@@ -1669,3 +1669,107 @@ if (
 }
 
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="litdom-book-stats">
+
+  <!-- VIEWS -->
+
+  <span class="litdom-stat">
+
+    <svg
+      class="litdom-stat-icon"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        d="M2 12s3.5-6 10-6
+           10 6 10 6-3.5 6-10 6
+           -10-6-10-6Z"
+      />
+
+      <circle
+        cx="12"
+        cy="12"
+        r="3"
+      />
+    </svg>
+
+    <strong id="litdom-book-views">
+      0
+    </strong>
+
+  </span>
+
+
+  <!-- LIKES -->
+
+  <button
+    type="button"
+    id="litdom-like-button"
+    aria-label="Like this book"
+    aria-pressed="false"
+  >
+
+    <svg
+      id="litdom-like-heart"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+
+      <path
+        d="M20.84 4.61
+           a5.5 5.5 0 0 0-7.78 0
+           L12 5.67
+           10.94 4.61
+           a5.5 5.5 0 0 0-7.78 7.78
+           L12 21.23
+           l8.84-8.84
+           a5.5 5.5 0 0 0 0-7.78Z"
+      />
+
+    </svg>
+
+    <strong id="litdom-book-likes">
+      0
+    </strong>
+
+  </button>
+
+
+  <!-- COMMENTS -->
+
+  <span class="litdom-stat">
+
+    <svg
+      class="litdom-stat-icon"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+
+      <path
+        d="M20 11.5
+           a7.5 7.5 0 0 1-7.5 7.5
+           H8l-4 3v-5
+           a7.5 7.5 0 1 1 16-5.5Z"
+      />
+
+    </svg>
+
+    <strong id="litdom-book-comments">
+      0
+    </strong>
+
+  </span>
+
+</section>
