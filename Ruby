@@ -1,0 +1,697 @@
+rows.forEach(
+  function (chapter) {
+
+    const card =
+      document.createElement(
+        "div"
+      );
+
+    card.className =
+      "led-chapter";
+
+
+    /* =================================================
+       CHAPTER HEADING
+    ================================================= */
+
+    const heading =
+      document.createElement(
+        "h4"
+      );
+
+    heading.textContent =
+      "Chapter " +
+      (
+        chapter.chapter_number ??
+        "—"
+      ) +
+      " — " +
+      (
+        chapter.title ||
+        "Untitled Chapter"
+      );
+
+
+    /* =================================================
+       CHAPTER META
+    ================================================= */
+
+    const meta =
+      document.createElement(
+        "div"
+      );
+
+    meta.className =
+      "led-chapter-meta";
+
+
+    addChapterBadge(
+      meta,
+      "Status: " +
+      (
+        chapter.status ||
+        "draft"
+      )
+    );
+
+
+    addChapterBadge(
+      meta,
+      "Words: " +
+      (
+        chapter.word_count ||
+        0
+      )
+    );
+
+
+    addChapterBadge(
+      meta,
+      "Locked: " +
+      (
+        chapter.is_locked
+          ? "Yes"
+          : "No"
+      )
+    );
+
+
+    addChapterBadge(
+      meta,
+      "Ruby: " +
+      (
+        chapter.unlock_cost !== null &&
+        chapter.unlock_cost !== undefined &&
+        chapter.unlock_cost !== ""
+          ? chapter.unlock_cost
+          : "Not set"
+      )
+    );
+
+
+    /* =================================================
+       CHAPTER CONTENT
+    ================================================= */
+
+    const content =
+      document.createElement(
+        "div"
+      );
+
+    content.className =
+      "led-chapter-content";
+
+    content.textContent =
+      chapter.content ||
+      "No chapter content available.";
+
+
+    /* =================================================
+       RUBY PRICE CONTROL
+    ================================================= */
+
+    const rubyControl =
+      document.createElement(
+        "div"
+      );
+
+    rubyControl.style.marginTop =
+      "15px";
+
+    rubyControl.style.padding =
+      "15px";
+
+    rubyControl.style.borderRadius =
+      "14px";
+
+    rubyControl.style.background =
+      "#faf6f8";
+
+    rubyControl.style.border =
+      "1px solid #eadde5";
+
+
+    const rubyLabel =
+      document.createElement(
+        "label"
+      );
+
+    rubyLabel.textContent =
+      "Ruby price for this chapter";
+
+    rubyLabel.style.display =
+      "block";
+
+    rubyLabel.style.marginBottom =
+      "7px";
+
+    rubyLabel.style.fontWeight =
+      "700";
+
+    rubyLabel.style.fontSize =
+      "12px";
+
+
+    const rubyInput =
+      document.createElement(
+        "input"
+      );
+
+    rubyInput.type =
+      "number";
+
+    rubyInput.min =
+      "1";
+
+    rubyInput.step =
+      "1";
+
+    rubyInput.placeholder =
+      "Leave empty for free chapter";
+
+    rubyInput.value =
+      (
+        chapter.unlock_cost !== null &&
+        chapter.unlock_cost !== undefined
+      )
+        ? chapter.unlock_cost
+        : "";
+
+    rubyInput.style.width =
+      "100%";
+
+    rubyInput.style.boxSizing =
+      "border-box";
+
+    rubyInput.style.padding =
+      "10px";
+
+    rubyInput.style.borderRadius =
+      "10px";
+
+    rubyInput.style.border =
+      "1px solid #decbd6";
+
+
+    const saveRubyButton =
+      document.createElement(
+        "button"
+      );
+
+    saveRubyButton.type =
+      "button";
+
+    saveRubyButton.textContent =
+      "Save Ruby Price";
+
+    saveRubyButton.className =
+      "led-action-button";
+
+    saveRubyButton.style.marginTop =
+      "9px";
+
+
+    saveRubyButton.addEventListener(
+      "click",
+      async function () {
+
+        const rawValue =
+          rubyInput.value.trim();
+
+
+        /*
+         * EMPTY RUBY PRICE
+         *
+         * Empty means:
+         * - no Ruby charge
+         * - chapter remains unlocked
+         */
+
+        if (rawValue === "") {
+
+          saveRubyButton.disabled =
+            true;
+
+
+          const {
+            error
+          } =
+            await supabaseClient
+              .from("chapters")
+              .update({
+                unlock_cost: null,
+                is_locked: false,
+                updated_at:
+                  new Date().toISOString()
+              })
+              .eq(
+                "id",
+                chapter.id
+              );
+
+
+          saveRubyButton.disabled =
+            false;
+
+
+          if (error) {
+
+            console.error(
+              "CLEAR CHAPTER RUBY PRICE ERROR:",
+              error
+            );
+
+            alert(
+              "The Ruby price could not be cleared."
+            );
+
+            return;
+          }
+
+
+          chapter.unlock_cost =
+            null;
+
+          chapter.is_locked =
+            false;
+
+
+          alert(
+            "Ruby price cleared. This chapter is now free."
+          );
+
+
+          openBookReview(
+            currentReviewBook
+          );
+
+          return;
+        }
+
+
+        const rubyPrice =
+          Number(
+            rawValue
+          );
+
+
+        if (
+          !Number.isInteger(
+            rubyPrice
+          ) ||
+          rubyPrice <= 0
+        ) {
+
+          alert(
+            "Enter a valid Ruby amount greater than zero."
+          );
+
+          return;
+        }
+
+
+        saveRubyButton.disabled =
+          true;
+
+
+        const {
+          error
+        } =
+          await supabaseClient
+            .from("chapters")
+            .update({
+              unlock_cost:
+                rubyPrice,
+
+              is_locked:
+                true,
+
+              updated_at:
+                new Date().toISOString()
+            })
+            .eq(
+              "id",
+              chapter.id
+            );
+
+
+        saveRubyButton.disabled =
+          false;
+
+
+        if (error) {
+
+          console.error(
+            "SAVE CHAPTER RUBY PRICE ERROR:",
+            error
+          );
+
+          alert(
+            "The Ruby price could not be saved."
+          );
+
+          return;
+        }
+
+
+        chapter.unlock_cost =
+          rubyPrice;
+
+        chapter.is_locked =
+          true;
+
+
+        alert(
+          "Ruby price saved. This chapter is now locked."
+        );
+
+
+        openBookReview(
+          currentReviewBook
+        );
+
+      }
+    );
+
+
+    rubyControl.appendChild(
+      rubyLabel
+    );
+
+    rubyControl.appendChild(
+      rubyInput
+    );
+
+    rubyControl.appendChild(
+      saveRubyButton
+    );
+
+
+    /* =================================================
+       REVIEW ACTIONS
+    ================================================= */
+
+    const actions =
+      document.createElement(
+        "div"
+      );
+
+    actions.style.display =
+      "flex";
+
+    actions.style.flexWrap =
+      "wrap";
+
+    actions.style.gap =
+      "8px";
+
+    actions.style.marginTop =
+      "15px";
+
+
+    /* =================================================
+       APPROVE CHAPTER BUTTON
+    ================================================= */
+
+    const approveChapterButton =
+      document.createElement(
+        "button"
+      );
+
+    approveChapterButton.type =
+      "button";
+
+    approveChapterButton.textContent =
+      "Approve Chapter";
+
+    approveChapterButton.className =
+      "led-action-button";
+
+
+    approveChapterButton.addEventListener(
+      "click",
+      async function () {
+
+        if (
+          chapter.status ===
+          "approved"
+        ) {
+
+          alert(
+            "This chapter is already approved."
+          );
+
+          return;
+        }
+
+
+        const confirmed =
+          confirm(
+            "Approve Chapter " +
+            (
+              chapter.chapter_number ??
+              ""
+            ) +
+            "?"
+          );
+
+
+        if (!confirmed) {
+          return;
+        }
+
+
+        approveChapterButton.disabled =
+          true;
+
+        rejectChapterButton.disabled =
+          true;
+
+
+        const now =
+          new Date().toISOString();
+
+
+        const {
+          error
+        } =
+          await supabaseClient
+            .from("chapters")
+            .update({
+
+              status:
+                "approved",
+
+              reviewed_at:
+                now,
+
+              reviewed_by:
+                session.user.id,
+
+              published_at:
+                now,
+
+              updated_at:
+                now
+
+            })
+            .eq(
+              "id",
+              chapter.id
+            );
+
+
+        if (error) {
+
+          console.error(
+            "CHAPTER APPROVAL ERROR:",
+            error
+          );
+
+
+          alert(
+            "The chapter could not be approved."
+          );
+
+
+          approveChapterButton.disabled =
+            false;
+
+          rejectChapterButton.disabled =
+            false;
+
+          return;
+        }
+
+
+        alert(
+          "Chapter approved."
+        );
+
+
+        openBookReview(
+          currentReviewBook
+        );
+
+      }
+    );
+
+
+    /* =================================================
+       REJECT CHAPTER BUTTON
+    ================================================= */
+
+    const rejectChapterButton =
+      document.createElement(
+        "button"
+      );
+
+    rejectChapterButton.type =
+      "button";
+
+    rejectChapterButton.textContent =
+      "Reject Chapter";
+
+    rejectChapterButton.className =
+      "led-action-button";
+
+
+    rejectChapterButton.style.background =
+      "#8b4055";
+
+
+    rejectChapterButton.addEventListener(
+      "click",
+      async function () {
+
+        const confirmed =
+          confirm(
+            "Reject Chapter " +
+            (
+              chapter.chapter_number ??
+              ""
+            ) +
+            "?"
+          );
+
+
+        if (!confirmed) {
+          return;
+        }
+
+
+        approveChapterButton.disabled =
+          true;
+
+        rejectChapterButton.disabled =
+          true;
+
+
+        const now =
+          new Date().toISOString();
+
+
+        const {
+          error
+        } =
+          await supabaseClient
+            .from("chapters")
+            .update({
+
+              status:
+                "rejected",
+
+              reviewed_at:
+                now,
+
+              reviewed_by:
+                session.user.id,
+
+              updated_at:
+                now
+
+            })
+            .eq(
+              "id",
+              chapter.id
+            );
+
+
+        if (error) {
+
+          console.error(
+            "CHAPTER REJECTION ERROR:",
+            error
+          );
+
+
+          alert(
+            "The chapter could not be rejected."
+          );
+
+
+          approveChapterButton.disabled =
+            false;
+
+          rejectChapterButton.disabled =
+            false;
+
+          return;
+        }
+
+
+        alert(
+          "Chapter rejected."
+        );
+
+
+        openBookReview(
+          currentReviewBook
+        );
+
+      }
+    );
+
+
+    actions.appendChild(
+      approveChapterButton
+    );
+
+    actions.appendChild(
+      rejectChapterButton
+    );
+
+
+    /* =================================================
+       ADD EVERYTHING TO CHAPTER CARD
+    ================================================= */
+
+    card.appendChild(
+      heading
+    );
+
+    card.appendChild(
+      meta
+    );
+
+    card.appendChild(
+      content
+    );
+
+    card.appendChild(
+      rubyControl
+    );
+
+    card.appendChild(
+      actions
+    );
+
+
+    chapters.appendChild(
+      card
+    );
+
+  }
+);
+
+}
