@@ -695,3 +695,175 @@ rows.forEach(
 );
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const approveChapterButton =
+  document.createElement(
+    "button"
+  );
+
+approveChapterButton.type =
+  "button";
+
+approveChapterButton.className =
+  "led-action-button";
+
+
+/* =====================================================
+   CHAPTER APPROVAL BUTTON STATE
+===================================================== */
+
+if (
+  chapter.status ===
+    "published"
+) {
+
+  approveChapterButton.textContent =
+    "✓ Approved";
+
+  approveChapterButton.disabled =
+    true;
+
+  approveChapterButton.style.opacity =
+    "0.65";
+
+  approveChapterButton.style.cursor =
+    "default";
+
+} else {
+
+  approveChapterButton.textContent =
+    "Approve Chapter";
+
+
+  approveChapterButton.addEventListener(
+    "click",
+    async function () {
+
+      if (!currentReviewBook) {
+
+        alert(
+          "No book is currently selected."
+        );
+
+        return;
+      }
+
+
+      const confirmed =
+        confirm(
+          "Approve Chapter " +
+          (
+            chapter.chapter_number ??
+            ""
+          ) +
+          "?"
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      approveChapterButton.disabled =
+        true;
+
+      rejectChapterButton.disabled =
+        true;
+
+
+      const now =
+        new Date().toISOString();
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("chapters")
+          .update({
+
+            status:
+              "published",
+
+            reviewed_at:
+              now,
+
+            reviewed_by:
+              session.user.id,
+
+            published_at:
+              now,
+
+            updated_at:
+              now
+
+          })
+          .eq(
+            "id",
+            chapter.id
+          );
+
+
+      if (error) {
+
+        console.error(
+          "CHAPTER APPROVAL ERROR:",
+          error
+        );
+
+
+        alert(
+          "Chapter approval failed:\n\n" +
+          (
+            error.message ||
+            "Unknown error"
+          ) +
+          "\n\nCode: " +
+          (
+            error.code ||
+            "Unknown"
+          )
+        );
+
+
+        approveChapterButton.disabled =
+          false;
+
+        rejectChapterButton.disabled =
+          false;
+
+        return;
+      }
+
+
+      alert(
+        "Chapter approved and published."
+      );
+
+
+      /* =============================================
+         RELOAD BOOK REVIEW
+      ============================================= */
+
+      openBookReview(
+        currentReviewBook
+      );
+
+    }
+  );
+
+}
