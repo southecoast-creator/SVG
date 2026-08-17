@@ -1373,3 +1373,79 @@ document.addEventListener(
         );
 
       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="led-book-actions">
+
+  <h3>Book Decision</h3>
+
+  <button
+    type="button"
+    id="led-approve-book"
+    class="led-action-button led-approve-button"
+  >
+    Approve Book
+  </button>
+
+  <button
+    type="button"
+    id="led-reject-book"
+    class="led-action-button led-reject-button"
+  >
+    Reject Book
+  </button>
+
+  <div class="led-price-control">
+
+    <label for="led-book-diamond-price">
+      Full Book Diamond Price
+    </label>
+
+    <input
+      type="number"
+      id="led-book-diamond-price"
+      min="0"
+      step="1"
+      placeholder="Enter diamond amount"
+    />
+
+    <button
+      type="button"
+      id="led-save-diamond-price"
+      class="led-action-button"
+    >
+      Save Diamond Price
+    </button>
+
+  </div>
+
+  <div class="led-gift-control">
+
+    <h4>Book Gifts</h4>
+
+    <p>
+      The available gifts will be based on this book's genre.
+    </p>
+
+    <button
+      type="button"
+      id="led-set-book-gifts"
+      class="led-action-button"
+    >
+      Set Book Gifts
+    </button>
+
+  </div>
+
+</div>
