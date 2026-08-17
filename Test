@@ -1688,3 +1688,105 @@ rejectBookButton.addEventListener(
 
   }
 );
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   SAVE FULL BOOK DIAMOND PRICE
+===================================================== */
+
+saveDiamondPriceButton.addEventListener(
+  "click",
+  async function () {
+
+    if (!currentReviewBook) {
+      alert("No book is currently selected.");
+      return;
+    }
+
+    const diamondPrice =
+      Number(
+        diamondPriceInput.value
+      );
+
+    if (
+      !Number.isInteger(diamondPrice) ||
+      diamondPrice < 0
+    ) {
+      alert(
+        "Please enter a valid diamond amount."
+      );
+
+      return;
+    }
+
+
+    const confirmed =
+      confirm(
+        "Set the full-book unlock price to " +
+        diamondPrice +
+        " diamonds?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    saveDiamondPriceButton.disabled = true;
+
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("books")
+        .update({
+          full_book_unlock_cost:
+            diamondPrice,
+          updated_at:
+            new Date().toISOString()
+        })
+        .eq(
+          "id",
+          currentReviewBook.book_id
+        );
+
+
+    if (error) {
+
+      console.error(
+        "DIAMOND PRICE SAVE ERROR:",
+        error
+      );
+
+      alert(
+        "The diamond price could not be saved."
+      );
+
+      saveDiamondPriceButton.disabled =
+        false;
+
+      return;
+    }
+
+
+    alert(
+      "Full book diamond price saved: " +
+      diamondPrice +
+      " diamonds."
+    );
+
+
+    saveDiamondPriceButton.disabled =
+      false;
+
+  }
+);
