@@ -1,315 +1,102 @@
-submitCommentButton.addEventListener(
-  "click",
-  async function () {
+async function loadExistingComments() {
 
-    const commentText =
-      commentInput.value.trim();
-
-
-    /*
-     * DO NOT ALLOW EMPTY COMMENTS
-     */
-
-    if (!commentText) {
-
-      commentInput.focus();
-
-      return;
-    }
-
-
-    /*
-     * GET CURRENT USER
-     */
-
-    const {
-      data: {
-        user
-      },
-      error: userError
-    } =
-      await litdomSupabase.auth.getUser();
-
-
-    if (userError) {
-
-      console.error(
-        "User lookup error:",
-        userError
+  const {
+    data: existingComments,
+    error: commentsError
+  } =
+    await litdomSupabase
+      .from("comments")
+      .select(
+        "id, user_id, content, created_at"
+      )
+      .eq(
+        "chapter_id",
+        chapter.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
       );
 
-      alert(
-        "We couldn't verify your account."
-      );
 
-      return;
-    }
+  if (commentsError) {
 
-
-    /*
-     * USER MUST BE LOGGED IN
-     */
-
-    if (!user) {
-
-      alert(
-        "Please log in before posting a comment."
-      );
-
-      return;
-    }
-
-
-    /*
-     * DISABLE BUTTON WHILE POSTING
-     */
-
-    submitCommentButton.disabled =
-      true;
-
-    submitCommentButton.textContent =
-      "Posting...";
-
-
-    /*
-     * INSERT COMMENT
-     */
-
-    const {
-      data: newComment,
-      error: insertCommentError
-    } =
-      await litdomSupabase
-        .from("comments")
-        .insert([
-          {
-            user_id:
-              user.id,
-
-            book_id:
-              chapter.book_id,
-
-            chapter_id:
-              chapter.id,
-
-            content:
-              commentText
-          }
-        ])
-        .select()
-        .single();
-
-
-    /*
-     * HANDLE DATABASE ERROR
-     */
-
-    if (insertCommentError) {
-
-      console.error(
-        "Comment insertion error:",
-        insertCommentError
-      );
-
-      alert(
-        "Comment error: " +
-        (
-          insertCommentError.message ||
-          "Unable to post comment."
-        )
-      );
-
-      submitCommentButton.disabled =
-        false;
-
-      submitCommentButton.textContent =
-        "Post Comment";
-
-      return;
-    }
-
-
-    /*
-     * SUCCESS
-     */
-
-    commentInput.value =
-      "";
-
-
-    /*
-     * ADD NEW COMMENT
-     * TO THE VISIBLE LIST
-     */
-
-    const commentItem =
-      document.createElement(
-        "div"
-      );
-
-    commentItem.className =
-      "reader-comment";
-
-
-    const commentTextElement =
-      document.createElement(
-        "div"
-      );
-
-    commentTextElement.className =
-      "reader-comment-text";
-
-    commentTextElement.textContent =
-      newComment.content;
-
-
-    commentItem.appendChild(
-      commentTextElement
+    console.error(
+      "Comments loading error:",
+      commentsError
     );
 
+    return;
+  }
+
+
+  commentsList.innerHTML =
+    "";
+
+
+  if (
+    !existingComments ||
+    existingComments.length === 0
+  ) {
+
+    const emptyMessage =
+      document.createElement(
+        "div"
+      );
+
+    emptyMessage.className =
+      "no-comments-message";
+
+    emptyMessage.textContent =
+      "No comments yet. Be the first to comment.";
 
     commentsList.appendChild(
-      commentItem
+      emptyMessage
     );
 
-
-    /*
-     * UPDATE COUNTER
-     */
-
-    await loadCommentCount();
-
-
-    /*
-     * RESTORE BUTTON
-     */
-
-    submitCommentButton.disabled =
-      false;
-
-    submitCommentButton.textContent =
-      "Post Comment";
-
-  }
-);
-
-
-.chapter-comments {
-  width: 100%;
-  margin-top: 18px;
-  padding: 18px;
-  box-sizing: border-box;
-  background: #fafafa;
-  border-radius: 14px;
-  border: 1px solid #eeeeee;
-}
-
-
-.comments-list {
-  width: 100%;
-  margin-bottom: 16px;
-}
-
-
-.reader-comment {
-  width: 100%;
-  padding: 13px 14px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  background: #ffffff;
-  border: 1px solid #eeeeee;
-  border-radius: 12px;
-}
-
-
-.reader-comment-text {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #333333;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-
-.comment-form {
-  width: 100%;
-}
-
-
-.comment-input {
-  display: block;
-  width: 100%;
-  min-height: 90px;
-  padding: 13px 14px;
-  box-sizing: border-box;
-  resize: vertical;
-  border: 1px solid #dddddd;
-  border-radius: 12px;
-  background: #ffffff;
-  color: #222222;
-  font-family: inherit;
-  font-size: 15px;
-  line-height: 1.5;
-  outline: none;
-}
-
-
-.comment-input:focus {
-  border-color: #f2c94c;
-  box-shadow: 0 0 0 3px rgba(242, 201, 76, 0.15);
-}
-
-
-.submit-comment-button {
-  display: block;
-  width: 100%;
-  margin-top: 10px;
-  padding: 12px 18px;
-  border: none;
-  border-radius: 10px;
-  background: #222222;
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-
-.submit-comment-button:hover {
-  background: #333333;
-}
-
-
-.submit-comment-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-
-@media (max-width: 480px) {
-
-  .chapter-comments {
-    padding: 14px;
-    border-radius: 12px;
+    return;
   }
 
 
-  .comment-input {
-    min-height: 85px;
-    font-size: 15px;
-  }
+  existingComments.forEach(
+    function (savedComment) {
+
+      const commentItem =
+        document.createElement(
+          "div"
+        );
+
+      commentItem.className =
+        "reader-comment";
 
 
-  .submit-comment-button {
-    padding: 13px 16px;
-  }
+      const commentTextElement =
+        document.createElement(
+          "div"
+        );
+
+      commentTextElement.className =
+        "reader-comment-text";
+
+      commentTextElement.textContent =
+        savedComment.content;
+
+
+      commentItem.appendChild(
+        commentTextElement
+      );
+
+
+      commentsList.appendChild(
+        commentItem
+      );
+
+    }
+  );
 
 }
 
 
-
-
-
-
-
+loadExistingComments();
