@@ -229,3 +229,95 @@ article.appendChild(
 chaptersContainer.appendChild(
   article
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+  .chapter-actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 32px;
+    padding: 18px 8px;
+    border-top: 1px solid #eeeeee;
+    box-sizing: border-box;
+  }
+
+
+  .reader-action-button {
+    border: none;
+    background: transparent;
+    padding: 8px 10px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    color: #555555;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+
+  .reader-action-button svg {
+    width: 25px;
+    height: 25px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+
+  .reader-action-button span {
+    display: block;
+  }
+
+
+  .reader-action-button:hover {
+    color: #111111;
+  }
+
+
+  @media (max-width: 480px) {
+
+    .chapter-actions {
+      gap: 4px;
+      padding-left: 2px;
+      padding-right: 2px;
+    }
+
+
+    .reader-action-button {
+      padding-left: 6px;
+      padding-right: 6px;
+      font-size: 12px;
+    }
+
+
+    .reader-action-button svg {
+      width: 24px;
+      height: 24px;
+    }
+
+  }
+
+</style>
