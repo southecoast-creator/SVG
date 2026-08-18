@@ -7,7 +7,16 @@ async function loadExistingComments() {
     await litdomSupabase
       .from("comments")
       .select(
-        "id, user_id, content, created_at"
+        `
+        id,
+        user_id,
+        content,
+        created_at,
+        profiles (
+          username,
+          display_name
+        )
+        `
       )
       .eq(
         "chapter_id",
@@ -72,6 +81,51 @@ async function loadExistingComments() {
         "reader-comment";
 
 
+      /*
+       * COMMENT USER
+       */
+
+      const commentUser =
+        document.createElement(
+          "div"
+        );
+
+      commentUser.className =
+        "reader-comment-user";
+
+
+      const profile =
+        savedComment.profiles;
+
+
+      let username =
+        "";
+
+
+      if (profile) {
+
+        username =
+          profile.username ||
+          profile.display_name ||
+          "Reader";
+
+      } else {
+
+        username =
+          "Reader";
+
+      }
+
+
+      commentUser.textContent =
+        "@" +
+        username;
+
+
+      /*
+       * COMMENT TEXT
+       */
+
       const commentTextElement =
         document.createElement(
           "div"
@@ -84,10 +138,24 @@ async function loadExistingComments() {
         savedComment.content;
 
 
+      /*
+       * ADD USERNAME
+       * AND COMMENT
+       */
+
+      commentItem.appendChild(
+        commentUser
+      );
+
       commentItem.appendChild(
         commentTextElement
       );
 
+
+      /*
+       * ADD COMMENT
+       * TO THE LIST
+       */
 
       commentsList.appendChild(
         commentItem
