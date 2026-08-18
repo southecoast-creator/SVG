@@ -125,3 +125,24 @@ async function loadCommentCount() {
 
 
 loadCommentCount();
+commentButton.addEventListener(
+  "click",
+  function () {
+
+    if (
+      commentsSection.style.display ===
+      "none"
+    ) {
+
+      commentsSection.style.display =
+        "block";
+
+    } else {
+
+      commentsSection.style.display =
+        "none";
+
+    }
+
+  }
+);
