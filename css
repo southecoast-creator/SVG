@@ -1,528 +1,127 @@
-article.appendChild(
-  chapterContent
-);
-
-
-/*
- * CHAPTER ACTIONS
- */
-
-const actions =
+const commentsSection =
   document.createElement(
     "div"
   );
 
-actions.className =
-  "chapter-actions";
+commentsSection.className =
+  "chapter-comments";
+
+commentsSection.style.display =
+  "none";
 
 
-/*
- * LIKE BUTTON
- */
+const commentsList =
+  document.createElement(
+    "div"
+  );
 
-const likeButton =
+commentsList.className =
+  "comments-list";
+
+
+const commentForm =
+  document.createElement(
+    "div"
+  );
+
+commentForm.className =
+  "comment-form";
+
+
+const commentInput =
+  document.createElement(
+    "textarea"
+  );
+
+commentInput.placeholder =
+  "Write a comment...";
+
+commentInput.rows =
+  3;
+
+commentInput.className =
+  "comment-input";
+
+
+const submitCommentButton =
   document.createElement(
     "button"
   );
 
-likeButton.type =
+submitCommentButton.type =
   "button";
 
-likeButton.className =
-  "reader-action-button";
+submitCommentButton.className =
+  "submit-comment-button";
 
-likeButton.setAttribute(
-  "aria-label",
-  "Like chapter"
+submitCommentButton.textContent =
+  "Post Comment";
+
+
+commentForm.appendChild(
+  commentInput
 );
 
-likeButton.innerHTML = `
-  <svg
-    viewBox="0 0 24 24"
-    aria-hidden="true"
-  >
-    <path
-      d="M20.8 8.7c0-2.5-2-4.5-4.5-4.5-1.5 0-2.8.7-3.7 1.8-.9-1.1-2.2-1.8-3.7-1.8-2.5 0-4.5 2-4.5 4.5 0 5.2 8.2 9.7 8.2 9.7s8.2-4.5 8.2-9.7Z"
-    />
-  </svg>
-
-  <span>Like</span>
-`;
-
-
-/*
- * COMMENT BUTTON
- */
-
-const commentButton =
-  document.createElement(
-    "button"
-  );
-
-commentButton.type =
-  "button";
-
-commentButton.className =
-  "reader-action-button";
-
-commentButton.setAttribute(
-  "aria-label",
-  "Comment on chapter"
+commentForm.appendChild(
+  submitCommentButton
 );
 
-commentButton.innerHTML = `
-  <svg
-    viewBox="0 0 24 24"
-    aria-hidden="true"
-  >
-    <path
-      d="M20 11.5a8 8 0 0 1-8 8 8.4 8.4 0 0 1-3.2-.6L4 20l1.1-3.7A8 8 0 1 1 20 11.5Z"
-    />
-  </svg>
-
-  <span>Comment</span>
-`;
-
-
-/*
- * GIFT BUTTON
- */
-
-const giftButton =
-  document.createElement(
-    "button"
-  );
-
-giftButton.type =
-  "button";
-
-giftButton.className =
-  "reader-action-button";
-
-giftButton.setAttribute(
-  "aria-label",
-  "Give a gift"
+commentsSection.appendChild(
+  commentsList
 );
 
-giftButton.innerHTML = `
-  <svg
-    viewBox="0 0 24 24"
-    aria-hidden="true"
-  >
-    <path
-      d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"
-    />
-
-    <path
-      d="M2 7h20v5H2z"
-    />
-
-    <path
-      d="M12 7v15"
-    />
-
-    <path
-      d="M12 7H8.5a2.5 2.5 0 1 1 2.5-2.5V7Z"
-    />
-
-    <path
-      d="M12 7h3.5A2.5 2.5 0 1 0 13 4.5V7Z"
-    />
-  </svg>
-
-  <span>Gift</span>
-`;
-
-
-/*
- * SHARE BUTTON
- */
-
-const shareButton =
-  document.createElement(
-    "button"
-  );
-
-shareButton.type =
-  "button";
-
-shareButton.className =
-  "reader-action-button";
-
-shareButton.setAttribute(
-  "aria-label",
-  "Share book"
+commentsSection.appendChild(
+  commentForm
 );
 
-shareButton.innerHTML = `
-  <svg
-    viewBox="0 0 24 24"
-    aria-hidden="true"
-  >
-    <circle
-      cx="18"
-      cy="5"
-      r="2"
-    />
-
-    <circle
-      cx="6"
-      cy="12"
-      r="2"
-    />
-
-    <circle
-      cx="18"
-      cy="19"
-      r="2"
-    />
-
-    <path
-      d="M8 11l8-5"
-    />
-
-    <path
-      d="M8 13l8 5"
-    />
-  </svg>
-
-  <span>Share</span>
-`;
-
-
-/*
- * ADD BUTTONS
- * TO ACTION AREA
- */
-
-actions.appendChild(
-  likeButton
-);
-
-actions.appendChild(
-  commentButton
-);
-
-actions.appendChild(
-  giftButton
-);
-
-actions.appendChild(
-  shareButton
-);
-
-
-/*
- * ADD ACTION AREA
- * TO CHAPTER
- */
-
-article.appendChild(
-  actions
-);
-
-
-/*
- * ADD CHAPTER TO READER
- */
-
-chaptersContainer.appendChild(
-  article
-);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<style>
-
-  .chapter-actions {
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-start;
-    gap: 12px;
-    margin-top: 32px;
-    padding: 18px 8px;
-    border-top: 1px solid #eeeeee;
-    box-sizing: border-box;
-  }
-
-
-  .reader-action-button {
-    border: none;
-    background: transparent;
-    padding: 8px 10px;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    cursor: pointer;
-    color: #555555;
-    font-size: 13px;
-    line-height: 1.2;
-  }
-
-
-  .reader-action-button svg {
-    width: 25px;
-    height: 25px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-
-  .reader-action-button span {
-    display: block;
-  }
-
-
-  .reader-action-button:hover {
-    color: #111111;
-  }
-
-
-  @media (max-width: 480px) {
-
-    .chapter-actions {
-      gap: 4px;
-      padding-left: 2px;
-      padding-right: 2px;
-    }
-
-
-    .reader-action-button {
-      padding-left: 6px;
-      padding-right: 6px;
-      font-size: 12px;
-    }
-
-
-    .reader-action-button svg {
-      width: 24px;
-      height: 24px;
-    }
-
-  }
-
-</style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-likeButton.addEventListener(
-  "click",
-  async function () {
-
-    try {
-
-      /*
-       * GET THE CURRENT USER
-       */
-
-      const {
-        data: {
-          user
-        },
-        error: userError
-      } =
-        await litdomSupabase.auth.getUser();
-
-
-      if (userError) {
-
-        console.error(
-          "Unable to get user:",
-          userError
-        );
-
-        alert(
-          "Please log in before liking this chapter."
-        );
-
-        return;
-      }
-
-
-      /*
-       * USER MUST BE LOGGED IN
-       */
-
-      if (!user) {
-
-        alert(
-          "Please log in before liking this chapter."
-        );
-
-        return;
-      }
-
-
-      /*
-       * CHECK WHETHER THIS USER
-       * ALREADY LIKED THIS CHAPTER
-       */
-
-      const {
-        data: existingLike,
-        error: existingLikeError
-      } =
-        await litdomSupabase
-          .from("chapter_likes")
-          .select(
-            "id"
-          )
-          .eq(
-            "chapter_id",
-            chapter.id
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .maybeSingle();
-
-
-      if (existingLikeError) {
-
-        console.error(
-          "Like check failed:",
-          existingLikeError
-        );
-
-        alert(
-          "We couldn't check your like right now."
-        );
-
-        return;
-      }
-
-
-      /*
-       * IF ALREADY LIKED:
-       * REMOVE THE LIKE
-       */
-
-      if (existingLike) {
-
-        const {
-          error: deleteLikeError
-        } =
-          await litdomSupabase
-            .from("chapter_likes")
-            .delete()
-            .eq(
-              "id",
-              existingLike.id
-            );
-
-
-        if (deleteLikeError) {
-
-          console.error(
-            "Unlike failed:",
-            deleteLikeError
-          );
-
-          alert(
-            "We couldn't remove your like."
-          );
-
-          return;
+async function loadCommentCount() {
+
+  const {
+    count,
+    error
+  } =
+    await litdomSupabase
+      .from("comments")
+      .select(
+        "id",
+        {
+          count: "exact",
+          head: true
         }
-
-
-        likeButton.classList.remove(
-          "liked"
-        );
-
-        return;
-      }
-
-
-      /*
-       * OTHERWISE:
-       * CREATE A NEW CHAPTER LIKE
-       */
-
-      const {
-        error: insertLikeError
-      } =
-        await litdomSupabase
-          .from("chapter_likes")
-          .insert([
-            {
-              chapter_id:
-                chapter.id,
-
-              user_id:
-                user.id
-            }
-          ]);
-
-
-      if (insertLikeError) {
-
-        console.error(
-          "Like insertion failed:",
-          insertLikeError
-        );
-
-        alert(
-          "We couldn't save your like."
-        );
-
-        return;
-      }
-
-
-      /*
-       * SUCCESS
-       */
-
-      likeButton.classList.add(
-        "liked"
+      )
+      .eq(
+        "chapter_id",
+        chapter.id
       );
 
-    } catch (error) {
 
-      console.error(
-        "Unexpected like error:",
-        error
+  if (error) {
+
+    console.error(
+      "Comment count error:",
+      error
+    );
+
+    return;
+  }
+
+
+  const commentCount =
+    commentButton.querySelector(
+      ".comment-count"
+    );
+
+
+  if (commentCount) {
+
+    commentCount.textContent =
+      String(
+        count || 0
       );
-
-      alert(
-        "Something went wrong while liking this chapter."
-      );
-
-    }
 
   }
-);
+
+}
+
+
+loadCommentCount();
