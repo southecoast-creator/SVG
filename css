@@ -321,3 +321,208 @@ chaptersContainer.appendChild(
   }
 
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+likeButton.addEventListener(
+  "click",
+  async function () {
+
+    try {
+
+      /*
+       * GET THE CURRENT USER
+       */
+
+      const {
+        data: {
+          user
+        },
+        error: userError
+      } =
+        await litdomSupabase.auth.getUser();
+
+
+      if (userError) {
+
+        console.error(
+          "Unable to get user:",
+          userError
+        );
+
+        alert(
+          "Please log in before liking this chapter."
+        );
+
+        return;
+      }
+
+
+      /*
+       * USER MUST BE LOGGED IN
+       */
+
+      if (!user) {
+
+        alert(
+          "Please log in before liking this chapter."
+        );
+
+        return;
+      }
+
+
+      /*
+       * CHECK WHETHER THIS USER
+       * ALREADY LIKED THIS CHAPTER
+       */
+
+      const {
+        data: existingLike,
+        error: existingLikeError
+      } =
+        await litdomSupabase
+          .from("chapter_likes")
+          .select(
+            "id"
+          )
+          .eq(
+            "chapter_id",
+            chapter.id
+          )
+          .eq(
+            "user_id",
+            user.id
+          )
+          .maybeSingle();
+
+
+      if (existingLikeError) {
+
+        console.error(
+          "Like check failed:",
+          existingLikeError
+        );
+
+        alert(
+          "We couldn't check your like right now."
+        );
+
+        return;
+      }
+
+
+      /*
+       * IF ALREADY LIKED:
+       * REMOVE THE LIKE
+       */
+
+      if (existingLike) {
+
+        const {
+          error: deleteLikeError
+        } =
+          await litdomSupabase
+            .from("chapter_likes")
+            .delete()
+            .eq(
+              "id",
+              existingLike.id
+            );
+
+
+        if (deleteLikeError) {
+
+          console.error(
+            "Unlike failed:",
+            deleteLikeError
+          );
+
+          alert(
+            "We couldn't remove your like."
+          );
+
+          return;
+        }
+
+
+        likeButton.classList.remove(
+          "liked"
+        );
+
+        return;
+      }
+
+
+      /*
+       * OTHERWISE:
+       * CREATE A NEW CHAPTER LIKE
+       */
+
+      const {
+        error: insertLikeError
+      } =
+        await litdomSupabase
+          .from("chapter_likes")
+          .insert([
+            {
+              chapter_id:
+                chapter.id,
+
+              user_id:
+                user.id
+            }
+          ]);
+
+
+      if (insertLikeError) {
+
+        console.error(
+          "Like insertion failed:",
+          insertLikeError
+        );
+
+        alert(
+          "We couldn't save your like."
+        );
+
+        return;
+      }
+
+
+      /*
+       * SUCCESS
+       */
+
+      likeButton.classList.add(
+        "liked"
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Unexpected like error:",
+        error
+      );
+
+      alert(
+        "Something went wrong while liking this chapter."
+      );
+
+    }
+
+  }
+);
