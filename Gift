@@ -1,0 +1,558 @@
+/*
+ * GIFT SHOP
+ */
+
+giftButton.addEventListener(
+  "click",
+  () => {
+
+    /*
+     * GIFT CATALOG
+     */
+
+    const giftCatalog = [
+      {
+        type: "pancakes",
+        name: "Pancakes",
+        price: 8000,
+        image: ""
+      },
+
+      {
+        type: "chips",
+        name: "Chips",
+        price: 700,
+        image: ""
+      },
+
+      {
+        type: "avocado",
+        name: "Avocado",
+        price: 100,
+        image: ""
+      },
+
+      {
+        type: "croissant",
+        name: "Croissant",
+        price: 1000,
+        image: ""
+      },
+
+      {
+        type: "pie",
+        name: "Pie",
+        price: 2000,
+        image: ""
+      },
+
+      {
+        type: "pizza",
+        name: "Pizza",
+        price: 5000,
+        image: ""
+      },
+
+      {
+        type: "bracelet",
+        name: "Bracelet",
+        price: 500,
+        image: ""
+      },
+
+      {
+        type: "teapot",
+        name: "Teapot",
+        price: 1000,
+        image: ""
+      },
+
+      {
+        type: "donut",
+        name: "Donut",
+        price: 300,
+        image: ""
+      },
+
+      {
+        type: "camera",
+        name: "Camera",
+        price: 1000,
+        image: ""
+      },
+
+      {
+        type: "school-bag",
+        name: "School Bag",
+        price: 200,
+        image: ""
+      },
+
+      {
+        type: "scarf",
+        name: "Scarf",
+        price: 10000,
+        image: ""
+      },
+
+      {
+        type: "goggles",
+        name: "Swimming Goggles",
+        price: 2000,
+        image: ""
+      },
+
+      {
+        type: "rocket",
+        name: "Rocket",
+        price: 1500,
+        image: ""
+      },
+
+      {
+        type: "ink",
+        name: "Ink",
+        price: 100,
+        image: ""
+      },
+
+      {
+        type: "island",
+        name: "Island",
+        price: 20000,
+        image: ""
+      },
+
+      {
+        type: "crown",
+        name: "Crown",
+        price: 50000,
+        image: ""
+      },
+
+      {
+        type: "keyboard",
+        name: "Keyboard",
+        price: 250,
+        image: ""
+      },
+
+      {
+        type: "coffee",
+        name: "Coffee",
+        price: 2500,
+        image: ""
+      }
+    ];
+
+
+    /*
+     * CREATE POPUP
+     */
+
+    const giftOverlay =
+      document.createElement("div");
+
+    giftOverlay.className =
+      "litdom-gift-overlay";
+
+
+    /*
+     * CREATE GIFT SHOP
+     */
+
+    const giftShop =
+      document.createElement("div");
+
+    giftShop.className =
+      "litdom-gift-shop";
+
+
+    /*
+     * HEADER
+     */
+
+    giftShop.innerHTML = `
+      <div class="gift-shop-header">
+
+        <div class="gift-shop-heading">
+
+          <h2>
+            Gift Shop
+          </h2>
+
+          <p>
+            Support the author
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="gift-shop-close"
+          aria-label="Close Gift Shop"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="gift-shop-grid"></div>
+
+      <div class="gift-shop-tiers">
+
+        <div class="gift-tier-note">
+
+          <span class="gift-tier-symbol">
+            ✦
+          </span>
+
+          <div>
+            <strong>
+              Special support tiers
+            </strong>
+
+            <p>
+              Some gifts come with extra
+              special benefits.
+            </p>
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="gift-tier-button"
+        >
+          Find out more about the tiers
+        </button>
+
+      </div>
+
+      <button
+        type="button"
+        class="gift-cancel-button"
+      >
+        Cancel
+      </button>
+    `;
+
+
+    /*
+     * GET ELEMENTS
+     */
+
+    const giftGrid =
+      giftShop.querySelector(
+        ".gift-shop-grid"
+      );
+
+    const closeButton =
+      giftShop.querySelector(
+        ".gift-shop-close"
+      );
+
+    const cancelButton =
+      giftShop.querySelector(
+        ".gift-cancel-button"
+      );
+
+
+    /*
+     * CREATE GIFT CARDS
+     */
+
+    giftCatalog.forEach(
+      (gift) => {
+
+        const giftCard =
+          document.createElement(
+            "button"
+          );
+
+        giftCard.type =
+          "button";
+
+        giftCard.className =
+          "gift-card";
+
+        giftCard.dataset.giftType =
+          gift.type;
+
+        giftCard.dataset.ngnPrice =
+          gift.price;
+
+
+        /*
+         * IMAGE AREA
+         */
+
+        const imageArea =
+          document.createElement(
+            "div"
+          );
+
+        imageArea.className =
+          "gift-image-area";
+
+
+        /*
+         * IMAGE
+         *
+         * Images will be added
+         * later.
+         */
+
+        if (gift.image) {
+
+          const image =
+            document.createElement(
+              "img"
+            );
+
+          image.src =
+            gift.image;
+
+          image.alt =
+            gift.name;
+
+          image.loading =
+            "lazy";
+
+          image.className =
+            "gift-image";
+
+          imageArea.appendChild(
+            image
+          );
+
+        } else {
+
+          /*
+           * Temporary placeholder
+           */
+
+          imageArea.innerHTML = `
+            <span
+              class="gift-image-placeholder"
+              aria-hidden="true"
+            >
+              ✦
+            </span>
+          `;
+
+        }
+
+
+        /*
+         * GIFT NAME
+         */
+
+        const giftName =
+          document.createElement(
+            "span"
+          );
+
+        giftName.className =
+          "gift-name";
+
+        giftName.textContent =
+          gift.name;
+
+
+        /*
+         * PRICE
+         */
+
+        const giftPrice =
+          document.createElement(
+            "span"
+          );
+
+        giftPrice.className =
+          "gift-price";
+
+        giftPrice.textContent =
+          `₦${gift.price.toLocaleString(
+            "en-NG"
+          )}`;
+
+
+        /*
+         * BUILD CARD
+         */
+
+        giftCard.appendChild(
+          imageArea
+        );
+
+        giftCard.appendChild(
+          giftName
+        );
+
+        giftCard.appendChild(
+          giftPrice
+        );
+
+
+        /*
+         * GIFT SELECTION
+         */
+
+        giftCard.addEventListener(
+          "click",
+          () => {
+
+            document
+              .querySelectorAll(
+                ".gift-card.selected"
+              )
+              .forEach(
+                (card) => {
+                  card.classList.remove(
+                    "selected"
+                  );
+                }
+              );
+
+
+            giftCard.classList.add(
+              "selected"
+            );
+
+
+            console.log(
+              "Selected gift:",
+              gift.type
+            );
+
+            console.log(
+              "Gift NGN value:",
+              gift.price
+            );
+
+          }
+        );
+
+
+        giftGrid.appendChild(
+          giftCard
+        );
+
+      }
+    );
+
+
+    /*
+     * ADD SHOP TO OVERLAY
+     */
+
+    giftOverlay.appendChild(
+      giftShop
+    );
+
+
+    /*
+     * ADD OVERLAY TO PAGE
+     */
+
+    document.body.appendChild(
+      giftOverlay
+    );
+
+
+    /*
+     * PREVENT BACKGROUND
+     * SCROLLING
+     */
+
+    document.body.style.overflow =
+      "hidden";
+
+
+    /*
+     * CLOSE FUNCTION
+     */
+
+    const closeGiftShop =
+      () => {
+
+        giftOverlay.classList.add(
+          "closing"
+        );
+
+        setTimeout(
+          () => {
+
+            giftOverlay.remove();
+
+            document.body.style.overflow =
+              "";
+
+          },
+          220
+        );
+
+      };
+
+
+    closeButton.addEventListener(
+      "click",
+      closeGiftShop
+    );
+
+    cancelButton.addEventListener(
+      "click",
+      closeGiftShop
+    );
+
+
+    /*
+     * CLICK OUTSIDE SHOP
+     */
+
+    giftOverlay.addEventListener(
+      "click",
+      (event) => {
+
+        if (
+          event.target ===
+          giftOverlay
+        ) {
+          closeGiftShop();
+        }
+
+      }
+    );
+
+
+    /*
+     * ESCAPE KEY
+     */
+
+    const escapeHandler =
+      (event) => {
+
+        if (
+          event.key === "Escape"
+        ) {
+
+          closeGiftShop();
+
+          document.removeEventListener(
+            "keydown",
+            escapeHandler
+          );
+
+        }
+
+      };
+
+
+    document.addEventListener(
+      "keydown",
+      escapeHandler
+    );
+
+  }
+);
