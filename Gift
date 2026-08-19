@@ -556,3 +556,795 @@ giftButton.addEventListener(
 
   }
 );
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * LITDOM GIFT SHOP
+ */
+
+.litdom-gift-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 16px;
+
+  background:
+    rgba(8, 7, 5, 0.72);
+
+  backdrop-filter:
+    blur(10px);
+
+  -webkit-backdrop-filter:
+    blur(10px);
+
+  animation:
+    giftOverlayIn 220ms ease;
+}
+
+
+.litdom-gift-shop {
+  width: min(
+    100%,
+    430px
+  );
+
+  max-height:
+    min(
+      88vh,
+      720px
+    );
+
+  overflow-y: auto;
+
+  position: relative;
+
+  padding:
+    22px 16px 18px;
+
+  border:
+    1px solid
+    rgba(255, 210, 92, 0.22);
+
+  border-radius:
+    24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31, 27, 20, 0.98),
+      rgba(15, 14, 12, 0.99)
+    );
+
+  box-shadow:
+    0 30px 80px
+    rgba(0, 0, 0, 0.55),
+
+    0 0 0 1px
+    rgba(255, 255, 255, 0.03),
+
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.05);
+
+  animation:
+    giftShopIn 280ms
+    cubic-bezier(
+      0.16,
+      1,
+      0.3,
+      1
+    );
+}
+
+
+.litdom-gift-shop::-webkit-scrollbar {
+  width: 4px;
+}
+
+.litdom-gift-shop::-webkit-scrollbar-thumb {
+  background:
+    rgba(255, 210, 92, 0.25);
+
+  border-radius:
+    10px;
+}
+
+
+/*
+ * HEADER
+ */
+
+.gift-shop-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom:
+    18px;
+}
+
+
+.gift-shop-heading {
+  text-align: left;
+}
+
+
+.gift-shop-heading h2 {
+  margin: 0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    25px;
+
+  font-weight:
+    700;
+
+  letter-spacing:
+    -0.4px;
+
+  color:
+    #f8e8bd;
+}
+
+
+.gift-shop-heading p {
+  margin:
+    4px 0 0;
+
+  font-size:
+    12px;
+
+  letter-spacing:
+    0.4px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.58
+    );
+}
+
+
+.gift-shop-close {
+  width:
+    34px;
+
+  height:
+    34px;
+
+  flex-shrink: 0;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color:
+    rgba(255, 255, 255, 0.7);
+
+  font-size:
+    23px;
+
+  line-height:
+    1;
+
+  cursor:
+    pointer;
+
+  transition:
+    180ms ease;
+}
+
+
+.gift-shop-close:hover {
+  color:
+    #fff;
+
+  background:
+    rgba(
+      255,
+      210,
+      92,
+      0.12
+    );
+
+  border-color:
+    rgba(
+      255,
+      210,
+      92,
+      0.35
+    );
+}
+
+
+/*
+ * GIFT GRID
+ */
+
+.gift-shop-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+
+  gap:
+    9px;
+}
+
+
+/*
+ * GIFT CARD
+ */
+
+.gift-card {
+  position: relative;
+
+  min-width: 0;
+
+  aspect-ratio:
+    1 / 1.08;
+
+  padding:
+    7px 5px 8px;
+
+  display: flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.065
+    );
+
+  border-radius:
+    14px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.035
+    );
+
+  color:
+    #fff;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+
+.gift-card:hover {
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(
+      255,
+      210,
+      92,
+      0.38
+    );
+
+  background:
+    rgba(
+      255,
+      210,
+      92,
+      0.055
+    );
+}
+
+
+.gift-card:active {
+  transform:
+    scale(0.97);
+}
+
+
+/*
+ * SELECTED GIFT
+ */
+
+.gift-card.selected {
+  border-color:
+    rgba(
+      255,
+      214,
+      92,
+      0.92
+    );
+
+  background:
+    rgba(
+      255,
+      210,
+      92,
+      0.075
+    );
+
+  box-shadow:
+    0 0 0 1px
+    rgba(
+      255,
+      210,
+      92,
+      0.18
+    ),
+
+    0 0 18px
+    rgba(
+      255,
+      203,
+      65,
+      0.16
+    );
+}
+
+
+/*
+ * IMAGE AREA
+ */
+
+.gift-image-area {
+  width:
+    64px;
+
+  height:
+    64px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  margin-bottom:
+    4px;
+}
+
+
+.gift-image {
+  width:
+    100%;
+
+  height:
+    100%;
+
+  object-fit:
+    contain;
+
+  display:
+    block;
+}
+
+
+.gift-image-placeholder {
+  width:
+    46px;
+
+  height:
+    46px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    12px;
+
+  color:
+    rgba(
+      255,
+      218,
+      120,
+      0.5
+    );
+
+  background:
+    rgba(
+      255,
+      210,
+      92,
+      0.06
+    );
+
+  font-size:
+    20px;
+}
+
+
+/*
+ * GIFT NAME
+ */
+
+.gift-name {
+  max-width:
+    100%;
+
+  overflow:
+    hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.25;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.78
+    );
+}
+
+
+/*
+ * GIFT PRICE
+ */
+
+.gift-price {
+  margin-top:
+    2px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+
+  color:
+    #f5d47b;
+}
+
+
+/*
+ * SPECIAL TIERS
+ */
+
+.gift-shop-tiers {
+  margin-top:
+    18px;
+
+  padding-top:
+    14px;
+
+  border-top:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.07
+    );
+}
+
+
+.gift-tier-note {
+  display:
+    flex;
+
+  gap:
+    9px;
+
+  align-items:
+    flex-start;
+}
+
+
+.gift-tier-symbol {
+  color:
+    #f5d47b;
+
+  font-size:
+    16px;
+
+  line-height:
+    1.1;
+}
+
+
+.gift-tier-note strong {
+  display:
+    block;
+
+  font-size:
+    12px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.86
+    );
+}
+
+
+.gift-tier-note p {
+  margin:
+    3px 0 0;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.4;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.48
+    );
+}
+
+
+.gift-tier-button {
+  width:
+    100%;
+
+  margin-top:
+    10px;
+
+  padding:
+    10px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      210,
+      92,
+      0.2
+    );
+
+  border-radius:
+    10px;
+
+  background:
+    rgba(
+      255,
+      210,
+      92,
+      0.045
+    );
+
+  color:
+    #e9ca79;
+
+  font-size:
+    11px;
+
+  cursor:
+    pointer;
+}
+
+
+/*
+ * CANCEL
+ */
+
+.gift-cancel-button {
+  width:
+    100%;
+
+  margin-top:
+    10px;
+
+  padding:
+    10px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    );
+
+  border-radius:
+    10px;
+
+  background:
+    transparent;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.52
+    );
+
+  font-size:
+    11px;
+
+  cursor:
+    pointer;
+
+  transition:
+    160ms ease;
+}
+
+
+.gift-cancel-button:hover {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.85
+    );
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.04
+    );
+}
+
+
+/*
+ * ANIMATIONS
+ */
+
+@keyframes giftOverlayIn {
+
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+
+}
+
+
+@keyframes giftShopIn {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+.litdom-gift-overlay.closing {
+  opacity: 0;
+
+  transition:
+    opacity 220ms ease;
+}
+
+
+.litdom-gift-overlay.closing
+.litdom-gift-shop {
+  transform:
+    translateY(12px)
+    scale(0.98);
+
+  transition:
+    transform 220ms ease;
+}
+
+
+/*
+ * SMALL PHONES
+ */
+
+@media (
+  max-width: 360px
+) {
+
+  .litdom-gift-overlay {
+    padding:
+      10px;
+  }
+
+  .litdom-gift-shop {
+    padding:
+      18px 11px 14px;
+
+    border-radius:
+      20px;
+  }
+
+  .gift-shop-grid {
+    gap:
+      7px;
+  }
+
+  .gift-card {
+    border-radius:
+      12px;
+  }
+
+  .gift-image-area {
+    width:
+      56px;
+
+    height:
+      56px;
+  }
+
+}
