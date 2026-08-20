@@ -1,170 +1,226 @@
-async function loadExistingComments() {
+giftCard.addEventListener(
+  "click",
+  async () => {
 
-  const {
-    data: existingComments,
-    error: commentsError
-  } =
-    await litdomSupabase
-      .from("comments")
-      .select(
-        `
-        id,
-        user_id,
-        content,
-        created_at,
-        profiles (
-          username,
-          display_name
-        )
-        `
+    /*
+     * REMOVE PREVIOUS SELECTION
+     */
+
+    document
+      .querySelectorAll(
+        ".gift-card.selected"
       )
-      .eq(
-        "chapter_id",
-        chapter.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending: true
+      .forEach(
+        (card) => {
+          card.classList.remove(
+            "selected"
+          );
         }
       );
 
 
-  if (commentsError) {
+    /*
+     * SELECT THIS GIFT
+     */
 
-    console.error(
-      "Comments loading error:",
-      commentsError
+    giftCard.classList.add(
+      "selected"
     );
 
-    return;
-  }
+
+    /*
+     * PREVENT DOUBLE CLICK
+     */
+
+    if (
+      giftCard.dataset.processing ===
+      "true"
+    ) {
+      return;
+    }
+
+    giftCard.dataset.processing =
+      "true";
 
 
-  commentsList.innerHTML =
-    "";
+    /*
+     * SAVE ORIGINAL CARD
+     */
+
+    const originalContent =
+      giftCard.innerHTML;
 
 
-  if (
-    !existingComments ||
-    existingComments.length === 0
-  ) {
+    /*
+     * SHOW LOADING
+     */
 
-    const emptyMessage =
-      document.createElement(
-        "div"
-      );
-
-    emptyMessage.className =
-      "no-comments-message";
-
-    emptyMessage.textContent =
-      "No comments yet. Be the first to comment.";
-
-    commentsList.appendChild(
-      emptyMessage
-    );
-
-    return;
-  }
+    giftCard.innerHTML = `
+      <div class="gift-payment-loading">
+        <span class="gift-loading-spinner"></span>
+        <span>Preparing gift...</span>
+      </div>
+    `;
 
 
-  existingComments.forEach(
-    function (savedComment) {
+    try {
 
-      const commentItem =
-        document.createElement(
-          "div"
-        );
+      /*
+       * GET LOGGED-IN READER
+       */
 
-      commentItem.className =
-        "reader-comment";
+      const {
+        data: {
+          user
+        },
+        error: userError
+      } =
+        await litdomSupabase.auth.getUser();
 
 
       /*
-       * COMMENT USER
+       * CHECK READER
        */
 
-      const commentUser =
-        document.createElement(
-          "div"
+      if (
+        userError ||
+        !user
+      ) {
+        throw new Error(
+          "Please sign in before sending a gift."
         );
-
-      commentUser.className =
-        "reader-comment-user";
-
-
-      const profile =
-        savedComment.profiles;
-
-
-      let username =
-        "";
-
-
-      if (profile) {
-
-        username =
-          profile.username ||
-          profile.display_name ||
-          "Reader";
-
-      } else {
-
-        username =
-          "Reader";
-
       }
 
 
-      commentUser.textContent =
-        "@" +
-        username;
+      /*
+       * CHECK EMAIL
+       */
+
+      if (
+        !user.email
+      ) {
+        throw new Error(
+          "Your account does not have an email address."
+        );
+      }
 
 
       /*
-       * COMMENT TEXT
+       * CREATE GIFT PAYMENT
        */
 
-      const commentTextElement =
-        document.createElement(
-          "div"
+      const {
+        data,
+        error
+      } =
+        await litdomSupabase.functions.invoke(
+          "create-gift-payment",
+          {
+            body: {
+
+              gift_type:
+                gift.type,
+
+              book_id:
+                bookId,
+
+              chapter_id:
+                chapter.id,
+
+              sender_id:
+                user.id,
+
+              receiver_id:
+                bookAuthorId,
+
+              email:
+                user.email
+
+            }
+          }
         );
 
-      commentTextElement.className =
-        "reader-comment-text";
 
-      commentTextElement.textContent =
-        savedComment.content;
+      /*
+       * CHECK FUNCTION ERROR
+       */
+
+      if (error) {
+
+        console.error(
+          "Gift payment function error:",
+          error
+        );
+
+        throw new Error(
+          "Unable to start the gift payment."
+        );
+      }
 
 
       /*
-       * ADD USERNAME
-       * AND COMMENT
+       * CHECK PAYMENT LINK
        */
 
-      commentItem.appendChild(
-        commentUser
-      );
+      if (
+        !data ||
+        !data.success ||
+        !data.payment_link
+      ) {
 
-      commentItem.appendChild(
-        commentTextElement
+        console.error(
+          "Gift payment response:",
+          data
+        );
+
+        throw new Error(
+          data?.error ||
+          "Unable to create the gift payment."
+        );
+      }
+
+
+      /*
+       * GO TO FLUTTERWAVE
+       */
+
+      window.location.href =
+        data.payment_link;
+
+
+    } catch (error) {
+
+      console.error(
+        "Gift payment failed:",
+        error
       );
 
 
       /*
-       * ADD COMMENT
-       * TO THE LIST
+       * RESTORE CARD
        */
 
-      commentsList.appendChild(
-        commentItem
+      giftCard.innerHTML =
+        originalContent;
+
+      giftCard.dataset.processing =
+        "false";
+
+      giftCard.classList.remove(
+        "selected"
+      );
+
+
+      /*
+       * SHOW ERROR
+       */
+
+      alert(
+        error?.message ||
+        "We couldn't start the gift payment. Please try again."
       );
 
     }
-  );
 
-}
-
-
-loadExistingComments();
+  }
+);
