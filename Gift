@@ -305,3 +305,62 @@ giftCard.addEventListener(
 
   }
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+         * GIFT SELECTION
+         */
+
+        giftCard.addEventListener(
+          "click",
+          () => {
+
+            document
+              .querySelectorAll(
+                ".gift-card.selected"
+              )
+              .forEach(
+                (card) => {
+                  card.classList.remove(
+                    "selected"
+                  );
+                }
+              );
+
+
+            giftCard.classList.add(
+              "selected"
+            );
+
+
+            console.log(
+              "Selected gift:",
+              gift.type
+            );
+
+            console.log(
+              "Gift NGN value:",
+              gift.price
+            );
+
+          }
+        );
+
+
+        giftGrid.appendChild(
+          giftCard
+        );
+
+      }
+    );
