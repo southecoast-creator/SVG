@@ -1,1249 +1,1267 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+"Access-Control-Allow-Origin": "*",
+"Access-Control-Allow-Headers":
+"authorization, x-client-info, apikey, content-type",
+"Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 /*
- * ============================================================
- * LITDOM GIFT PRICES
- * ============================================================
- *
- * These are the AUTHORITATIVE Litdom prices.
- *
- * The browser is NOT trusted to provide the price.
- */
+
+============================================================
+
+LITDOM GIFT PRICES
+
+============================================================
+
+These are the AUTHORITATIVE Litdom prices.
+
+The browser is NOT trusted to provide the price.
+*/
+
 
 const GIFT_PRICES_NGN: Record<string, number> = {
-  ink: 100,
-  avocado: 150,
-  "school-bag": 200,
-  keyboard: 250,
-  donut: 300,
-  bracelet: 500,
-  chips: 700,
-  croissant: 1000,
-  cauldron: 1250,
-  camera: 1500,
-  rocket: 1750,
-  pie: 2000,
-  goggles: 2250,
-  coffee: 2500,
-  pizza: 5000,
-  pancakes: 8000,
-  skulls: 10000,
-  island: 20000,
-  crown: 50000,
+ink: 100,
+avocado: 150,
+"school-bag": 200,
+keyboard: 250,
+donut: 300,
+bracelet: 500,
+chips: 700,
+croissant: 1000,
+cauldron: 1250,
+camera: 1500,
+rocket: 1750,
+pie: 2000,
+goggles: 2250,
+coffee: 2500,
+pizza: 5000,
+pancakes: 8000,
+skulls: 10000,
+island: 20000,
+crown: 50000,
 };
 
-
 /*
- * ============================================================
- * SUPPORTED LITDOM PAYMENT CURRENCIES
- * ============================================================
- *
- * These correspond to currencies/payment regions supported
- * by Flutterwave's current documentation.
- */
+
+============================================================
+
+SUPPORTED LITDOM PAYMENT CURRENCIES
+
+============================================================
+
+These correspond to currencies/payment regions supported
+
+by Flutterwave's current documentation.
+*/
+
 
 const SUPPORTED_CURRENCIES = new Set([
-  "NGN",
-  "USD",
-  "EUR",
-  "GBP",
-  "ZAR",
-  "GHS",
-  "KES",
-  "UGX",
-  "RWF",
-  "TZS",
-  "MWK",
-  "XAF",
-  "XOF",
-  "EGP",
+"NGN",
+"USD",
+"EUR",
+"GBP",
+"ZAR",
+"GHS",
+"KES",
+"UGX",
+"RWF",
+"TZS",
+"MWK",
+"XAF",
+"XOF",
+"EGP",
 ]);
 
-
 /*
- * ============================================================
- * CURRENCY INFORMATION
- * ============================================================
- */
+
+============================================================
+
+CURRENCY INFORMATION
+
+============================================================
+*/
+
 
 const CURRENCY_INFO: Record<
-  string,
-  {
-    locale: string;
-    symbol: string;
-    decimals: number;
-  }
+string,
+{
+locale: string;
+symbol: string;
+decimals: number;
+}
+
 > = {
-  NGN: {
-    locale: "en-NG",
-    symbol: "₦",
-    decimals: 0,
-  },
+NGN: {
+locale: "en-NG",
+symbol: "₦",
+decimals: 0,
+},
 
-  USD: {
-    locale: "en-US",
-    symbol: "$",
-    decimals: 2,
-  },
 
-  EUR: {
-    locale: "en-IE",
-    symbol: "€",
-    decimals: 2,
-  },
 
-  GBP: {
-    locale: "en-GB",
-    symbol: "£",
-    decimals: 2,
-  },
+USD: {
+locale: "en-US",
+symbol: "$",
+decimals: 2,
+},
 
-  ZAR: {
-    locale: "en-ZA",
-    symbol: "R",
-    decimals: 2,
-  },
+EUR: {
+locale: "en-IE",
+symbol: "€",
+decimals: 2,
+},
 
-  GHS: {
-    locale: "en-GH",
-    symbol: "GH₵",
-    decimals: 2,
-  },
+GBP: {
+locale: "en-GB",
+symbol: "£",
+decimals: 2,
+},
 
-  KES: {
-    locale: "en-KE",
-    symbol: "KSh",
-    decimals: 2,
-  },
+ZAR: {
+locale: "en-ZA",
+symbol: "R",
+decimals: 2,
+},
 
-  UGX: {
-    locale: "en-UG",
-    symbol: "UGX",
-    decimals: 0,
-  },
+GHS: {
+locale: "en-GH",
+symbol: "GH₵",
+decimals: 2,
+},
 
-  RWF: {
-    locale: "rw-RW",
-    symbol: "FRw",
-    decimals: 0,
-  },
+KES: {
+locale: "en-KE",
+symbol: "KSh",
+decimals: 2,
+},
 
-  TZS: {
-    locale: "sw-TZ",
-    symbol: "TSh",
-    decimals: 0,
-  },
+UGX: {
+locale: "en-UG",
+symbol: "UGX",
+decimals: 0,
+},
 
-  MWK: {
-    locale: "en-MW",
-    symbol: "MK",
-    decimals: 2,
-  },
+RWF: {
+locale: "rw-RW",
+symbol: "FRw",
+decimals: 0,
+},
 
-  XAF: {
-    locale: "fr-CM",
-    symbol: "FCFA",
-    decimals: 0,
-  },
+TZS: {
+locale: "sw-TZ",
+symbol: "TSh",
+decimals: 0,
+},
 
-  XOF: {
-    locale: "fr-SN",
-    symbol: "CFA",
-    decimals: 0,
-  },
+MWK: {
+locale: "en-MW",
+symbol: "MK",
+decimals: 2,
+},
 
-  EGP: {
-    locale: "ar-EG",
-    symbol: "E£",
-    decimals: 2,
-  },
+XAF: {
+locale: "fr-CM",
+symbol: "FCFA",
+decimals: 0,
+},
+
+XOF: {
+locale: "fr-SN",
+symbol: "CFA",
+decimals: 0,
+},
+
+EGP: {
+locale: "ar-EG",
+symbol: "E£",
+decimals: 2,
+},
 };
 
-
 /*
- * ============================================================
- * JSON RESPONSE HELPER
- * ============================================================
- */
+
+============================================================
+
+JSON RESPONSE HELPER
+
+============================================================
+*/
+
 
 function jsonResponse(
-  data: unknown,
-  status = 200,
+data: unknown,
+status = 200,
 ) {
-  return new Response(
-    JSON.stringify(data),
-    {
-      status,
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "application/json",
-      },
-    },
-  );
+return new Response(
+JSON.stringify(data),
+{
+status,
+headers: {
+...corsHeaders,
+"Content-Type": "application/json",
+},
+},
+);
 }
 
-
 /*
- * ============================================================
- * EXCHANGE RATE
- * ============================================================
- *
- * Litdom's accounting currency is NGN.
- *
- * We retrieve the current available NGN -> target currency
- * reference rate from Frankfurter.
- *
- * This is for approximate customer pricing.
- */
+
+============================================================
+
+EXCHANGE RATE
+
+============================================================
+
+Litdom's accounting currency is NGN.
+
+We retrieve the current available NGN -> target currency
+
+reference rate from Frankfurter.
+
+This is for approximate customer pricing.
+*/
+
 
 async function getExchangeRate(
-  currency: string,
+currency: string,
 ): Promise<{
-  rate: number;
-  source: string;
+rate: number;
+source: string;
 }> {
 
-  if (currency === "NGN") {
-    return {
-      rate: 1,
-      source: "Litdom NGN base",
-    };
-  }
-
-
-  const url =
-    `https://api.frankfurter.dev/v2/rate/NGN/${currency}`;
-
-
-  const response =
-    await fetch(url);
-
-
-  if (!response.ok) {
-    throw new Error(
-      `Unable to obtain exchange rate for ${currency}.`,
-    );
-  }
-
-
-  const data =
-    await response.json();
-
-
-  const rate =
-    Number(data?.rate);
-
-
-  if (
-    !Number.isFinite(rate) ||
-    rate <= 0
-  ) {
-    throw new Error(
-      `Invalid exchange rate returned for ${currency}.`,
-    );
-  }
-
-
-  return {
-    rate,
-    source:
-      `Frankfurter (${data?.date ?? "latest"})`,
-  };
+if (currency === "NGN") {
+return {
+rate: 1,
+source: "Litdom NGN base",
+};
 }
 
+const url =
+https://api.frankfurter.dev/v2/rate/NGN/${currency};
+
+const response =
+await fetch(url);
+
+if (!response.ok) {
+throw new Error(
+Unable to obtain exchange rate for ${currency}.,
+);
+}
+
+const data =
+await response.json();
+
+const rate =
+Number(data?.rate);
+
+if (
+!Number.isFinite(rate) ||
+rate <= 0
+) {
+throw new Error(
+Invalid exchange rate returned for ${currency}.,
+);
+}
+
+return {
+rate,
+source:
+Frankfurter (${data?.date ?? "latest"}),
+};
+}
 
 /*
- * ============================================================
- * ROUND LOCAL PRICE
- * ============================================================
- *
- * You asked for approximate prices with rounding upward.
- *
- * We therefore round UP to the smallest sensible displayed
- * unit for the currency.
- */
+
+============================================================
+
+ROUND LOCAL PRICE
+
+============================================================
+
+You asked for approximate prices with rounding upward.
+
+We therefore round UP to the smallest sensible displayed
+
+unit for the currency.
+*/
+
 
 function roundUpPrice(
-  amount: number,
-  currency: string,
+amount: number,
+currency: string,
 ): number {
 
-  const info =
-    CURRENCY_INFO[currency];
+const info =
+CURRENCY_INFO[currency];
 
-
-  if (!info) {
-    return Math.ceil(amount);
-  }
-
-
-  if (info.decimals === 0) {
-    return Math.ceil(amount);
-  }
-
-
-  return Math.ceil(
-    amount * 100,
-  ) / 100;
+if (!info) {
+return Math.ceil(amount);
 }
 
+if (info.decimals === 0) {
+return Math.ceil(amount);
+}
+
+return Math.ceil(
+amount * 100,
+) / 100;
+}
 
 /*
- * ============================================================
- * AUTHENTICATE CURRENT USER
- * ============================================================
- *
- * The sender_id supplied by the browser must match the
- * authenticated Supabase user.
- */
+
+============================================================
+
+AUTHENTICATE CURRENT USER
+
+============================================================
+
+The sender_id supplied by the browser must match the
+
+authenticated Supabase user.
+*/
+
 
 async function getAuthenticatedUserId(
-  req: Request,
+req: Request,
 ): Promise<string> {
 
-  const authHeader =
-    req.headers.get(
-      "Authorization",
-    );
+const authHeader =
+req.headers.get(
+"Authorization",
+);
 
-
-  if (
-    !authHeader ||
-    !authHeader.startsWith("Bearer ")
-  ) {
-    throw new Error(
-      "Authentication is required.",
-    );
-  }
-
-
-  const supabaseUrl =
-    Deno.env.get(
-      "SUPABASE_URL",
-    );
-
-
-  const anonKey =
-    Deno.env.get(
-      "SUPABASE_ANON_KEY",
-    );
-
-
-  if (
-    !supabaseUrl ||
-    !anonKey
-  ) {
-    throw new Error(
-      "Supabase environment variables are not configured.",
-    );
-  }
-
-
-  const userResponse =
-    await fetch(
-      `${supabaseUrl}/auth/v1/user`,
-      {
-        method: "GET",
-
-        headers: {
-          Authorization: authHeader,
-          apikey: anonKey,
-        },
-      },
-    );
-
-
-  if (!userResponse.ok) {
-    throw new Error(
-      "Invalid or expired authentication session.",
-    );
-  }
-
-
-  const user =
-    await userResponse.json();
-
-
-  if (!user?.id) {
-    throw new Error(
-      "Authenticated user could not be identified.",
-    );
-  }
-
-
-  return user.id;
+if (
+!authHeader ||
+!authHeader.startsWith("Bearer ")
+) {
+throw new Error(
+"Authentication is required.",
+);
 }
 
+const supabaseUrl =
+Deno.env.get(
+"SUPABASE_URL",
+);
+
+const anonKey =
+Deno.env.get(
+"SUPABASE_ANON_KEY",
+);
+
+if (
+!supabaseUrl ||
+!anonKey
+) {
+throw new Error(
+"Supabase environment variables are not configured.",
+);
+}
+
+const userResponse =
+await fetch(
+${supabaseUrl}/auth/v1/user,
+{
+method: "GET",
+
+headers: {  
+      Authorization: authHeader,  
+      apikey: anonKey,  
+    },  
+  },  
+);
+
+if (!userResponse.ok) {
+throw new Error(
+"Invalid or expired authentication session.",
+);
+}
+
+const user =
+await userResponse.json();
+
+if (!user?.id) {
+throw new Error(
+"Authenticated user could not be identified.",
+);
+}
+
+return user.id;
+}
 
 /*
- * ============================================================
- * VERIFY BASIC SUPABASE RECORDS
- * ============================================================
- *
- * We use the service role only inside the Edge Function.
- * NEVER expose this key to Blogger.
- */
+
+============================================================
+
+VERIFY BASIC SUPABASE RECORDS
+
+============================================================
+
+We use the service role only inside the Edge Function.
+
+NEVER expose this key to Blogger.
+*/
+
 
 async function verifyRecords(
-  senderId: string,
-  receiverId: string,
-  bookId: string,
-  chapterId: string,
+senderId: string,
+receiverId: string,
+bookId: string,
+chapterId: string,
 ) {
 
-  const supabaseUrl =
-    Deno.env.get(
-      "SUPABASE_URL",
-    );
+const supabaseUrl =
+Deno.env.get(
+"SUPABASE_URL",
+);
 
+const serviceRoleKey =
+Deno.env.get(
+"SUPABASE_SERVICE_ROLE_KEY",
+);
 
-  const serviceRoleKey =
-    Deno.env.get(
-      "SUPABASE_SERVICE_ROLE_KEY",
-    );
-
-
-  if (
-    !supabaseUrl ||
-    !serviceRoleKey
-  ) {
-    throw new Error(
-      "Supabase service-role configuration is missing.",
-    );
-  }
-
-
-  const headers = {
-    apikey: serviceRoleKey,
-    Authorization:
-      `Bearer ${serviceRoleKey}`,
-  };
-
-
-  /*
-   * Sender profile
-   */
-
-  const senderResponse =
-    await fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(senderId)}&select=id`,
-      {
-        headers,
-      },
-    );
-
-
-  if (!senderResponse.ok) {
-    throw new Error(
-      "Unable to verify sender.",
-    );
-  }
-
-
-  const senderRows =
-    await senderResponse.json();
-
-
-  if (
-    !Array.isArray(senderRows) ||
-    senderRows.length !== 1
-  ) {
-    throw new Error(
-      "Sender profile was not found.",
-    );
-  }
-
-
-  /*
-   * Receiver profile
-   */
-
-  const receiverResponse =
-    await fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(receiverId)}&select=id`,
-      {
-        headers,
-      },
-    );
-
-
-  if (!receiverResponse.ok) {
-    throw new Error(
-      "Unable to verify receiver.",
-    );
-  }
-
-
-  const receiverRows =
-    await receiverResponse.json();
-
-
-  if (
-    !Array.isArray(receiverRows) ||
-    receiverRows.length !== 1
-  ) {
-    throw new Error(
-      "Receiver profile was not found.",
-    );
-  }
-
-
-  /*
-   * Book
-   */
-
-  const bookResponse =
-    await fetch(
-      `${supabaseUrl}/rest/v1/books?id=eq.${encodeURIComponent(bookId)}&select=id`,
-      {
-        headers,
-      },
-    );
-
-
-  if (!bookResponse.ok) {
-    throw new Error(
-      "Unable to verify book.",
-    );
-  }
-
-
-  const bookRows =
-    await bookResponse.json();
-
-
-  if (
-    !Array.isArray(bookRows) ||
-    bookRows.length !== 1
-  ) {
-    throw new Error(
-      "Book was not found.",
-    );
-  }
-
-
-  /*
-   * Chapter
-   */
-
-  const chapterResponse =
-    await fetch(
-      `${supabaseUrl}/rest/v1/chapters?id=eq.${encodeURIComponent(chapterId)}&select=id`,
-      {
-        headers,
-      },
-    );
-
-
-  if (!chapterResponse.ok) {
-    throw new Error(
-      "Unable to verify chapter.",
-    );
-  }
-
-
-  const chapterRows =
-    await chapterResponse.json();
-
-
-  if (
-    !Array.isArray(chapterRows) ||
-    chapterRows.length !== 1
-  ) {
-    throw new Error(
-      "Chapter was not found.",
-    );
-  }
+if (
+!supabaseUrl ||
+!serviceRoleKey
+) {
+throw new Error(
+"Supabase service-role configuration is missing.",
+);
 }
 
+const headers = {
+apikey: serviceRoleKey,
+Authorization:
+Bearer ${serviceRoleKey},
+};
 
 /*
- * ============================================================
- * SAVE GIFT PAYMENT
- * ============================================================
- */
+
+Sender profile
+*/
+
+
+const senderResponse =
+await fetch(
+${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(senderId)}&select=id,
+{
+headers,
+},
+);
+
+if (!senderResponse.ok) {
+throw new Error(
+"Unable to verify sender.",
+);
+}
+
+const senderRows =
+await senderResponse.json();
+
+if (
+!Array.isArray(senderRows) ||
+senderRows.length !== 1
+) {
+throw new Error(
+"Sender profile was not found.",
+);
+}
+
+/*
+
+Receiver profile
+*/
+
+
+const receiverResponse =
+await fetch(
+${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(receiverId)}&select=id,
+{
+headers,
+},
+);
+
+if (!receiverResponse.ok) {
+throw new Error(
+"Unable to verify receiver.",
+);
+}
+
+const receiverRows =
+await receiverResponse.json();
+
+if (
+!Array.isArray(receiverRows) ||
+receiverRows.length !== 1
+) {
+throw new Error(
+"Receiver profile was not found.",
+);
+}
+
+/*
+
+Book
+*/
+
+
+const bookResponse =
+await fetch(
+${supabaseUrl}/rest/v1/books?id=eq.${encodeURIComponent(bookId)}&select=id,
+{
+headers,
+},
+);
+
+if (!bookResponse.ok) {
+throw new Error(
+"Unable to verify book.",
+);
+}
+
+const bookRows =
+await bookResponse.json();
+
+if (
+!Array.isArray(bookRows) ||
+bookRows.length !== 1
+) {
+throw new Error(
+"Book was not found.",
+);
+}
+
+/*
+
+Chapter
+*/
+
+
+const chapterResponse =
+await fetch(
+${supabaseUrl}/rest/v1/chapters?id=eq.${encodeURIComponent(chapterId)}&select=id,
+{
+headers,
+},
+);
+
+if (!chapterResponse.ok) {
+throw new Error(
+"Unable to verify chapter.",
+);
+}
+
+const chapterRows =
+await chapterResponse.json();
+
+if (
+!Array.isArray(chapterRows) ||
+chapterRows.length !== 1
+) {
+throw new Error(
+"Chapter was not found.",
+);
+}
+}
+
+/*
+
+============================================================
+
+SAVE GIFT PAYMENT
+
+============================================================
+*/
+
 
 async function insertGiftPayment(
-  record: Record<string, unknown>,
+record: Record<string, unknown>,
 ) {
 
-  const supabaseUrl =
-    Deno.env.get(
-      "SUPABASE_URL",
-    );
+const supabaseUrl =
+Deno.env.get(
+"SUPABASE_URL",
+);
 
+const serviceRoleKey =
+Deno.env.get(
+"SUPABASE_SERVICE_ROLE_KEY",
+);
 
-  const serviceRoleKey =
-    Deno.env.get(
-      "SUPABASE_SERVICE_ROLE_KEY",
-    );
-
-
-  if (
-    !supabaseUrl ||
-    !serviceRoleKey
-  ) {
-    throw new Error(
-      "Supabase service-role configuration is missing.",
-    );
-  }
-
-
-  const response =
-    await fetch(
-      `${supabaseUrl}/rest/v1/gift_payments`,
-      {
-        method: "POST",
-
-        headers: {
-          apikey: serviceRoleKey,
-
-          Authorization:
-            `Bearer ${serviceRoleKey}`,
-
-          "Content-Type":
-            "application/json",
-
-          Prefer:
-            "return=representation",
-        },
-
-        body:
-          JSON.stringify(record),
-      },
-    );
-
-
-  const data =
-    await response.json();
-
-
-  if (!response.ok) {
-    console.error(
-      "Supabase gift payment insert error:",
-      data,
-    );
-
-    throw new Error(
-      "Unable to create gift payment record.",
-    );
-  }
-
-
-  return data;
+if (
+!supabaseUrl ||
+!serviceRoleKey
+) {
+throw new Error(
+"Supabase service-role configuration is missing.",
+);
 }
 
+const response =
+await fetch(
+${supabaseUrl}/rest/v1/gift_payments,
+{
+method: "POST",
+
+headers: {  
+      apikey: serviceRoleKey,  
+
+      Authorization:  
+        `Bearer ${serviceRoleKey}`,  
+
+      "Content-Type":  
+        "application/json",  
+
+      Prefer:  
+        "return=representation",  
+    },  
+
+    body:  
+      JSON.stringify(record),  
+  },  
+);
+
+const data =
+await response.json();
+
+if (!response.ok) {
+console.error(
+"Supabase gift payment insert error:",
+data,
+);
+
+throw new Error(  
+  "Unable to create gift payment record.",  
+);
+
+}
+
+return data;
+}
 
 /*
- * ============================================================
- * UPDATE GIFT PAYMENT
- * ============================================================
- */
+
+============================================================
+
+UPDATE GIFT PAYMENT
+
+============================================================
+*/
+
 
 async function updateGiftPayment(
-  txRef: string,
-  updates: Record<string, unknown>,
+txRef: string,
+updates: Record<string, unknown>,
 ) {
 
-  const supabaseUrl =
-    Deno.env.get(
-      "SUPABASE_URL",
-    );
+const supabaseUrl =
+Deno.env.get(
+"SUPABASE_URL",
+);
 
+const serviceRoleKey =
+Deno.env.get(
+"SUPABASE_SERVICE_ROLE_KEY",
+);
 
-  const serviceRoleKey =
-    Deno.env.get(
-      "SUPABASE_SERVICE_ROLE_KEY",
-    );
-
-
-  if (
-    !supabaseUrl ||
-    !serviceRoleKey
-  ) {
-    throw new Error(
-      "Supabase service-role configuration is missing.",
-    );
-  }
-
-
-  const response =
-    await fetch(
-      `${supabaseUrl}/rest/v1/gift_payments?tx_ref=eq.${encodeURIComponent(txRef)}`,
-      {
-        method: "PATCH",
-
-        headers: {
-          apikey: serviceRoleKey,
-
-          Authorization:
-            `Bearer ${serviceRoleKey}`,
-
-          "Content-Type":
-            "application/json",
-
-          Prefer:
-            "return=representation",
-        },
-
-        body:
-          JSON.stringify(updates),
-      },
-    );
-
-
-  const data =
-    await response.json();
-
-
-  if (!response.ok) {
-    console.error(
-      "Supabase gift payment update error:",
-      data,
-    );
-
-    throw new Error(
-      "Unable to update gift payment record.",
-    );
-  }
-
-
-  return data;
+if (
+!supabaseUrl ||
+!serviceRoleKey
+) {
+throw new Error(
+"Supabase service-role configuration is missing.",
+);
 }
 
+const response =
+await fetch(
+${supabaseUrl}/rest/v1/gift_payments?tx_ref=eq.${encodeURIComponent(txRef)},
+{
+method: "PATCH",
+
+headers: {  
+      apikey: serviceRoleKey,  
+
+      Authorization:  
+        `Bearer ${serviceRoleKey}`,  
+
+      "Content-Type":  
+        "application/json",  
+
+      Prefer:  
+        "return=representation",  
+    },  
+
+    body:  
+      JSON.stringify(updates),  
+  },  
+);
+
+const data =
+await response.json();
+
+if (!response.ok) {
+console.error(
+"Supabase gift payment update error:",
+data,
+);
+
+throw new Error(  
+  "Unable to update gift payment record.",  
+);
+
+}
+
+return data;
+}
 
 /*
- * ============================================================
- * MAIN FUNCTION
- * ============================================================
- */
+
+============================================================
+
+MAIN FUNCTION
+
+============================================================
+*/
+
 
 serve(async (req) => {
 
-  /*
-   * CORS
-   */
+/*
 
-  if (req.method === "OPTIONS") {
-    return new Response(
-      "ok",
-      {
-        headers:
-          corsHeaders,
-      },
+CORS
+*/
+
+
+if (req.method === "OPTIONS") {
+return new Response(
+"ok",
+{
+headers:
+corsHeaders,
+},
+);
+}
+
+try {
+
+/*  
+ * Only POST  
+ */  
+
+if (  
+  req.method !== "POST"  
+) {  
+  return jsonResponse(  
+    {  
+      error:  
+        "Only POST requests are allowed.",  
+    },  
+    405,  
+  );  
+}  
+
+
+/*  
+ * Authenticate user  
+ */  
+
+const authenticatedUserId =  
+  await getAuthenticatedUserId(  
+    req,  
+  );  
+
+
+/*  
+ * Read body  
+ */  
+
+const body =  
+  await req.json();  
+
+
+const {  
+  gift_type,  
+  book_id,  
+  chapter_id,  
+  sender_id,  
+  receiver_id,  
+  email,  
+  currency,  
+} = body;  
+
+
+/*  
+ * Required fields  
+ */  
+
+if (  
+  !gift_type ||  
+  !book_id ||  
+  !chapter_id ||  
+  !sender_id ||  
+  !receiver_id ||  
+  !email  
+) {  
+  return jsonResponse(  
+    {  
+      error:  
+        "Missing required gift information.",  
+    },  
+    400,  
+  );  
+}  
+
+
+/*  
+ * Sender must be the logged-in user.  
+ */  
+
+if (  
+  String(sender_id) !==  
+  authenticatedUserId  
+) {  
+  return jsonResponse(  
+    {  
+      error:  
+        "Sender does not match the authenticated user.",  
+    },  
+    403,  
+  );  
+}  
+
+
+/*  
+ * Normalize gift.  
+ */  
+
+const giftKey =  
+  String(  
+    gift_type,  
+  )  
+    .toLowerCase()  
+    .trim();  
+
+
+/*  
+ * Get authoritative NGN price.  
+ */  
+
+const ngnAmount =  
+  GIFT_PRICES_NGN[  
+    giftKey  
+  ];  
+
+
+if (  
+  !Number.isFinite(  
+    ngnAmount,  
+  ) ||  
+  ngnAmount <= 0  
+) {  
+  return jsonResponse(  
+    {  
+      error:  
+        "Invalid gift selected.",  
+    },  
+    400,  
+  );  
+}  
+
+
+/*  
+ * Currency.  
+ *  
+ * NGN is the safe default.  
+ *  
+ * Later the Gift Shop will automatically  
+ * provide the reader's regional currency.  
+ */  
+
+const requestedCurrency =  
+  String(  
+    currency ||  
+      "NGN",  
+  )  
+    .toUpperCase()  
+    .trim();  
+
+
+if (  
+  !SUPPORTED_CURRENCIES.has(  
+    requestedCurrency,  
+  )  
+) {  
+  return jsonResponse(  
+    {  
+      error:  
+        "This payment currency is not currently supported by Litdom.",  
+    },  
+    400,  
+  );  
+}  
+
+
+/*  
+ * Check all referenced records.  
+ */  
+
+await verifyRecords(  
+  sender_id,  
+  receiver_id,  
+  book_id,  
+  chapter_id,  
+);  
+
+
+/*  
+ * Get exchange rate.  
+ */  
+
+const {  
+  rate,  
+  source,  
+} =  
+  await getExchangeRate(  
+    requestedCurrency,  
+  );  
+
+
+/*  
+ * Calculate reader's price.  
+ */  
+
+const rawAmount =  
+  ngnAmount * rate;  
+
+
+const amount =  
+  roundUpPrice(  
+    rawAmount,  
+    requestedCurrency,  
+  );  
+
+
+if (  
+  !Number.isFinite(  
+    amount,  
+  ) ||  
+  amount <= 0  
+) {  
+  throw new Error(  
+    "Calculated payment amount is invalid.",  
+  );  
+}  
+
+
+/*  
+ * Flutterwave secret.  
+ */  
+
+const secretKey =  
+  Deno.env.get(  
+    "FLW_V3_SECRET_KEY",  
+  );  
+
+
+if (!secretKey) {  
+  throw new Error(  
+    "FLW_V3_SECRET_KEY is not configured in Supabase.",  
+  );  
+}  
+
+
+/*  
+ * Unique transaction reference.  
+ */  
+
+const txRef =  
+  `gift-${giftKey}-${crypto.randomUUID()}`;  
+
+
+/*  
+ * ========================================================  
+ * CREATE PENDING DATABASE RECORD FIRST  
+ * ========================================================  
+ *  
+ * This ensures Litdom knows about the intended payment  
+ * before the reader leaves for Flutterwave.  
+ */  
+
+await insertGiftPayment(  
+  {  
+    sender_id,  
+    receiver_id,  
+    book_id,  
+    chapter_id,  
+
+    gift_type:  
+      giftKey,  
+
+    amount,  
+
+    currency:  
+      requestedCurrency,  
+
+    ngn_amount:  
+      ngnAmount,  
+
+    exchange_rate:  
+      rate,  
+
+    exchange_rate_source:  
+      source,  
+
+    customer_email:  
+      String(email)  
+        .trim()  
+        .toLowerCase(),  
+
+    status:  
+      "pending",  
+
+    tx_ref:  
+      txRef,  
+  },  
+);  
+
+
+/*  
+ * ========================================================  
+ * CREATE FLUTTERWAVE CHECKOUT  
+ * ========================================================  
+ *  
+ * We allow Flutterwave to automatically remove payment  
+ * methods that aren't applicable to the selected currency.  
+ */  
+
+const flutterwaveResponse =  
+  await fetch(  
+    "https://api.flutterwave.com/v3/payments",  
+    {  
+      method:  
+        "POST",  
+
+      headers: {  
+        Authorization:  
+          `Bearer ${secretKey}`,  
+
+        "Content-Type":  
+          "application/json",  
+      },  
+
+      body:  
+        JSON.stringify(  
+          {  
+            tx_ref:  
+              txRef,  
+
+            amount:  
+              amount,  
+
+            currency:  
+              requestedCurrency,  
+
+            redirect_url:  
+              "https://litdom.blogspot.com/p/reading_01731693423.html",  
+
+            payment_options:  
+              "card,account,banktransfer,ussd,opay,mobilemoneyghana,mpesa,mobilemoneyuganda,mobilemoneyrwanda,mobilemoneyzambia,mobilemoneyxaf,mobilemoneyxof,fawrypay",  
+
+            customer: {  
+              email:  
+                String(email)  
+                  .trim()  
+                  .toLowerCase(),  
+            },  
+
+            customizations: {  
+              title:  
+                "Litdom Gift Shop",  
+
+              description:  
+                `Gift: ${giftKey}`,  
+
+              logo:  
+                "https://litdom.blogspot.com/favicon.ico",  
+            },  
+
+            meta: {  
+              gift_type:  
+                giftKey,  
+
+              book_id:  
+                book_id,  
+
+              chapter_id:  
+                chapter_id,  
+
+              sender_id:  
+                sender_id,  
+
+              receiver_id:  
+                receiver_id,  
+
+              ngn_amount:  
+                ngnAmount,  
+
+              payment_currency:  
+                requestedCurrency,  
+
+              exchange_rate:  
+                rate,  
+            },  
+          },  
+        ),  
+    },  
+  );  
+
+
+const flutterwaveData =  
+  await flutterwaveResponse.json();  
+
+
+/*  
+ * Flutterwave rejected checkout creation.  
+ */  
+
+if (  
+  !flutterwaveResponse.ok ||  
+  flutterwaveData?.status !==  
+    "success"  
+) {  
+
+  console.error(  
+    "Flutterwave payment creation error:",  
+    flutterwaveData,  
+  );  
+
+
+  /*  
+   * Keep the payment record but mark it failed.  
+   */  
+
+  await updateGiftPayment(  
+    txRef,  
+    {  
+      status:  
+        "failed",  
+    },  
+  );  
+
+
+  return jsonResponse(  
+    {  
+      error:  
+        "Flutterwave could not create the payment.",  
+    },  
+    502,  
+  );  
+}  
+
+
+const paymentLink =  
+  flutterwaveData?.data?.link;  
+
+
+const flutterwaveTransactionId =  
+  flutterwaveData?.data?.id  
+    ? String(  
+        flutterwaveData.data.id,  
+      )  
+    : null;  
+
+
+if (!paymentLink) {  
+
+  await updateGiftPayment(  
+    txRef,  
+    {  
+      status:  
+        "failed",  
+    },  
+  );  
+
+
+  throw new Error(  
+    "Flutterwave returned no payment link.",  
+  );  
+}  
+
+
+/*  
+ * Save Flutterwave information.  
+ */  
+
+await updateGiftPayment(  
+  txRef,  
+  {  
+    payment_link:  
+      paymentLink,  
+
+    flutterwave_transaction_id:  
+      flutterwaveTransactionId,  
+  },  
+);  
+
+
+/*  
+ * Return ONLY what the frontend needs.  
+ *  
+ * The browser receives the display/payment information,  
+ * but the server remains authoritative.  
+ */  
+
+return jsonResponse(  
+  {  
+    success:  
+      true,  
+
+    payment_link:  
+      paymentLink,  
+
+    tx_ref:  
+      txRef,  
+
+    gift_type:  
+      giftKey,  
+
+    ngn_amount:  
+      ngnAmount,  
+
+    amount:  
+      amount,  
+
+    currency:  
+      requestedCurrency,  
+
+    exchange_rate:  
+      rate,  
+
+    exchange_rate_source:  
+      source,  
+  },  
+  200,  
+);
+
+} catch (error) {
+
+console.error(
+      "Litdom gift payment error:",
+      error,
     );
-  }
 
-
-  try {
-
-    /*
-     * Only POST
-     */
-
-    if (
-      req.method !== "POST"
-    ) {
-      return jsonResponse(
-        {
-          error:
-            "Only POST requests are allowed.",
-        },
-        405,
-      );
-    }
-
-
-    /*
-     * Authenticate user
-     */
-
-    const authenticatedUserId =
-      await getAuthenticatedUserId(
-        req,
-      );
-
-
-    /*
-     * Read body
-     */
-
-    const body =
-      await req.json();
-
-
-    const {
-      gift_type,
-      book_id,
-      chapter_id,
-      sender_id,
-      receiver_id,
-      email,
-      currency,
-    } = body;
-
-
-    /*
-     * Required fields
-     */
-
-    if (
-      !gift_type ||
-      !book_id ||
-      !chapter_id ||
-      !sender_id ||
-      !receiver_id ||
-      !email
-    ) {
-      return jsonResponse(
-        {
-          error:
-            "Missing required gift information.",
-        },
-        400,
-      );
-    }
-
-
-    /*
-     * Sender must be the logged-in user.
-     */
-
-    if (
-      String(sender_id) !==
-      authenticatedUserId
-    ) {
-      return jsonResponse(
-        {
-          error:
-            "Sender does not match the authenticated user.",
-        },
-        403,
-      );
-    }
-
-
-    /*
-     * Normalize gift.
-     */
-
-    const giftKey =
-      String(
-        gift_type,
-      )
-        .toLowerCase()
-        .trim();
-
-
-    /*
-     * Get authoritative NGN price.
-     */
-
-    const ngnAmount =
-      GIFT_PRICES_NGN[
-        giftKey
-      ];
-
-
-    if (
-      !Number.isFinite(
-        ngnAmount,
-      ) ||
-      ngnAmount <= 0
-    ) {
-      return jsonResponse(
-        {
-          error:
-            "Invalid gift selected.",
-        },
-        400,
-      );
-    }
-
-
-    /*
-     * Currency.
-     *
-     * NGN is the safe default.
-     *
-     * Later the Gift Shop will automatically
-     * provide the reader's regional currency.
-     */
-
-    const requestedCurrency =
-      String(
-        currency ||
-          "NGN",
-      )
-        .toUpperCase()
-        .trim();
-
-
-    if (
-      !SUPPORTED_CURRENCIES.has(
-        requestedCurrency,
-      )
-    ) {
-      return jsonResponse(
-        {
-          error:
-            "This payment currency is not currently supported by Litdom.",
-        },
-        400,
-      );
-    }
-
-
-    /*
-     * Check all referenced records.
-     */
-
-    await verifyRecords(
-      sender_id,
-      receiver_id,
-      book_id,
-      chapter_id,
-    );
-
-
-    /*
-     * Get exchange rate.
-     */
-
-    const {
-      rate,
-      source,
-    } =
-      await getExchangeRate(
-        requestedCurrency,
-      );
-
-
-    /*
-     * Calculate reader's price.
-     */
-
-    const rawAmount =
-      ngnAmount * rate;
-
-
-    const amount =
-      roundUpPrice(
-        rawAmount,
-        requestedCurrency,
-      );
-
-
-    if (
-      !Number.isFinite(
-        amount,
-      ) ||
-      amount <= 0
-    ) {
-      throw new Error(
-        "Calculated payment amount is invalid.",
-      );
-    }
-
-
-    /*
-     * Flutterwave secret.
-     */
-
-    const secretKey =
-      Deno.env.get(
-        "FLW_V3_SECRET_KEY",
-      );
-
-
-    if (!secretKey) {
-      throw new Error(
-        "FLW_V3_SECRET_KEY is not configured in Supabase.",
-      );
-    }
-
-
-    /*
-     * Unique transaction reference.
-     */
-
-    const txRef =
-      `gift-${giftKey}-${crypto.randomUUID()}`;
-
-
-    /*
-     * ========================================================
-     * CREATE PENDING DATABASE RECORD FIRST
-     * ========================================================
-     *
-     * This ensures Litdom knows about the intended payment
-     * before the reader leaves for Flutterwave.
-     */
-
-    await insertGiftPayment(
-      {
-        sender_id,
-        receiver_id,
-        book_id,
-        chapter_id,
-
-        gift_type:
-          giftKey,
-
-        amount,
-
-        currency:
-          requestedCurrency,
-
-        ngn_amount:
-          ngnAmount,
-
-        exchange_rate:
-          rate,
-
-        exchange_rate_source:
-          source,
-
-        customer_email:
-          String(email)
-            .trim()
-            .toLowerCase(),
-
-        status:
-          "pending",
-
-        tx_ref:
-          txRef,
-      },
-    );
-
-
-    /*
-     * ========================================================
-     * CREATE FLUTTERWAVE CHECKOUT
-     * ========================================================
-     *
-     * We allow Flutterwave to automatically remove payment
-     * methods that aren't applicable to the selected currency.
-     */
-
-    const flutterwaveResponse =
-      await fetch(
-        "https://api.flutterwave.com/v3/payments",
-        {
-          method:
-            "POST",
-
-          headers: {
-            Authorization:
-              `Bearer ${secretKey}`,
-
-            "Content-Type":
-              "application/json",
-          },
-
-          body:
-            JSON.stringify(
-              {
-                tx_ref:
-                  txRef,
-
-                amount:
-                  amount,
-
-                currency:
-                  requestedCurrency,
-
-                redirect_url:
-                  "https://litdom.blogspot.com/p/reading_01731693423.html",
-
-                payment_options:
-                  "card,account,banktransfer,ussd,opay,mobilemoneyghana,mpesa,mobilemoneyuganda,mobilemoneyrwanda,mobilemoneyzambia,mobilemoneyxaf,mobilemoneyxof,fawrypay",
-
-                customer: {
-                  email:
-                    String(email)
-                      .trim()
-                      .toLowerCase(),
-                },
-
-                customizations: {
-                  title:
-                    "Litdom Gift Shop",
-
-                  description:
-                    `Gift: ${giftKey}`,
-
-                  logo:
-                    "https://litdom.blogspot.com/favicon.ico",
-                },
-
-                meta: {
-                  gift_type:
-                    giftKey,
-
-                  book_id:
-                    book_id,
-
-                  chapter_id:
-                    chapter_id,
-
-                  sender_id:
-                    sender_id,
-
-                  receiver_id:
-                    receiver_id,
-
-                  ngn_amount:
-                    ngnAmount,
-
-                  payment_currency:
-                    requestedCurrency,
-
-                  exchange_rate:
-                    rate,
-                },
-              },
-            ),
-        },
-      );
-
-
-    const flutterwaveData =
-      await flutterwaveResponse.json();
-
-
-    /*
-     * Flutterwave rejected checkout creation.
-     */
-
-    if (
-      !flutterwaveResponse.ok ||
-      flutterwaveData?.status !==
-        "success"
-    ) {
-
-      console.error(
-        "Flutterwave payment creation error:",
-        flutterwaveData,
-      );
-
-
-      /*
-       * Keep the payment record but mark it failed.
-       */
-
-      await updateGiftPayment(
-        txRef,
-        {
-          status:
-            "failed",
-        },
-      );
-
-
-      return jsonResponse(
-        {
-          error:
-            "Flutterwave could not create the payment.",
-        },
-        502,
-      );
-    }
-
-
-    const paymentLink =
-      flutterwaveData?.data?.link;
-
-
-    const flutterwaveTransactionId =
-      flutterwaveData?.data?.id
-        ? String(
-            flutterwaveData.data.id,
-          )
-        : null;
-
-
-    if (!paymentLink) {
-
-      await updateGiftPayment(
-        txRef,
-        {
-          status:
-            "failed",
-        },
-      );
-
-
-      throw new Error(
-        "Flutterwave returned no payment link.",
-      );
-    }
-
-
-    /*
-     * Save Flutterwave information.
-     */
-
-    await updateGiftPayment(
-      txRef,
-      {
-        payment_link:
-          paymentLink,
-
-        flutterwave_transaction_id:
-          flutterwaveTransactionId,
-      },
-    );
-
-
-    /*
-     * Return ONLY what the frontend needs.
-     *
-     * The browser receives the display/payment information,
-     * but the server remains authoritative.
-     */
 
     return jsonResponse(
       {
-        success:
-          true,
-
-        payment_link:
-          paymentLink,
-
-        tx_ref:
-          txRef,
-
-        gift_type:
-          giftKey,
-
-        ngn_amount:
-          ngnAmount,
-
-        amount:
-          amount,
-
-        currency:
-          requestedCurrency,
-
-        exchange_rate:
-          rate,
-
-        exchange_rate_source:
-          source,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to create gift payment.",
       },
-      200,
+      500,
     );
-
-
-  } catch (error) {
-
-  
+  }
+});
