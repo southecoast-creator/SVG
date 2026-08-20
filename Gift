@@ -37,3 +37,271 @@ if (
 
 const bookAuthorId =
   bookInfo.author_id;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * GIFT SELECTION + PAYMENT
+ */
+
+giftCard.addEventListener(
+  "click",
+  async function () {
+
+    /*
+     * REMOVE PREVIOUS SELECTION
+     */
+
+    document
+      .querySelectorAll(
+        ".gift-card.selected"
+      )
+      .forEach(
+        function (card) {
+
+          card.classList.remove(
+            "selected"
+          );
+
+        }
+      );
+
+
+    /*
+     * SELECT THIS GIFT
+     */
+
+    giftCard.classList.add(
+      "selected"
+    );
+
+
+    /*
+     * PREVENT DOUBLE CLICK
+     */
+
+    if (
+      giftCard.dataset.processing ===
+      "true"
+    ) {
+
+      return;
+
+    }
+
+
+    giftCard.dataset.processing =
+      "true";
+
+
+    /*
+     * SAVE CARD CONTENT
+     */
+
+    const originalContent =
+      giftCard.innerHTML;
+
+
+    /*
+     * SHOW PAYMENT LOADING
+     */
+
+    giftCard.innerHTML = `
+      <div class="gift-payment-loading">
+
+        <span class="gift-loading-spinner"></span>
+
+        <span>
+          Preparing gift...
+        </span>
+
+      </div>
+    `;
+
+
+    try {
+
+      /*
+       * GET CURRENTLY LOGGED-IN READER
+       */
+
+      const {
+        data: {
+          user
+        },
+        error: userError
+      } =
+        await litdomSupabase.auth.getUser();
+
+
+      /*
+       * CHECK READER
+       */
+
+      if (
+        userError ||
+        !user
+      ) {
+
+        throw new Error(
+          "Please sign in before sending a gift."
+        );
+
+      }
+
+
+      /*
+       * CHECK EMAIL
+       */
+
+      if (
+        !user.email
+      ) {
+
+        throw new Error(
+          "Your account does not have an email address."
+        );
+
+      }
+
+
+      /*
+       * SEND GIFT PAYMENT REQUEST
+       */
+
+      const {
+        data,
+        error
+      } =
+        await litdomSupabase.functions.invoke(
+          "create-gift-payment",
+          {
+            body: {
+
+              gift_type:
+                gift.type,
+
+              book_id:
+                bookId,
+
+              chapter_id:
+                chapter.id,
+
+              sender_id:
+                user.id,
+
+              receiver_id:
+                bookAuthorId,
+
+              email:
+                user.email
+
+            }
+          }
+        );
+
+
+      /*
+       * HANDLE SUPABASE FUNCTION ERROR
+       */
+
+      if (error) {
+
+        console.error(
+          "Gift payment function error:",
+          error
+        );
+
+        throw new Error(
+          "Unable to start the gift payment."
+        );
+
+      }
+
+
+      /*
+       * HANDLE PAYMENT CREATION ERROR
+       */
+
+      if (
+        !data ||
+        !data.success ||
+        !data.payment_link
+      ) {
+
+        console.error(
+          "Gift payment response:",
+          data
+        );
+
+        throw new Error(
+          data?.error ||
+          "Unable to create the gift payment."
+        );
+
+      }
+
+
+      /*
+       * OPEN FLUTTERWAVE CHECKOUT
+       */
+
+      window.location.href =
+        data.payment_link;
+
+
+    } catch (error) {
+
+      console.error(
+        "Gift payment failed:",
+        error
+      );
+
+
+      /*
+       * RESTORE GIFT CARD
+       */
+
+      giftCard.innerHTML =
+        originalContent;
+
+
+      giftCard.dataset.processing =
+        "false";
+
+
+      /*
+       * REMOVE SELECTION
+       */
+
+      giftCard.classList.remove(
+        "selected"
+      );
+
+
+      /*
+       * SHOW ERROR
+       */
+
+      alert(
+        error?.message ||
+        "We couldn't start the gift payment. Please try again."
+      );
+
+    }
+
+  }
+);
