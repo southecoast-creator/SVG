@@ -1130,5 +1130,148 @@ giftButton.addEventListener(
 
               /*
                * Create gift payment.
-               *
+               ** IMPORTANT:
+               * Send the detected currency to the
+               * Edge Function.
+               */
+
+              const {
+                data,
+                error
+              } =
+                await litdomSupabase
+                  .functions
+                  .invoke(
+                    "create-gift-payment",
+                    {
+                      body: {
+
+                        gift_type:
+                          gift.type,
+
+                        book_id:
+                          bookId,
+
+                        chapter_id:
+                          chapter.id,
+
+                        sender_id:
+                          user.id,
+
+                        receiver_id:
+                          bookAuthorId,
+
+                        email:
+                          user.email,
+
+                        currency:
+                          detectedCurrency
+
+                      }
+
+                    }
+                  );
+
+
+              /*
+               * Check Supabase function error.
+               */
+
+              if (error) {
+
+                console.error(
+                  "Gift payment function error:",
+                  error
+                );
+
+                throw new Error(
+                  error.message ||
+                  "Unable to start the gift payment."
+                );
+
+              }
+
+
+              /*
+               * Check payment response.
+               */
+
+              if (
+                !data ||
+                !data.success ||
+                !data.payment_link
+              ) {
+
+                console.error(
+                  "Gift payment response:",
+                  data
+                );
+
+                throw new Error(
+                  data?.error ||
+                  "Unable to create the gift payment."
+                );
+
+              }
+
+
+              /*
+               * Go to Flutterwave.
+               */
+
+              window.location.href =
+                data.payment_link;
+
+
+            } catch (error) {
+
+              console.error(
+                "Gift payment failed:",
+                error
+              );
+
+
+              /*
+               * Restore card.
+               */
+
+              giftCard.innerHTML =
+                originalContent;
+
+              giftCard.dataset.processing =
+                "false";
+
+              giftCard.classList.remove(
+                "selected"
+              );
+
+
+              /*
+               * Show error.
+               */
+
+              alert(
+                error?.message ||
+                "We couldn't start the gift payment. Please try again."
+              );
+
+            }
+
+          }
+        );
+
+
+        /*
+         * Add card to grid.
+         */
+
+        giftGrid.appendChild(
+          giftCard
+        );
+
+      }
+    );
+
+  }
+);
                
