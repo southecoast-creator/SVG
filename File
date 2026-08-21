@@ -532,4 +532,191 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const giftGrid = giftShop.querySelector(".gift-shop-grid");
       const closeButton = giftShop.querySelector(".gift-shop-close");
+      const cancelButton = giftShop.querySelector(".gift-cancel-button");
+      const tierButton = giftShop.querySelector(".gift-tier-button");
+
+      let shopClosed = false;
+
+      const closeGiftShop = () => {
+        if (shopClosed) {
+          return;
+        }
+        shopClosed = true;
+        giftOverlay.classList.add("closing");
+        setTimeout(() => {
+          giftOverlay.remove();
+          document.body.style.overflow = "";
+        }, 220);
+        document.removeEventListener("keydown", escapeHandler);
+      };
+
+      closeButton.addEventListener("click", closeGiftShop);
+      cancelButton.addEventListener("click", closeGiftShop);
+
+      tierButton.addEventListener("click", () => {
+        alert("Special support tiers will be available soon.");
+      });
+
+      giftOverlay.addEventListener("click", (event) => {
+        if (event.target === giftOverlay) {
+          closeGiftShop();
+        }
+      });
+
+const escapeHandler = (event) => {
+        if (event.key === "Escape") {
+          closeGiftShop();
+        }
+      };
+
+      document.addEventListener("keydown", escapeHandler);
+
+      giftCatalog.forEach((gift) => {
+        const giftCard = document.createElement("button");
+        giftCard.type = "button";
+        giftCard.className = "gift-card";
+        giftCard.dataset.giftType = gift.type;
+        giftCard.dataset.ngnPrice = String(gift.price);
+
+        const imageArea = document.createElement("div");
+        imageArea.className = "gift-image-area";
+
+        if (gift.image) {
+          const image = document.createElement("img");
+          image.src = gift.image;
+          image.alt = gift.name;
+          image.loading = "lazy";
+          image.className = "gift-image";
+          imageArea.appendChild(image);
+        } else {
+          imageArea.innerHTML = `<span class="gift-image-placeholder" aria-hidden="true">✦</span>`;
+        }
+
+        const giftName = document.createElement("span");
+        giftName.className = "gift-name";
+        giftName.textContent = gift.name;
+
+        const giftPrice = document.createElement("span");
+        giftPrice.className = "gift-price";
+
+        const localAmount = gift.price * displayRate;
+
+        const safeAmount = displayCurrency.decimals === 0
+          ? Math.ceil(localAmount)
+          : Math.ceil(localAmount * 100) / 100;
+
+        giftPrice.textContent = `${displayCurrency.symbol} ${safeAmount.toLocaleString(displayCurrency.locale, {
+          minimumFractionDigits: displayCurrency.decimals,
+          maximumFractionDigits: displayCurrency.decimals
+        })}`;
+
+        giftCard.appendChild(imageArea);
+        giftCard.appendChild(giftName);
+        giftCard.appendChild(giftPrice);
+
+        giftCard.addEventListener("click", async () => {
+          if (giftCard.dataset.processing === "true") {
+            return;
+          }
+
+          giftShop.querySelectorAll(".gift-card.selected").forEach((card) => {
+            card.classList.remove("selected");
+          });
+
+          giftCard.classList.add("selected");
+          giftCard.dataset.processing = "true";
+
+          const originalContent = giftCard.innerHTML;
+
+          giftCard.innerHTML = `
+            <div class="gift-payment-loading">
+              <span class="gift-loading-spinner"></span>
+              <span>Preparing gift...</span>
+            </div>
+          `;
+
+          try {
+            const { data: { user }, error: userError } = await litdomSupabase.auth.getUser();
+
+            if (userError || !user) {
+              throw new Error("Please sign in before sending a gift.");
+            }
+
+            if (!user.email) {
+              throw new Error("Your account does not have an email address.");
+            }
+
+            const { data, error } = await litdomSupabase.functions.invoke("create-gift-payment", {
+              body: {
+                gift_type: gift.type,
+                book_id: bookId,
+                chapter_id: chapter.id,
+                sender_id: user.id,
+                receiver_id: bookAuthorId,
+                email: user.email,
+                currency: detectedCurrency
+              }
+            });
+
+if (error) {
+              console.error("Gift payment function error:", error);
+              throw new Error(error.message || "Unable to start the gift payment.");
+            }
+
+            if (!data || !data.success || !data.payment_link) {
+              console.error("Gift payment response:", data);
+              throw new Error(data?.error || "Unable to create the gift payment.");
+            }
+
+            window.location.href = data.payment_link;
+          } catch (error) {
+            console.error("Gift payment failed:", error);
+            giftCard.innerHTML = originalContent;
+            giftCard.dataset.processing = "false";
+            giftCard.classList.remove("selected");
+            alert(error?.message || "We couldn't start the gift payment. Please try again.");
+          }
+        });
+
+        giftGrid.appendChild(giftCard);
+      });
+    });
+
+    alert("BEFORE GIFT BUTTON");
+
+    const shareButton = document.createElement("button");
+    shareButton.type = "button";
+    shareButton.className = "reader-action-button";
+    shareButton.setAttribute("aria-label", "Share book");
+    shareButton.innerHTML = `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="18" cy="5" r="2" />
+        <circle cx="6" cy="12" r="2" />
+        <circle cx="18" cy="19" r="2" />
+        <path d="M8 11l8-5" />
+        <path d="M8 13l8 5" />
+      </svg>
+      <span>Share</span>
+    `;
+
+    actions.appendChild(likeButton);
+    actions.appendChild(commentButton);
+    actions.appendChild(giftButton);
+    actions.appendChild(shareButton);
+
+    article.appendChild(actions);
+    article.appendChild(commentsSection);
+
+    chaptersContainer.appendChild(article);
+  });
+
+  if (startingChapterId) {
+    const startingChapter = document.querySelector(".reader-chapter");
+    if (startingChapter) {
+      startingChapter.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+});
+</script>
+
     
