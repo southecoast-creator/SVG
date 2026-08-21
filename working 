@@ -1,83 +1,105 @@
-/*
- * ============================================================
- * DETECT READER COUNTRY AND PAYMENT CURRENCY
- * ============================================================
- */
+const giftCurrencyInfo = {
+  NGN: {
+    locale: "en-NG",
+    symbol: "₦",
+    decimals: 0
+  },
 
-let readerCurrency = "NGN";
+  USD: {
+    locale: "en-US",
+    symbol: "$",
+    decimals: 2
+  },
 
-try {
-  const locationResponse =
-    await fetch(
-      "https://ipapi.co/json/"
-    );
+  EUR: {
+    locale: "en-IE",
+    symbol: "€",
+    decimals: 2
+  },
 
-  if (locationResponse.ok) {
+  GBP: {
+    locale: "en-GB",
+    symbol: "£",
+    decimals: 2
+  },
 
-    const locationData =
-      await locationResponse.json();
+  ZAR: {
+    locale: "en-ZA",
+    symbol: "R",
+    decimals: 2
+  },
 
-    const countryCode =
-      String(
-        locationData?.country_code || "NG"
-      )
-        .toUpperCase()
-        .trim();
+  GHS: {
+    locale: "en-GH",
+    symbol: "GH₵",
+    decimals: 2
+  },
 
-    const countryCurrencyMap = {
+  KES: {
+    locale: "en-KE",
+    symbol: "KSh",
+    decimals: 2
+  },
 
-      NG: "NGN",
+  UGX: {
+    locale: "en-UG",
+    symbol: "UGX",
+    decimals: 0
+  },
 
-      US: "USD",
-      CA: "USD",
+  RWF: {
+    locale: "rw-RW",
+    symbol: "FRw",
+    decimals: 0
+  },
 
-      GB: "GBP",
+  TZS: {
+    locale: "sw-TZ",
+    symbol: "TSh",
+    decimals: 0
+  },
 
-      IE: "EUR",
-      FR: "EUR",
-      DE: "EUR",
-      ES: "EUR",
-      IT: "EUR",
-      PT: "EUR",
-      NL: "EUR",
-      BE: "EUR",
-      AT: "EUR",
-      FI: "EUR",
-      GR: "EUR",
+  MWK: {
+    locale: "en-MW",
+    symbol: "MK",
+    decimals: 2
+  },
 
-      ZA: "ZAR",
+  XAF: {
+    locale: "fr-CM",
+    symbol: "FCFA",
+    decimals: 0
+  },
 
-      GH: "GHS",
+  XOF: {
+    locale: "fr-SN",
+    symbol: "CFA",
+    decimals: 0
+  },
 
-      KE: "KES",
-
-      UG: "UGX",
-
-      RW: "RWF",
-
-      TZ: "TZS",
-
-      MW: "MWK",
-
-      CM: "XAF",
-
-      SN: "XOF",
-
-      EG: "EGP"
-    };
-
-    readerCurrency =
-      countryCurrencyMap[
-        countryCode
-      ] || "USD";
+  EGP: {
+    locale: "ar-EG",
+    symbol: "E£",
+    decimals: 2
   }
+};
 
-} catch (locationError) {
+const displayCurrency =
+  giftCurrencyInfo[
+    readerCurrency
+  ] || giftCurrencyInfo.NGN;
 
-  console.warn(
-    "Unable to detect reader country. Using NGN:",
-    locationError
-  );
+const displayAmount =
+  gift.price;
 
-  readerCurrency = "NGN";
-}
+giftPrice.textContent =
+  `${displayCurrency.symbol} ${displayAmount.toLocaleString(
+    displayCurrency.locale,
+    {
+      minimumFractionDigits:
+        displayCurrency.decimals,
+
+      maximumFractionDigits:
+        displayCurrency.decimals
+    }
+  )}`;
