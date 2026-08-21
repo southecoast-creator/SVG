@@ -1,0 +1,535 @@
+<script>
+const SUPABASE_URL = "https://uniecvgkxhcbedppadgx.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_UhqP7y8Cjyiv8RebOSMUDA_lBj0QuTE";
+const litdomSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+document.addEventListener("DOMContentLoaded", async function () {
+  alert("DOM SCRIPT WORKS");
+
+  const readerStatus = document.getElementById("readerStatus");
+  const chaptersContainer = document.getElementById("chaptersContainer");
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const bookId = urlParams.get("book");
+  const startingChapterId = urlParams.get("chapter");
+
+  if (!bookId) {
+    readerStatus.textContent = "No book was selected.";
+    return;
+  }
+
+  const { data: chapters, error: chaptersError } = await litdomSupabase
+    .from("chapters")
+    .select("id, book_id, chapter_number, title, content, status, word_count, is_locked, unlock_cost, published_at")
+    .eq("book_id", bookId)
+    .eq("status", "published")
+    .order("chapter_number", { ascending: true });
+
+  if (chaptersError) {
+    console.error("Chapter loading error:", chaptersError);
+    readerStatus.textContent = "Unable to load the chapters.";
+    return;
+  }
+
+  if (!chapters || chapters.length === 0) {
+    readerStatus.textContent = "This book doesn't have a published chapter yet.";
+    return;
+  }
+
+  const { data: bookInfo, error: bookInfoError } = await litdomSupabase
+    .from("books")
+    .select("author_id")
+    .eq("id", bookId)
+    .single();
+
+  if (bookInfoError || !bookInfo || !bookInfo.author_id) {
+    console.error("Unable to load book author:", bookInfoError);
+    throw new Error("Unable to identify the book author.");
+  }
+
+  const bookAuthorId = bookInfo.author_id;
+
+  readerStatus.style.display = "none";
+
+  chapters.forEach(function (chapter) {
+    const article = document.createElement("article");
+    article.className = "reader-chapter";
+
+    const chapterHeading = document.createElement("h2");
+    chapterHeading.textContent = "Chapter " + chapter.chapter_number;
+
+    const chapterTitle = document.createElement("h3");
+    chapterTitle.textContent = chapter.title || "";
+
+    const chapterContent = document.createElement("div");
+    chapterContent.className = "chapter-content";
+    chapterContent.style.width = "100%";
+    chapterContent.style.maxWidth = "900px";
+    chapterContent.style.margin = "0 auto";
+    chapterContent.style.textAlign = "left";
+    chapterContent.style.boxSizing = "border-box";
+    chapterContent.style.lineHeight = "1.8";
+    chapterContent.style.fontSize = "18px";
+    chapterContent.innerHTML = chapter.content || "";
+
+    article.appendChild(chapterHeading);
+    article.appendChild(chapterTitle);
+    article.appendChild(chapterContent);
+
+    const actions = document.createElement("div");
+    actions.className = "chapter-actions";
+
+    const likeButton = document.createElement("button");
+    likeButton.type = "button";
+    likeButton.className = "reader-action-button";
+    likeButton.setAttribute("aria-label", "Like chapter");
+    likeButton.innerHTML = `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.8 8.7c0-2.5-2-4.5-4.5-4.5-1.5 0-2.8.7-3.7 1.8-.9-1.1-2.2-1.8-3.7-1.8-2.5 0-4.5 2-4.5 4.5 0 5.2 8.2 9.7 8.2 9.7s8.2-4.5 8.2-9.7Z" />
+      </svg>
+      <span class="like-count">0</span>
+      <span>Like</span>
+    `;
+
+    async function loadLikeCount() {
+      const { count, error } = await litdomSupabase
+        .from("chapter_likes")
+        .select("id", { count: "exact", head: true })
+        .eq("chapter_id", chapter.id);
+
+      if (error) {
+        console.error("Like count error:", error);
+        return;
+      }
+
+      const likeCount = likeButton.querySelector(".like-count");
+      if (likeCount) {
+        likeCount.textContent = String(count || 0);
+      }
+    }
+
+    loadLikeCount();
+
+    likeButton.addEventListener("click", async function () {
+      try {
+        const { data: { user }, error: userError } = await litdomSupabase.auth.getUser();
+
+        if (userError) {
+          console.error("Unable to get user:", userError);
+          alert("Please log in before liking this chapter.");
+          return;
+        }
+
+        if (!user) {
+          alert("Please log in before liking this chapter.");
+          return;
+        }
+
+        const { data: existingLike, error: existingLikeError } = await litdomSupabase
+          .from("chapter_likes")
+          .select("id")
+          .eq("chapter_id", chapter.id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (existingLikeError) {
+          console.error("Like check failed:", existingLikeError);
+          alert("We couldn't check your like right now.");
+          return;
+        }
+
+        if (existingLike) {
+          const { error: deleteLikeError } = await litdomSupabase
+            .from("chapter_likes")
+            .delete()
+            .eq("id", existingLike.id);
+
+          if (deleteLikeError) {
+            console.error("Unlike failed:", deleteLikeError);
+            alert("We couldn't remove your like.");
+            return;
+          }
+
+          likeButton.classList.remove("liked");
+          await loadLikeCount();
+          return;
+        }
+
+        const { error: insertLikeError } = await litdomSupabase
+          .from("chapter_likes")
+          .insert([{ chapter_id: chapter.id, user_id: user.id }]);
+
+        if (insertLikeError) {
+          console.error("Like insertion failed:", insertLikeError);
+          alert("Like error: " + (insertLikeError.message || "Unknown database error."));
+          return;
+        }
+
+        likeButton.classList.add("liked");
+        await loadLikeCount();
+      } catch (error) {
+        console.error("Unexpected like error:", error);
+        alert("Something went wrong while liking this chapter.");
+      }
+    });
+
+    const commentButton = document.createElement("button");
+    commentButton.type = "button";
+    commentButton.className = "reader-action-button";
+    commentButton.setAttribute("aria-label", "Comment on chapter");
+    commentButton.innerHTML = `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 11.5a8 8 0 0 1-8 8 8.4 8.4 0 0 1-3.2-.6L4 20l1.1-3.7A8 8 0 1 1 20 11.5Z" />
+      </svg>
+      <span class="comment-count">0</span>
+      <span>Comment</span>
+    `;
+
+    const commentsSection = document.createElement("div");
+    commentsSection.className = "chapter-comments";
+    commentsSection.style.display = "none";
+
+    const commentsList = document.createElement("div");
+    commentsList.className = "comments-list";
+
+    const commentForm = document.createElement("div");
+    commentForm.className = "comment-form";
+
+    const commentInput = document.createElement("textarea");
+    commentInput.placeholder = "Write a comment...";
+    commentInput.rows = 3;
+    commentInput.className = "comment-input";
+
+    const submitCommentButton = document.createElement("button");
+    submitCommentButton.type = "button";
+    submitCommentButton.className = "submit-comment-button";
+    submitCommentButton.textContent = "Post Comment";
+
+    const cancelCommentButton = document.createElement("button");
+    cancelCommentButton.type = "button";
+    cancelCommentButton.className = "cancel-comment-button";
+    cancelCommentButton.textContent = "Cancel";
+
+    commentForm.appendChild(commentInput);
+    commentForm.appendChild(submitCommentButton);
+    commentForm.appendChild(cancelCommentButton);
+    commentsSection.appendChild(commentsList);
+    commentsSection.appendChild(commentForm);
+
+    async function loadCommentCount() {
+      const { count, error } = await litdomSupabase
+        .from("comments")
+        .select("id", { count: "exact", head: true })
+        .eq("chapter_id", chapter.id);
+
+      if (error) {
+        console.error("Comment count error:", error);
+        return;
+      }
+
+      const commentCount = commentButton.querySelector(".comment-count");
+      if (commentCount) {
+        commentCount.textContent = String(count || 0);
+      }
+    }
+
+    loadCommentCount();
+
+    async function loadExistingComments() {
+      const { data: existingComments, error: commentsError } = await litdomSupabase
+        .from("comments")
+        .select(`
+          id,
+          user_id,
+          content,
+          created_at,
+          profiles ( username, display_name )
+        `)
+        .eq("chapter_id", chapter.id)
+        .order("created_at", { ascending: true });
+
+      if (commentsError) {
+        console.error("Comments loading error:", commentsError);
+        return;
+      }
+
+      commentsList.innerHTML = "";
+
+      if (!existingComments || existingComments.length === 0) {
+        const emptyMessage = document.createElement("div");
+        emptyMessage.className = "no-comments-message";
+        emptyMessage.textContent = "No comments yet. Be the first to comment.";
+        commentsList.appendChild(emptyMessage);
+        return;
+      }
+
+      existingComments.forEach(function (savedComment) {
+        const commentItem = document.createElement("div");
+        commentItem.className = "reader-comment";
+
+        const commentUser = document.createElement("div");
+        commentUser.className = "reader-comment-user";
+
+        const profile = savedComment.profiles;
+        let username = "";
+
+        if (profile) {
+          username = profile.username || profile.display_name || "Reader";
+        } else {
+          username = "Reader";
+        }
+
+        commentUser.textContent = "@" + username;
+
+        const commentTextElement = document.createElement("div");
+        commentTextElement.className = "reader-comment-text";
+        commentTextElement.textContent = savedComment.content;
+
+        commentItem.appendChild(commentUser);
+        commentItem.appendChild(commentTextElement);
+        commentsList.appendChild(commentItem);
+      });
+    }
+
+    loadExistingComments();
+
+    commentButton.addEventListener("click", function () {
+      if (commentsSection.style.display === "none") {
+        commentsSection.style.display = "block";
+      } else {
+        commentsSection.style.display = "none";
+      }
+    });
+
+    cancelCommentButton.addEventListener("click", function () {
+      commentsSection.style.display = "none";
+    });
+
+    submitCommentButton.addEventListener("click", async function () {
+      const commentText = commentInput.value.trim();
+
+      if (!commentText) {
+        commentInput.focus();
+        return;
+      }
+
+      const { data: { user }, error: userError } = await litdomSupabase.auth.getUser();
+
+      if (userError) {
+        console.error("User lookup error:", userError);
+        alert("We couldn't verify your account.");
+        return;
+      }
+
+      if (!user) {
+        alert("Please log in before posting a comment.");
+        return;
+      }
+
+      submitCommentButton.disabled = true;
+      submitCommentButton.textContent = "Posting...";
+
+      const { data: newComment, error: insertCommentError } = await litdomSupabase
+        .from("comments")
+        .insert([{ user_id: user.id, book_id: chapter.book_id, chapter_id: chapter.id, content: commentText }])
+        .select()
+        .single();
+
+      if (insertCommentError) {
+        console.error("Comment insertion error:", insertCommentError);
+        alert("Comment error: " + (insertCommentError.message || "Unable to post comment."));
+        submitCommentButton.disabled = false;
+        submitCommentButton.textContent = "Post Comment";
+        return;
+      }
+
+      commentInput.value = "";
+
+      const commentItem = document.createElement("div");
+      commentItem.className = "reader-comment";
+
+      const commentTextElement = document.createElement("div");
+      commentTextElement.className = "reader-comment-text";
+      commentTextElement.textContent = newComment.content;
+
+      commentItem.appendChild(commentTextElement);
+      commentsList.appendChild(commentItem);
+
+      await loadCommentCount();
+
+      submitCommentButton.disabled = false;
+      submitCommentButton.textContent = "Post Comment";
+    });
+
+    alert("BEFORE GIFT BUTTON");
+
+    const giftButton = document.createElement("button");
+    giftButton.type = "button";
+    giftButton.className = "reader-action-button";
+    giftButton.setAttribute("aria-label", "Give a gift");
+    giftButton.innerHTML = `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+        <path d="M2 7h20v5H2z" />
+        <path d="M12 7v15" />
+        <path d="M12 7H8.5a2.5 2.5 0 1 1 2.5-2.5V7Z" />
+        <path d="M12 7h3.5A2.5 2.5 0 1 0 13 4.5V7Z" />
+      </svg>
+      <span class="gift-count">0</span>
+      <span>Gift</span>
+    `;
+
+    async function loadGiftCount() {
+      try {
+        const { data: { user } } = await litdomSupabase.auth.getUser();
+        if (!user) {
+          return;
+        }
+        const { count, error } = await litdomSupabase
+          .from("gift_payments")
+          .select("id", { count: "exact", head: true })
+          .eq("sender_id", user.id)
+          .in("status", ["successful", "completed"]);
+
+        if (error) {
+          console.error("Gift count error:", error);
+          return;
+        }
+
+        const countElement = giftButton.querySelector(".gift-count");
+        if (countElement) {
+          countElement.textContent = String(count || 0);
+        }
+      } catch (error) {
+        console.error("Unable to load gift count:", error);
+      }
+    }
+
+    giftButton.addEventListener("click", async () => {
+      const giftCatalog = [
+        { type: "pancakes", name: "Pancakes", price: 8000, image: "https://i.postimg.cc/v8zBYtF4/5-20260818-151703-0004.png" },
+        { type: "chips", name: "Chips", price: 700, image: "https://i.postimg.cc/HLczHLrk/6-20260818-151703-0005.png" },
+        { type: "avocado", name: "Avocado", price: 150, image: "https://i.postimg.cc/1tZqTGbs/7-20260818-151703-0006-removebg-preview.png" },
+        { type: "croissant", name: "Croissant", price: 1000, image: "https://i.postimg.cc/6pTT12mk/9-20260818-151704-0008.png" },
+        { type: "pie", name: "Pie", price: 2000, image: "https://i.postimg.cc/pVwgSpLK/10-20260818-151704-0009-removebg-preview.png" },
+        { type: "pizza", name: "Pizza", price: 5000, image: "https://i.postimg.cc/wjVcDbr6/11-20260818-151704-0010-removebg-preview.png" },
+        { type: "bracelet", name: "Bracelet", price: 500, image: "https://i.postimg.cc/kGxxjjT8/Colorful-Beaded-Bracelet.png" },
+        { type: "cauldron", name: "Cauldron", price: 1250, image: "https://i.postimg.cc/3rv58gyZ/3-20260818-151703-0002.png" },
+        { type: "donut", name: "Donut", price: 300, image: "https://i.postimg.cc/zGW1xTNZ/Pink-Frosted-Donut.png" },
+        { type: "camera", name: "Camera", price: 1500, image: "https://i.postimg.cc/FR6Wtnbj/Pastel-Retro-Camera.png" },
+        { type: "school-bag", name: "School Bag", price: 200, image: "https://i.postimg.cc/8CB4K09z/6-20260819-184810-0002.png" },
+        { type: "skulls", name: "Skulls", price: 10000, image: "https://i.postimg.cc/hjXrDthW/2-20260819-184810-0001.png" },
+        { type: "goggles", name: "Swimming Goggles", price: 2250, image: "https://i.postimg.cc/mrD3jgYF/1-20260819-184809-0000.png" },
+        { type: "rocket", name: "Rocket", price: 1750, image: "https://i.postimg.cc/sXQ3pqTR/14-20260818-151704-0013-removebg-preview.png" },
+        { type: "ink", name: "Ink", price: 100, image: "https://i.postimg.cc/N0QtzLbm/13-20260818-151704-0012-removebg-preview.png" },
+        { type: "island", name: "Island", price: 20000, image: "https://i.postimg.cc/NFYZ5XXD/12-20260818-151704-0011.png" },
+        { type: "crown", name: "Crown", price: 50000, image: "https://i.postimg.cc/6pY6w9DF/4-20260818-151703-0003.png" },
+        { type: "keyboard", name: "Keyboard", price: 250, image: "https://i.postimg.cc/BvT3hJJs/1-20260818-151703-0000.png" },
+        { type: "coffee", name: "Coffee", price: 2500, image: "https://i.postimg.cc/6p61swVN/8-20260818-151704-0007.png" }
+      ];
+
+      const giftCurrencyInfo = {
+        NGN: { locale: "en-NG", symbol: "₦", decimals: 0 },
+        USD: { locale: "en-US", symbol: "$", decimals: 2 },
+        EUR: { locale: "en-IE", symbol: "€", decimals: 2 },
+        GBP: { locale: "en-GB", symbol: "£", decimals: 2 },
+        ZAR: { locale: "en-ZA", symbol: "R", decimals: 2 },
+        GHS: { locale: "en-GH", symbol: "GH₵", decimals: 2 },
+        KES: { locale: "en-KE", symbol: "KSh", decimals: 2 },
+        UGX: { locale: "en-UG", symbol: "UGX", decimals: 0 },
+        RWF: { locale: "rw-RW", symbol: "FRw", decimals: 0 },
+        TZS: { locale: "sw-TZ", symbol: "TSh", decimals: 0 },
+        MWK: { locale: "en-MW", symbol: "MK", decimals: 2 },
+        XAF: { locale: "fr-CM", symbol: "FCFA", decimals: 0 },
+        XOF: { locale: "fr-SN", symbol: "CFA", decimals: 0 },
+        EGP: { locale: "ar-EG", symbol: "E£", decimals: 2 }
+      };
+
+      let detectedCurrency = "NGN";
+
+      try {
+        const locationResponse = await fetch("https://ipapi.co/json/");
+
+        if (locationResponse.ok) {
+          const locationData = await locationResponse.json();
+          const countryCode = String(locationData?.country_code || "NG").toUpperCase().trim();
+          const countryCurrencyMap = {
+            NG: "NGN",
+            US: "USD", CA: "USD",
+            GB: "GBP",
+            IE: "EUR", FR: "EUR", DE: "EUR", ES: "EUR", IT: "EUR", PT: "EUR", NL: "EUR", BE: "EUR", AT: "EUR", FI: "EUR", GR: "EUR",
+            ZA: "ZAR",
+            GH: "GHS",
+            KE: "KES",
+            UG: "UGX",
+            RW: "RWF",
+            TZ: "TZS",
+            MW: "MWK",
+            CM: "XAF",
+            SN: "XOF",
+            EG: "EGP"
+          };
+          detectedCurrency = countryCurrencyMap[countryCode] || "USD";
+        }
+      } catch (locationError) {
+        console.warn("Unable to detect reader country. Using NGN:", locationError);
+        detectedCurrency = "NGN";
+      }
+
+      const displayCurrency = giftCurrencyInfo[detectedCurrency] || giftCurrencyInfo.NGN;
+
+      let displayRate = 1;
+
+      if (detectedCurrency !== "NGN") {
+        try {
+          const rateResponse = await fetch("https://open.er-api.com/v6/latest/NGN");
+
+          if (rateResponse.ok) {
+            const rateData = await rateResponse.json();
+            const rate = Number(rateData?.rates?.[detectedCurrency]);
+
+            if (Number.isFinite(rate) && rate > 0) {
+              displayRate = rate;
+            }
+          }
+        } catch (rateError) {
+          console.warn("Unable to obtain display exchange rate. Showing NGN prices.", rateError);
+          detectedCurrency = "NGN";
+        }
+      }
+
+      const giftOverlay = document.createElement("div");
+      giftOverlay.className = "litdom-gift-overlay";
+
+      const giftShop = document.createElement("div");
+      giftShop.className = "litdom-gift-shop";
+
+      giftShop.innerHTML = `
+        <div class="gift-shop-header">
+          <div class="gift-shop-heading">
+            <h2>Gift Shop</h2>
+            <p>Support the author</p>
+          </div>
+          <button type="button" class="gift-shop-close" aria-label="Close Gift Shop">×</button>
+        </div>
+        <div class="gift-shop-grid"></div>
+        <div class="gift-shop-tiers">
+          <div class="gift-tier-note">
+            <span class="gift-tier-symbol">✦</span>
+            <div>
+              <strong>Special support tiers</strong>
+              <p>Some gifts come with extra special benefits.</p>
+            </div>
+          </div>
+          <button type="button" class="gift-tier-button">Find out more about the tiers</button>
+        </div>
+        <button type="button" class="gift-cancel-button">Cancel</button>
+      `;
+
+      giftOverlay.appendChild(giftShop);
+      document.body.appendChild(giftOverlay);
+      document.body.style.overflow = "hidden";
+
+      const giftGrid = giftShop.querySelector(".gift-shop-grid");
+      const closeButton = giftShop.querySelector(".gift-shop-close");
+    
