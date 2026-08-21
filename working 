@@ -1,93 +1,83 @@
 /*
  * ============================================================
- * DETERMINE READER CURRENCY
+ * DETECT READER COUNTRY AND PAYMENT CURRENCY
  * ============================================================
  */
 
-const readerLocale =
-  navigator.language ||
-  "en-NG";
+let readerCurrency = "NGN";
 
-const localeCurrencyMap = {
-  NG: "NGN",
-  US: "USD",
-  CA: "CAD",
-  GB: "GBP",
-  IE: "EUR",
-  FR: "EUR",
-  DE: "EUR",
-  ES: "EUR",
-  IT: "EUR",
-  PT: "EUR",
-  NL: "EUR",
-  BE: "EUR",
-  AT: "EUR",
-  FI: "EUR",
-  GR: "EUR",
-  GH: "GHS",
-  KE: "KES",
-  ZA: "ZAR",
-  UG: "UGX",
-  RW: "RWF",
-  TZ: "TZS",
-  MW: "MWK",
-  EG: "EGP",
-  CM: "XAF",
-  SN: "XOF"
-};
+try {
+  const locationResponse =
+    await fetch(
+      "https://ipapi.co/json/"
+    );
 
-const localeParts =
-  readerLocale.split("-");
+  if (locationResponse.ok) {
 
-const readerCountry =
-  localeParts.length > 1
-    ? localeParts[
-        localeParts.length - 1
-      ].toUpperCase()
-    : "NG";
+    const locationData =
+      await locationResponse.json();
 
-const readerCurrency =
-  localeCurrencyMap[
-    readerCountry
-  ] || "USD";
+    const countryCode =
+      String(
+        locationData?.country_code || "NG"
+      )
+        .toUpperCase()
+        .trim();
 
+    const countryCurrencyMap = {
 
-/*
- * ============================================================
- * CREATE GIFT PAYMENT
- * ============================================================
- */
+      NG: "NGN",
 
-const {
-  data,
-  error
-} =
-  await litdomSupabase.functions.invoke(
-    "create-gift-payment",
-    {
-      body: {
+      US: "USD",
+      CA: "USD",
 
-        gift_type:
-          gift.type,
+      GB: "GBP",
 
-        book_id:
-          bookId,
+      IE: "EUR",
+      FR: "EUR",
+      DE: "EUR",
+      ES: "EUR",
+      IT: "EUR",
+      PT: "EUR",
+      NL: "EUR",
+      BE: "EUR",
+      AT: "EUR",
+      FI: "EUR",
+      GR: "EUR",
 
-        chapter_id:
-          chapter.id,
+      ZA: "ZAR",
 
-        sender_id:
-          user.id,
+      GH: "GHS",
 
-        receiver_id:
-          bookAuthorId,
+      KE: "KES",
 
-        email:
-          user.email,
+      UG: "UGX",
 
-        currency:
-          readerCurrency
+      RW: "RWF",
 
-      }
-    }
+      TZ: "TZS",
+
+      MW: "MWK",
+
+      CM: "XAF",
+
+      SN: "XOF",
+
+      EG: "EGP"
+    };
+
+    readerCurrency =
+      countryCurrencyMap[
+        countryCode
+      ] || "USD";
+  }
+
+} catch (locationError) {
+
+  console.warn(
+    "Unable to detect reader country. Using NGN:",
+    locationError
   );
+
+  readerCurrency = "NGN";
+}
