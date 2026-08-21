@@ -1,105 +1,1134 @@
-const giftCurrencyInfo = {
-  NGN: {
-    locale: "en-NG",
-    symbol: "₦",
-    decimals: 0
-  },
+/*
+ * ============================================================
+ * GIFT BUTTON
+ * ============================================================
+ */
 
-  USD: {
-    locale: "en-US",
-    symbol: "$",
-    decimals: 2
-  },
+const giftButton =
+  document.createElement("button");
 
-  EUR: {
-    locale: "en-IE",
-    symbol: "€",
-    decimals: 2
-  },
+giftButton.type =
+  "button";
 
-  GBP: {
-    locale: "en-GB",
-    symbol: "£",
-    decimals: 2
-  },
+giftButton.className =
+  "reader-action-button";
 
-  ZAR: {
-    locale: "en-ZA",
-    symbol: "R",
-    decimals: 2
-  },
+giftButton.setAttribute(
+  "aria-label",
+  "Give a gift"
+);
 
-  GHS: {
-    locale: "en-GH",
-    symbol: "GH₵",
-    decimals: 2
-  },
+giftButton.innerHTML = `
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path
+      d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"
+    />
 
-  KES: {
-    locale: "en-KE",
-    symbol: "KSh",
-    decimals: 2
-  },
+    <path
+      d="M2 7h20v5H2z"
+    />
 
-  UGX: {
-    locale: "en-UG",
-    symbol: "UGX",
-    decimals: 0
-  },
+    <path
+      d="M12 7v15"
+    />
 
-  RWF: {
-    locale: "rw-RW",
-    symbol: "FRw",
-    decimals: 0
-  },
+    <path
+      d="M12 7H8.5a2.5 2.5 0 1 1 2.5-2.5V7Z"
+    />
 
-  TZS: {
-    locale: "sw-TZ",
-    symbol: "TSh",
-    decimals: 0
-  },
+    <path
+      d="M12 7h3.5A2.5 2.5 0 1 0 13 4.5V7Z"
+    />
+  </svg>
 
-  MWK: {
-    locale: "en-MW",
-    symbol: "MK",
-    decimals: 2
-  },
+  <span class="gift-count">
+    0
+  </span>
 
-  XAF: {
-    locale: "fr-CM",
-    symbol: "FCFA",
-    decimals: 0
-  },
+  <span>Gift</span>
+`;
 
-  XOF: {
-    locale: "fr-SN",
-    symbol: "CFA",
-    decimals: 0
-  },
 
-  EGP: {
-    locale: "ar-EG",
-    symbol: "E£",
-    decimals: 2
-  }
-};
+/*
+ * ============================================================
+ * LOAD GIFT COUNT
+ * ============================================================
+ */
 
-const displayCurrency =
-  giftCurrencyInfo[
-    readerCurrency
-  ] || giftCurrencyInfo.NGN;
+async function loadGiftCount() {
 
-const displayAmount =
-  gift.price;
+  try {
 
-giftPrice.textContent =
-  `${displayCurrency.symbol} ${displayAmount.toLocaleString(
-    displayCurrency.locale,
-    {
-      minimumFractionDigits:
-        displayCurrency.decimals,
+    const {
+      data: { user }
+    } =
+      await litdomSupabase.auth.getUser();
 
-      maximumFractionDigits:
-        displayCurrency.decimals
+    if (!user) {
+      return;
     }
-  )}`;
+
+    const {
+      count,
+      error
+    } =
+      await litdomSupabase
+        .from("gift_payments")
+        .select("id", {
+          count: "exact",
+          head: true
+        })
+        .eq(
+          "sender_id",
+          user.id
+        )
+        .in("status", [
+          "successful",
+          "completed"
+        ]);
+
+    if (error) {
+
+      console.error(
+        "Gift count error:",
+        error
+      );
+
+      return;
+    }
+
+    const countElement =
+      giftButton.querySelector(
+        ".gift-count"
+      );
+
+    if (countElement) {
+
+      countElement.textContent =
+        String(count || 0);
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Unable to load gift count:",
+      error
+    );
+
+  }
+}
+
+loadGiftCount();
+
+
+/*
+ * ============================================================
+ * GIFT SHOP
+ * ============================================================
+ */
+
+giftButton.addEventListener(
+  "click",
+  async () => {
+
+    /*
+     * ========================================================
+     * GIFT CATALOG
+     * ========================================================
+     */
+
+    const giftCatalog = [
+
+      {
+        type: "pancakes",
+        name: "Pancakes",
+        price: 8000,
+        image:
+          "https://i.postimg.cc/v8zBYtF4/5-20260818-151703-0004.png"
+      },
+
+      {
+        type: "chips",
+        name: "Chips",
+        price: 700,
+        image:
+          "https://i.postimg.cc/HLczHLrk/6-20260818-151703-0005.png"
+      },
+
+      {
+        type: "avocado",
+        name: "Avocado",
+        price: 150,
+        image:
+          "https://i.postimg.cc/1tZqTGbs/7-20260818-151703-0006-removebg-preview.png"
+      },
+
+      {
+        type: "croissant",
+        name: "Croissant",
+        price: 1000,
+        image:
+          "https://i.postimg.cc/6pTT12mk/9-20260818-151704-0008.png"
+      },
+
+      {
+        type: "pie",
+        name: "Pie",
+        price: 2000,
+        image:
+          "https://i.postimg.cc/pVwgSpLK/10-20260818-151704-0009-removebg-preview.png"
+      },
+
+      {
+        type: "pizza",
+        name: "Pizza",
+        price: 5000,
+        image:
+          "https://i.postimg.cc/wjVcDbr6/11-20260818-151704-0010-removebg-preview.png"
+      },
+
+      {
+        type: "bracelet",
+        name: "Bracelet",
+        price: 500,
+        image:
+          "https://i.postimg.cc/kGxxjjT8/Colorful-Beaded-Bracelet.png"
+      },
+
+      {
+        type: "cauldron",
+        name: "Cauldron",
+        price: 1250,
+        image:
+          "https://i.postimg.cc/3rv58gyZ/3-20260818-151703-0002.png"
+      },
+
+      {
+        type: "donut",
+        name: "Donut",
+        price: 300,
+        image:
+          "https://i.postimg.cc/zGW1xTNZ/Pink-Frosted-Donut.png"
+      },
+
+      {
+        type: "camera",
+        name: "Camera",
+        price: 1500,
+        image:
+          "https://i.postimg.cc/FR6Wtnbj/Pastel-Retro-Camera.png"
+      },
+
+      {
+        type: "school-bag",
+        name: "School Bag",
+        price: 200,
+        image:
+          "https://i.postimg.cc/8CB4K09z/6-20260819-184810-0002.png"
+      },
+
+      {
+        type: "skulls",
+        name: "Skulls",
+        price: 10000,
+        image:
+          "https://i.postimg.cc/hjXrDthW/2-20260819-184810-0001.png"
+      },
+
+      {
+        type: "goggles",
+        name: "Swimming Goggles",
+        price: 2250,
+        image:
+          "https://i.postimg.cc/mrD3jgYF/1-20260819-184809-0000.png"
+      },
+
+      {
+        type: "rocket",
+        name: "Rocket",
+        price: 1750,
+        image:
+          "https://i.postimg.cc/sXQ3pqTR/14-20260818-151704-0013-removebg-preview.png"
+      },
+
+      {
+        type: "ink",
+        name: "Ink",
+        price: 100,
+        image:
+          "https://i.postimg.cc/N0QtzLbm/13-20260818-151704-0012-removebg-preview.png"
+      },
+
+      {
+        type: "island",
+        name: "Island",
+        price: 20000,
+        image:
+          "https://i.postimg.cc/NFYZ5XXD/12-20260818-151704-0011.png"
+      },
+
+      {
+        type: "crown",
+        name: "Crown",
+        price: 50000,
+        image:
+          "https://i.postimg.cc/6pY6w9DF/4-20260818-151703-0003.png"
+      },
+
+      {
+        type: "keyboard",
+        name: "Keyboard",
+        price: 250,
+        image:
+          "https://i.postimg.cc/BvT3hJJs/1-20260818-151703-0000.png"
+      },
+
+      {
+        type: "coffee",
+        name: "Coffee",
+        price: 2500,
+        image:
+          "https://i.postimg.cc/6p61swVN/8-20260818-151704-0007.png"
+      }
+
+    ];
+
+
+    /*
+     * ========================================================
+     * CURRENCY INFORMATION
+     * ========================================================
+     */
+
+    const giftCurrencyInfo = {
+
+      NGN: {
+        locale: "en-NG",
+        symbol: "₦",
+        decimals: 0
+      },
+
+      USD: {
+        locale: "en-US",
+        symbol: "$",
+        decimals: 2
+      },
+
+      EUR: {
+        locale: "en-IE",
+        symbol: "€",
+        decimals: 2
+      },
+
+      GBP: {
+        locale: "en-GB",
+        symbol: "£",
+        decimals: 2
+      },
+
+      ZAR: {
+        locale: "en-ZA",
+        symbol: "R",
+        decimals: 2
+      },
+
+      GHS: {
+        locale: "en-GH",
+        symbol: "GH₵",
+        decimals: 2
+      },
+
+      KES: {
+        locale: "en-KE",
+        symbol: "KSh",
+        decimals: 2
+      },
+
+      UGX: {
+        locale: "en-UG",
+        symbol: "UGX",
+        decimals: 0
+      },
+
+      RWF: {
+        locale: "rw-RW",
+        symbol: "FRw",
+        decimals: 0
+      },
+
+      TZS: {
+        locale: "sw-TZ",
+        symbol: "TSh",
+        decimals: 0
+      },
+
+      MWK: {
+        locale: "en-MW",
+        symbol: "MK",
+        decimals: 2
+      },
+
+      XAF: {
+        locale: "fr-CM",
+        symbol: "FCFA",
+        decimals: 0
+      },
+
+      XOF: {
+        locale: "fr-SN",
+        symbol: "CFA",
+        decimals: 0
+      },
+
+      EGP: {
+        locale: "ar-EG",
+        symbol: "E£",
+        decimals: 2
+      }
+
+    };
+
+
+    /*
+     * ========================================================
+     * DETECT READER CURRENCY
+     * ========================================================
+     */
+
+    let detectedCurrency =
+      "NGN";
+
+    try {
+
+      const locationResponse =
+        await fetch(
+          "https://ipapi.co/json/"
+        );
+
+      if (locationResponse.ok) {
+
+        const locationData =
+          await locationResponse.json();
+
+        const countryCode =
+          String(
+            locationData?.country_code ||
+            "NG"
+          )
+            .toUpperCase()
+            .trim();
+
+        const countryCurrencyMap = {
+
+          NG: "NGN",
+
+          US: "USD",
+          CA: "USD",
+
+          GB: "GBP",
+
+          IE: "EUR",
+          FR: "EUR",
+          DE: "EUR",
+          ES: "EUR",
+          IT: "EUR",
+          PT: "EUR",
+          NL: "EUR",
+          BE: "EUR",
+          AT: "EUR",
+          FI: "EUR",
+          GR: "EUR",
+
+          ZA: "ZAR",
+
+          GH: "GHS",
+
+          KE: "KES",
+
+          UG: "UGX",
+
+          RW: "RWF",
+
+          TZ: "TZS",
+
+          MW: "MWK",
+
+          CM: "XAF",
+
+          SN: "XOF",
+
+          EG: "EGP"
+
+        };
+
+        detectedCurrency =
+          countryCurrencyMap[
+            countryCode
+          ] || "USD";
+
+      }
+
+    } catch (locationError) {
+
+      console.warn(
+        "Unable to detect reader country. Using NGN:",
+        locationError
+      );
+
+      detectedCurrency =
+        "NGN";
+
+    }
+
+
+    /*
+     * ========================================================
+     * GET DISPLAY CURRENCY
+     * ========================================================
+     */
+
+    const displayCurrency =
+      giftCurrencyInfo[
+        detectedCurrency
+      ] ||
+      giftCurrencyInfo.NGN;
+
+
+    /*
+     * ========================================================
+     * GET EXCHANGE RATE FOR DISPLAY
+     * ========================================================
+     *
+     * NGN is the authoritative Litdom base price.
+     *
+     * This is ONLY for displaying the approximate local
+     * price in the shop.
+     *
+     * The create-gift-payment Edge Function remains
+     * authoritative for the actual payment amount.
+     */
+
+    let displayRate =
+      1;
+
+    if (
+      detectedCurrency !==
+      "NGN"
+    ) {
+
+      try {
+
+        const rateResponse =
+          await fetch(
+            "https://open.er-api.com/v6/latest/NGN"
+          );
+
+        if (
+          rateResponse.ok
+        ) {
+
+          const rateData =
+            await rateResponse.json();
+
+          const rate =
+            Number(
+              rateData?.rates?.[
+                detectedCurrency
+              ]
+            );
+
+          if (
+            Number.isFinite(rate) &&
+            rate > 0
+          ) {
+
+            displayRate =
+              rate;
+
+          }
+
+        }
+
+      } catch (rateError) {
+
+        console.warn(
+          "Unable to obtain display exchange rate. Showing NGN prices.",
+          rateError
+        );
+
+        detectedCurrency =
+          "NGN";
+
+      }
+
+    }
+
+
+    /*
+     * ========================================================
+     * CREATE POPUP
+     * ========================================================
+     */
+
+    const giftOverlay =
+      document.createElement(
+        "div"
+      );
+
+    giftOverlay.className =
+      "litdom-gift-overlay";
+
+
+    const giftShop =
+      document.createElement(
+        "div"
+      );
+
+    giftShop.className =
+      "litdom-gift-shop";
+
+
+    /*
+     * ========================================================
+     * SHOP HEADER
+     * ========================================================
+     */
+
+    giftShop.innerHTML = `
+
+      <div class="gift-shop-header">
+
+        <div class="gift-shop-heading">
+
+          <h2>
+            Gift Shop
+          </h2>
+
+          <p>
+            Support the author
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="gift-shop-close"
+          aria-label="Close Gift Shop"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="gift-shop-grid"></div>
+
+      <div class="gift-shop-tiers">
+
+        <div class="gift-tier-note">
+
+          <span
+            class="gift-tier-symbol"
+          >
+            ✦
+          </span>
+
+          <div>
+
+            <strong>
+              Special support tiers
+            </strong>
+
+            <p>
+              Some gifts come with extra
+              special benefits.
+            </p>
+
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="gift-tier-button"
+        >
+          Find out more about the tiers
+        </button>
+
+      </div>
+
+      <button
+        type="button"
+        class="gift-cancel-button"
+      >
+        Cancel
+      </button>
+
+    `;
+
+
+    /*
+     * ========================================================
+     * ADD SHOP TO PAGE
+     * ========================================================
+     */
+
+    giftOverlay.appendChild(
+      giftShop
+    );
+
+    document.body.appendChild(
+      giftOverlay
+    );
+
+    document.body.style.overflow =
+      "hidden";
+
+
+    /*
+     * ========================================================
+     * GET ELEMENTS
+     * ========================================================
+     */
+
+    const giftGrid =
+      giftShop.querySelector(
+        ".gift-shop-grid"
+      );
+
+    const closeButton =
+      giftShop.querySelector(
+        ".gift-shop-close"
+      );
+
+    const cancelButton =
+      giftShop.querySelector(
+        ".gift-cancel-button"
+      );
+
+    const tierButton =
+      giftShop.querySelector(
+        ".gift-tier-button"
+      );
+
+
+    /*
+     * ========================================================
+     * CLOSE SHOP
+     * ========================================================
+     */
+
+    let shopClosed =
+      false;
+
+    const closeGiftShop =
+      () => {
+
+        if (shopClosed) {
+          return;
+        }
+
+        shopClosed =
+          true;
+
+        giftOverlay.classList.add(
+          "closing"
+        );
+
+        setTimeout(
+          () => {
+
+            giftOverlay.remove();
+
+            document.body.style.overflow =
+              "";
+
+          },
+          220
+        );
+
+        document.removeEventListener(
+          "keydown",
+          escapeHandler
+        );
+
+      };
+
+
+    /*
+     * ========================================================
+     * CLOSE BUTTON
+     * ========================================================
+     */
+
+    closeButton.addEventListener(
+      "click",
+      closeGiftShop
+    );
+
+
+    cancelButton.addEventListener(
+      "click",
+      closeGiftShop
+    );
+
+
+    /*
+     * ========================================================
+     * TIER BUTTON
+     * ========================================================
+     */
+
+    tierButton.addEventListener(
+      "click",
+      () => {
+
+        alert(
+          "Special support tiers will be available soon."
+        );
+
+      }
+    );
+
+
+    /*
+     * ========================================================
+     * CLICK OUTSIDE
+     * ========================================================
+     */
+
+    giftOverlay.addEventListener(
+      "click",
+      (event) => {
+
+        if (
+          event.target ===
+          giftOverlay
+        ) {
+
+          closeGiftShop();
+
+        }
+
+      }
+    );
+
+
+    /*
+     * ========================================================
+     * ESCAPE KEY
+     * ========================================================
+     */
+
+    const escapeHandler =
+      (event) => {
+
+        if (
+          event.key ===
+          "Escape"
+        ) {
+
+          closeGiftShop();
+
+        }
+
+      };
+
+
+    document.addEventListener(
+      "keydown",
+      escapeHandler
+    );
+
+
+    /*
+     * ========================================================
+     * CREATE GIFT CARDS
+     * ========================================================
+     */
+
+    giftCatalog.forEach(
+      (gift) => {
+
+        const giftCard =
+          document.createElement(
+            "button"
+          );
+
+        giftCard.type =
+          "button";
+
+        giftCard.className =
+          "gift-card";
+
+        giftCard.dataset.giftType =
+          gift.type;
+
+        giftCard.dataset.ngnPrice =
+          String(
+            gift.price
+          );
+
+
+        /*
+         * IMAGE AREA
+         */
+
+        const imageArea =
+          document.createElement(
+            "div"
+          );
+
+        imageArea.className =
+          "gift-image-area";
+
+
+        if (gift.image) {
+
+          const image =
+            document.createElement(
+              "img"
+            );
+
+          image.src =
+            gift.image;
+
+          image.alt =
+            gift.name;
+
+          image.loading =
+            "lazy";
+
+          image.className =
+            "gift-image";
+
+          imageArea.appendChild(
+            image
+          );
+
+        } else {
+
+          imageArea.innerHTML = `
+            <span
+              class="gift-image-placeholder"
+              aria-hidden="true"
+            >
+              ✦
+            </span>
+          `;
+
+        }
+
+
+        /*
+         * GIFT NAME
+         */
+
+        const giftName =
+          document.createElement(
+            "span"
+          );
+
+        giftName.className =
+          "gift-name";
+
+        giftName.textContent =
+          gift.name;
+
+
+        /*
+         * DISPLAY PRICE
+         */
+
+        const giftPrice =
+          document.createElement(
+            "span"
+          );
+
+        giftPrice.className =
+          "gift-price";
+
+
+        const localAmount =
+          gift.price *
+          displayRate;
+
+
+        const safeAmount =
+          displayCurrency.decimals ===
+          0
+            ? Math.ceil(
+                localAmount
+              )
+            : Math.ceil(
+                localAmount * 100
+              ) / 100;
+
+
+        giftPrice.textContent =
+          `${displayCurrency.symbol} ${safeAmount.toLocaleString(
+            displayCurrency.locale,
+            {
+              minimumFractionDigits:
+                displayCurrency.decimals,
+
+              maximumFractionDigits:
+                displayCurrency.decimals
+            }
+          )}`;
+
+
+        /*
+         * BUILD CARD
+         */
+
+        giftCard.appendChild(
+          imageArea
+        );
+
+        giftCard.appendChild(
+          giftName
+        );
+
+        giftCard.appendChild(
+          giftPrice
+        );
+
+
+        /*
+         * ======================================================
+         * GIFT SELECTION / PAYMENT
+         * ======================================================
+         */
+
+        giftCard.addEventListener(
+          "click",
+          async () => {
+
+            /*
+             * Prevent double click.
+             */
+
+            if (
+              giftCard.dataset.processing ===
+              "true"
+            ) {
+
+              return;
+
+            }
+
+
+            /*
+             * Remove previous selection.
+             */
+
+            giftShop
+              .querySelectorAll(
+                ".gift-card.selected"
+              )
+              .forEach(
+                (card) => {
+
+                  card.classList.remove(
+                    "selected"
+                  );
+
+                }
+              );
+
+
+            /*
+             * Select this gift.
+             */
+
+            giftCard.classList.add(
+              "selected"
+            );
+
+
+            giftCard.dataset.processing =
+              "true";
+
+
+            /*
+             * Save original card.
+             */
+
+            const originalContent =
+              giftCard.innerHTML;
+
+
+            /*
+             * Show loading.
+             */
+
+            giftCard.innerHTML = `
+              <div class="gift-payment-loading">
+
+                <span
+                  class="gift-loading-spinner"
+                ></span>
+
+                <span>
+                  Preparing gift...
+                </span>
+
+              </div>
+            `;
+
+
+            try {
+
+              /*
+               * Get logged-in reader.
+               */
+
+              const {
+                data: {
+                  user
+                },
+
+                error:
+                  userError
+
+              } =
+                await litdomSupabase
+                  .auth
+                  .getUser();
+
+
+              if (
+                userError ||
+                !user
+              ) {
+
+                throw new Error(
+                  "Please sign in before sending a gift."
+                );
+
+              }
+
+
+              /*
+               * Check email.
+               */
+
+              if (
+                !user.email
+              ) {
+
+                throw new Error(
+                  "Your account does not have an email address."
+                );
+
+              }
+
+
+              /*
+               * Create gift payment.
+               *
+               
