@@ -1,0 +1,293 @@
+const shareButton = document.createElement("button");
+
+shareButton.type = "button";
+
+shareButton.className = "reader-action-button";
+
+shareButton.setAttribute(
+  "aria-label",
+  "Share book"
+);
+
+shareButton.innerHTML = `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="18" cy="5" r="2" />
+    <circle cx="6" cy="12" r="2" />
+    <circle cx="18" cy="19" r="2" />
+    <path d="M8 11l8-5" />
+    <path d="M8 13l8 5" />
+  </svg>
+  <span>Share</span>
+`;
+
+
+/*
+ * ============================================================
+ * PERMANENT BOOK SHARE LINK
+ * ============================================================
+ *
+ * This points to the book information page.
+ *
+ * It contains only the book ID.
+ *
+ * It does NOT contain:
+ * - chapter ID
+ * - payment information
+ * - transaction reference
+ * - reader information
+ * - temporary session information
+ */
+
+const permanentBookShareUrl =
+  "https://litdom.blogspot.com/p/books.html?book=" +
+  encodeURIComponent(bookId);
+
+
+/*
+ * ============================================================
+ * SHARE BUTTON
+ * ============================================================
+ */
+
+shareButton.addEventListener(
+  "click",
+  async function () {
+
+    /*
+     * Make sure we actually have a book ID.
+     */
+
+    if (!bookId) {
+
+      alert(
+        "Unable to share this book right now."
+      );
+
+      return;
+    }
+
+
+    /*
+     * Try to get the book title from the page.
+     *
+     * If your book page already has a title element,
+     * this gives the shared link a nicer title.
+     */
+
+    let shareTitle =
+      "Read this book on Litdom";
+
+
+    /*
+     * Look for a likely book title element.
+     *
+     * We deliberately keep this optional.
+     */
+
+    const possibleBookTitle =
+      document.querySelector(
+        ".book-title, #bookTitle, h1"
+      );
+
+
+    if (
+      possibleBookTitle &&
+      possibleBookTitle.textContent.trim()
+    ) {
+
+      shareTitle =
+        possibleBookTitle.textContent.trim();
+
+    }
+
+
+    /*
+     * Text shown alongside the link by apps that support it.
+     */
+
+    const shareText =
+      "Read this book on Litdom";
+
+
+    /*
+     * ==========================================================
+     * NATIVE PHONE SHARE
+     * ==========================================================
+     *
+     * On supported phones this opens the normal system
+     * share sheet.
+     */
+
+    if (
+      navigator.share
+    ) {
+
+      try {
+
+        await navigator.share({
+
+          title:
+            shareTitle,
+
+          text:
+            shareText,
+
+          url:
+            permanentBookShareUrl
+
+        });
+
+        return;
+
+      } catch (shareError) {
+
+        /*
+         * The user may simply have cancelled the share sheet.
+         *
+         * In that case, do nothing.
+         */
+
+        if (
+          shareError &&
+          shareError.name ===
+            "AbortError"
+        ) {
+
+          return;
+
+        }
+
+        console.warn(
+          "Native share failed:",
+          shareError
+        );
+
+      }
+
+    }
+
+
+    /*
+     * ==========================================================
+     * FALLBACK: COPY THE PERMANENT LINK
+     * ==========================================================
+     *
+     * This is used when the browser does not support
+     * navigator.share.
+     */
+
+    try {
+
+      if (
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ) {
+
+        await navigator.clipboard.writeText(
+          permanentBookShareUrl
+        );
+
+        alert(
+          "Book link copied. You can now share it anywhere."
+        );
+
+        return;
+
+      }
+
+    } catch (clipboardError) {
+
+      console.warn(
+        "Clipboard API failed:",
+        clipboardError
+      );
+
+    }
+
+
+    /*
+     * ==========================================================
+     * FINAL FALLBACK
+     * ==========================================================
+     */
+
+    const temporaryInput =
+      document.createElement(
+        "input"
+      );
+
+    temporaryInput.type =
+      "text";
+
+    temporaryInput.value =
+      permanentBookShareUrl;
+
+    temporaryInput.setAttribute(
+      "readonly",
+      ""
+    );
+
+    temporaryInput.style.position =
+      "fixed";
+
+    temporaryInput.style.left =
+      "-9999px";
+
+    document.body.appendChild(
+      temporaryInput
+    );
+
+    temporaryInput.select();
+
+    temporaryInput.setSelectionRange(
+      0,
+      temporaryInput.value.length
+    );
+
+
+    try {
+
+      const copied =
+        document.execCommand(
+          "copy"
+        );
+
+
+      if (
+        copied
+      ) {
+
+        alert(
+          "Book link copied. You can now share it anywhere."
+        );
+
+      } else {
+
+        alert(
+          "Copy this book link:\n\n" +
+          permanentBookShareUrl
+        );
+
+      }
+
+    } catch (copyError) {
+
+      console.error(
+        "Final copy attempt failed:",
+        copyError
+      );
+
+      alert(
+        "Copy this book link:\n\n" +
+        permanentBookShareUrl
+      );
+
+    }
+
+
+    document.body.removeChild(
+      temporaryInput
+    );
+
+  }
+);
