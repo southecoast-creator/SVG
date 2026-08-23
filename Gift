@@ -7,35 +7,73 @@ async function renderChapterAccess() {
   const { data: { user } } = await litdomSupabase.auth.getUser();
 
   if (user) {
-    const { data: existingUnlock } = await litdomSupabase
+    const { data: existingChapterUnlock } = await litdomSupabase
       .from("chapter_unlocks")
       .select("id")
       .eq("chapter_id", chapter.id)
       .eq("reader_id", user.id)
       .maybeSingle();
 
-    if (existingUnlock) {
+    if (existingChapterUnlock) {
+      chapterContent.innerHTML = chapter.content || "";
+      return;
+    }
+
+    const { data: existingBookUnlock } = await litdomSupabase
+      .from("book_unlocks")
+      .select("id")
+      .eq("book_id", bookId)
+      .eq("reader_id", user.id)
+      .maybeSingle();
+
+    if (existingBookUnlock) {
       chapterContent.innerHTML = chapter.content || "";
       return;
     }
   }
 
+  const { data: bookPricing } = await litdomSupabase
+    .from("books")
+    .select("full_book_unlock_cost")
+    .eq("id", bookId)
+    .maybeSingle();
+
+  const diamondCost = bookPricing?.full_book_unlock_cost || 0;
+
   chapterContent.innerHTML = `
     <div class="chapter-lock-blocker" style="
-      padding: 40px 20px;
+      padding: 32px 20px;
       text-align: center;
       background: #faf6f8;
       border-radius: 16px;
       border: 1px solid #eadde5;
     ">
-      <p style="font-size: 17px; margin-bottom: 18px;">
-        You need <strong>${chapter.unlock_cost} Rubies</strong> to continue reading this chapter.
+
+      <p style="font-size: 17px; margin-bottom: 14px; font-weight: 600;">
+        You need ${chapter.unlock_cost} Rubies to unlock this chapter
       </p>
+
+      <div style="
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 14px;
+        border-radius: 16px;
+        background: #f0e4ea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+      ">
+        🔴
+      </div>
+
       <button
         type="button"
-        class="unlock-chapter-button"
+        class="pay-ruby-button"
         style="
-          padding: 12px 26px;
+          width: 100%;
+          max-width: 320px;
+          padding: 13px 20px;
           border: none;
           border-radius: 10px;
           background: #241f1b;
@@ -43,16 +81,81 @@ async function renderChapterAccess() {
           font-size: 15px;
           font-weight: 600;
           cursor: pointer;
+          margin-bottom: 26px;
         "
       >
-        Pay ${chapter.unlock_cost} Rubies to Unlock
+        Pay ${chapter.unlock_cost} Rubies
       </button>
+
+      <div style="height: 1px; background: #eadde5; margin: 0 0 26px;"></div>
+
+      <p style="font-size: 17px; margin-bottom: 14px; font-weight: 600;">
+        You need ${diamondCost} Diamonds to unlock this book
+      </p>
+
+      <div style="
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 14px;
+        border-radius: 16px;
+        background: #e4eef0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+      ">
+        💎
+      </div>
+
+      <button
+        type="button"
+        class="pay-diamond-button"
+        style="
+          width: 100%;
+          max-width: 320px;
+          padding: 13px 20px;
+          border: none;
+          border-radius: 10px;
+          background: #241f1b;
+          color: #fff;
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+          margin-bottom: 20px;
+        "
+      >
+        Pay ${diamondCost} Diamonds
+      </button>
+
+      <div>
+        <button
+          type="button"
+          class="check-wallet-button"
+          style="
+            border: none;
+            background: transparent;
+            color: #6b625b;
+            font-size: 13px;
+            text-decoration: underline;
+            cursor: pointer;
+          "
+        >
+          Check your wallet balance
+        </button>
+      </div>
+
     </div>
   `;
 
-  const unlockButton = chapterContent.querySelector(".unlock-chapter-button");
+  const payRubyButton = chapterContent.querySelector(".pay-ruby-button");
+  const payDiamondButton = chapterContent.querySelector(".pay-diamond-button");
+  const checkWalletButton = chapterContent.querySelector(".check-wallet-button");
 
-  unlockButton.addEventListener("click", async function () {
+  checkWalletButton.addEventListener("click", function () {
+    window.location.href = "/p/wallet.html";
+  });
+
+  payRubyButton.addEventListener("click", async function () {
     const { data: { user: unlockUser }, error: unlockUserError } = await litdomSupabase.auth.getUser();
 
     if (unlockUserError || !unlockUser) {
@@ -60,8 +163,8 @@ async function renderChapterAccess() {
       return;
     }
 
-    unlockButton.disabled = true;
-    unlockButton.textContent = "Unlocking...";
+    payRubyButton.disabled = true;
+    payRubyButton.textContent = "Unlocking...";
 
     const { data: wallet, error: walletError } = await litdomSupabase
       .from("wallets")
@@ -71,15 +174,15 @@ async function renderChapterAccess() {
 
     if (walletError || !wallet) {
       alert("We couldn't check your wallet balance right now.");
-      unlockButton.disabled = false;
-      unlockButton.textContent = `Pay ${chapter.unlock_cost} Rubies to Unlock`;
+      payRubyButton.disabled = false;
+      payRubyButton.textContent = `Pay ${chapter.unlock_cost} Rubies`;
       return;
     }
 
     if (wallet.ruby_balance < chapter.unlock_cost) {
-      alert("You don't have enough Rubies. Please top up your wallet to continue reading.");
-      unlockButton.disabled = false;
-      unlockButton.textContent = `Pay ${chapter.unlock_cost} Rubies to Unlock`;
+      alert("You don't have enough Rubies. Please top up your wallet.");
+      payRubyButton.disabled = false;
+      payRubyButton.textContent = `Pay ${chapter.unlock_cost} Rubies`;
       return;
     }
 
@@ -93,8 +196,8 @@ async function renderChapterAccess() {
     if (deductError) {
       console.error("Wallet deduction error:", deductError);
       alert("We couldn't deduct Rubies from your wallet.");
-      unlockButton.disabled = false;
-      unlockButton.textContent = `Pay ${chapter.unlock_cost} Rubies to Unlock`;
+      payRubyButton.disabled = false;
+      payRubyButton.textContent = `Pay ${chapter.unlock_cost} Rubies`;
       return;
     }
 
@@ -126,6 +229,86 @@ async function renderChapterAccess() {
       }]);
 
     chapterContent.innerHTML = chapter.content || "";
+  });
+
+  payDiamondButton.addEventListener("click", async function () {
+    const { data: { user: unlockUser }, error: unlockUserError } = await litdomSupabase.auth.getUser();
+
+    if (unlockUserError || !unlockUser) {
+      alert("Please log in to unlock this book.");
+      return;
+    }
+
+    if (!diamondCost || diamondCost <= 0) {
+      alert("This book does not have a Diamond unlock price set yet.");
+      return;
+    }
+
+    payDiamondButton.disabled = true;
+    payDiamondButton.textContent = "Unlocking...";
+
+    const { data: wallet, error: walletError } = await litdomSupabase
+      .from("wallets")
+      .select("diamond_balance")
+      .eq("user_id", unlockUser.id)
+      .maybeSingle();
+
+    if (walletError || !wallet) {
+      alert("We couldn't check your wallet balance right now.");
+      payDiamondButton.disabled = false;
+      payDiamondButton.textContent = `Pay ${diamondCost} Diamonds`;
+      return;
+    }
+
+    if (wallet.diamond_balance < diamondCost) {
+      alert("You don't have enough Diamonds. Please top up your wallet.");
+      payDiamondButton.disabled = false;
+      payDiamondButton.textContent = `Pay ${diamondCost} Diamonds`;
+      return;
+    }
+
+    const newBalance = wallet.diamond_balance - diamondCost;
+
+    const { error: deductError } = await litdomSupabase
+      .from("wallets")
+      .update({ diamond_balance: newBalance, updated_at: new Date().toISOString() })
+      .eq("user_id", unlockUser.id);
+
+    if (deductError) {
+      console.error("Wallet deduction error:", deductError);
+      alert("We couldn't deduct Diamonds from your wallet.");
+      payDiamondButton.disabled = false;
+      payDiamondButton.textContent = `Pay ${diamondCost} Diamonds`;
+      return;
+    }
+
+    const { error: unlockInsertError } = await litdomSupabase
+      .from("book_unlocks")
+      .insert([{
+        reader_id: unlockUser.id,
+        book_id: bookId,
+        currency: "diamond",
+        currency_amount: diamondCost
+      }]);
+
+    if (unlockInsertError) {
+      console.error("Book unlock insert error:", unlockInsertError);
+      alert("Diamonds were deducted but we couldn't unlock the book. Please contact support.");
+      return;
+    }
+
+    await litdomSupabase
+      .from("wallet_transactions")
+      .insert([{
+        user_id: unlockUser.id,
+        currency: "diamond",
+        amount: -diamondCost,
+        transaction_type: "book_unlock",
+        reference_id: bookId,
+        description: `Unlocked full book access`
+      }]);
+
+    location.reload();
   });
 }
 
