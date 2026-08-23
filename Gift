@@ -54,18 +54,18 @@ async function renderChapterAccess() {
       </p>
 
       <div style="
-        width: 96px;
-        height: 96px;
-        margin: 0 auto 14px;
-        border-radius: 16px;
-        background: #f0e4ea;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 42px;
-      ">
-        🔴
-      </div>
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 14px;
+  border-radius: 16px;
+  overflow: hidden;
+">
+  <img
+    src="PASTE_YOUR_RUBY_IMAGE_URL_HERE"
+    alt="Ruby"
+    style="width: 100%; height: 100%; object-fit: contain;"
+  />
+</div>
 
       <button
         type="button"
