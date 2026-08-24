@@ -1,315 +1,669 @@
-async function renderChapterAccess() {
-  if (!chapter.is_locked || !chapter.unlock_cost || chapter.unlock_cost <= 0) {
-    chapterContent.innerHTML = chapter.content || "";
-    return;
+<style>
+
+  * {
+    box-sizing: border-box;
   }
 
-  const { data: { user } } = await litdomSupabase.auth.getUser();
-
-  if (user) {
-    const { data: existingChapterUnlock } = await litdomSupabase
-      .from("chapter_unlocks")
-      .select("id")
-      .eq("chapter_id", chapter.id)
-      .eq("reader_id", user.id)
-      .maybeSingle();
-
-    if (existingChapterUnlock) {
-      chapterContent.innerHTML = chapter.content || "";
-      return;
-    }
-
-    const { data: existingBookUnlock } = await litdomSupabase
-      .from("book_unlocks")
-      .select("id")
-      .eq("book_id", bookId)
-      .eq("reader_id", user.id)
-      .maybeSingle();
-
-    if (existingBookUnlock) {
-      chapterContent.innerHTML = chapter.content || "";
-      return;
-    }
+  .wallet-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #241f1b;
   }
 
-  const { data: bookPricing } = await litdomSupabase
-    .from("books")
-    .select("full_book_unlock_cost")
-    .eq("id", bookId)
-    .maybeSingle();
+  .wallet-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
 
-  const diamondCost = bookPricing?.full_book_unlock_cost || 0;
+  .wallet-header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+  }
 
-  chapterContent.innerHTML = `
-    <div class="chapter-lock-blocker" style="
-      padding: 32px 20px;
-      text-align: center;
-      background: #faf6f8;
-      border-radius: 16px;
-      border: 1px solid #eadde5;
-    ">
+  .wallet-header p {
+    margin: 0;
+    color: #6b625b;
+    font-size: 14px;
+  }
 
-      <p style="font-size: 17px; margin-bottom: 14px; font-weight: 600;">
-        You need ${chapter.unlock_cost} Rubies to unlock this chapter
-      </p>
+  .wallet-balances {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
 
-      <div style="
-  width: 96px;
-  height: 96px;
-  margin: 0 auto 14px;
-  border-radius: 16px;
-  overflow: hidden;
-">
-  <img
-    src="PASTE_YOUR_RUBY_IMAGE_URL_HERE"
-    alt="Ruby"
-    style="width: 100%; height: 100%; object-fit: contain;"
-  />
-</div>
+  .wallet-balance-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 22px 16px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+    border: 1px solid #f0e8ee;
+  }
 
-      <button
-        type="button"
-        class="pay-ruby-button"
-        style="
-          width: 100%;
-          max-width: 320px;
-          padding: 13px 20px;
-          border: none;
-          border-radius: 10px;
-          background: #241f1b;
-          color: #fff;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-          margin-bottom: 26px;
-        "
-      >
-        Pay ${chapter.unlock_cost} Rubies
-      </button>
+  .wallet-balance-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 10px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #faf6f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-      <div style="height: 1px; background: #eadde5; margin: 0 0 26px;"></div>
+  .wallet-balance-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 
-      <p style="font-size: 17px; margin-bottom: 14px; font-weight: 600;">
-        You need ${diamondCost} Diamonds to unlock this book
-      </p>
+  .wallet-balance-label {
+    font-size: 13px;
+    color: #82786f;
+    margin-bottom: 4px;
+  }
 
-      <div style="
-  width: 96px;
-  height: 96px;
-  margin: 0 auto 14px;
-  border-radius: 16px;
-  overflow: hidden;
-">
-  <img
-    src="PASTE_YOUR_DIAMOND_IMAGE_URL_HERE"
-    alt="Diamond"
-    style="width: 100%; height: 100%; object-fit: contain;"
-  />
-</div>
+  .wallet-balance-value {
+    font-size: 26px;
+    font-weight: 700;
+  }
 
-      <button
-        type="button"
-        class="pay-diamond-button"
-        style="
-          width: 100%;
-          max-width: 320px;
-          padding: 13px 20px;
-          border: none;
-          border-radius: 10px;
-          background: #241f1b;
-          color: #fff;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-          margin-bottom: 20px;
-        "
-      >
-        Pay ${diamondCost} Diamonds
-      </button>
+  .wallet-topup-button {
+    display: block;
+    width: 100%;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 12px;
+    background: #241f1b;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 30px;
+  }
 
-      <div>
-        <button
-          type="button"
-          class="check-wallet-button"
-          style="
-            border: none;
-            background: transparent;
-            color: #6b625b;
-            font-size: 13px;
-            text-decoration: underline;
-            cursor: pointer;
-          "
-        >
-          Check your wallet balance
-        </button>
+  .wallet-topup-button:hover {
+    opacity: 0.92;
+  }
+
+  .wallet-earn-section {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px 18px;
+    border: 1px solid #f0e8ee;
+  }
+
+  .wallet-earn-section h2 {
+    margin: 0 0 14px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .wallet-earn-task {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #f2ecef;
+  }
+
+  .wallet-earn-task:last-child {
+    border-bottom: none;
+  }
+
+  .wallet-earn-task-info {
+    font-size: 14px;
+  }
+
+  .wallet-earn-task-title {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .wallet-earn-task-reward {
+    color: #82786f;
+    font-size: 12px;
+  }
+
+  .wallet-earn-task-button {
+    padding: 8px 16px;
+    border: 1px solid #241f1b;
+    border-radius: 8px;
+    background: transparent;
+    color: #241f1b;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* ===== TOP-UP MODAL ===== */
+
+  .wallet-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(8, 7, 5, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .wallet-modal-overlay.visible {
+    display: flex;
+  }
+
+  .wallet-modal {
+    width: 100%;
+    max-width: 480px;
+    max-height: 86vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 24px 18px;
+  }
+
+  .wallet-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .wallet-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .wallet-modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #f2ecef;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .wallet-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .wallet-tab-button {
+    flex: 1;
+    padding: 11px;
+    border: 1px solid #eadde5;
+    border-radius: 10px;
+    background: #faf6f8;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #6b625b;
+  }
+
+  .wallet-tab-button.active {
+    background: #241f1b;
+    color: #fff;
+    border-color: #241f1b;
+  }
+
+  .wallet-package-group {
+    display: none;
+  }
+
+  .wallet-package-group.active {
+    display: block;
+  }
+
+  .wallet-package-tier-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #82786f;
+    margin: 18px 0 10px;
+  }
+
+  .wallet-package-tier-label:first-child {
+    margin-top: 0;
+  }
+
+  .wallet-package-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .wallet-package-card {
+    border: 1px solid #eadde5;
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+    background: #faf6f8;
+    cursor: pointer;
+  }
+
+  .wallet-package-card:hover {
+    border-color: #241f1b;
+  }
+
+  .wallet-package-image-slot {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 8px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wallet-package-image-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .wallet-package-amount {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .wallet-package-price {
+    font-size: 12px;
+    color: #6b625b;
+  }
+
+  .wallet-modal-message {
+    text-align: center;
+    padding: 20px;
+    color: #6b625b;
+    font-size: 14px;
+  }
+
+</style>
+
+
+<div class="wallet-page" id="walletPage">
+
+  <div class="wallet-header">
+    <h1>My Wallet</h1>
+    <p>Manage your Rubies and Diamonds</p>
+  </div>
+
+  <div class="wallet-balances">
+
+    <div class="wallet-balance-card">
+      <div class="wallet-balance-icon">
+        <img src="PASTE_RUBY_ICON_URL_HERE" alt="Rubies" />
       </div>
-
+      <div class="wallet-balance-label">Rubies</div>
+      <div class="wallet-balance-value" id="rubyBalanceValue">—</div>
     </div>
-  `;
 
-  const payRubyButton = chapterContent.querySelector(".pay-ruby-button");
-  const payDiamondButton = chapterContent.querySelector(".pay-diamond-button");
-  const checkWalletButton = chapterContent.querySelector(".check-wallet-button");
+    <div class="wallet-balance-card">
+      <div class="wallet-balance-icon">
+        <img src="PASTE_DIAMOND_ICON_URL_HERE" alt="Diamonds" />
+      </div>
+      <div class="wallet-balance-label">Diamonds</div>
+      <div class="wallet-balance-value" id="diamondBalanceValue">—</div>
+    </div>
 
-  checkWalletButton.addEventListener("click", function () {
-    window.location.href = "/p/wallet.html";
+  </div>
+
+  <button type="button" class="wallet-topup-button" id="openTopupModalButton">
+    Top Up
+  </button>
+
+  <div class="wallet-earn-section">
+    <h2>Earn More</h2>
+
+    <div class="wallet-earn-task">
+      <div class="wallet-earn-task-info">
+        <div class="wallet-earn-task-title">Daily Check-In</div>
+        <div class="wallet-earn-task-reward">+5 Rubies</div>
+      </div>
+      <button type="button" class="wallet-earn-task-button" disabled>Coming Soon</button>
+    </div>
+
+    <div class="wallet-earn-task">
+      <div class="wallet-earn-task-info">
+        <div class="wallet-earn-task-title">Watch an Ad</div>
+        <div class="wallet-earn-task-reward">+10 Rubies</div>
+      </div>
+      <button type="button" class="wallet-earn-task-button" disabled>Coming Soon</button>
+    </div>
+
+    <div class="wallet-earn-task">
+      <div class="wallet-earn-task-info">
+        <div class="wallet-earn-task-title">Invite a Friend</div>
+        <div class="wallet-earn-task-reward">+Diamonds</div>
+      </div>
+      <button type="button" class="wallet-earn-task-button" disabled>Coming Soon</button>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ===== TOP-UP MODAL ===== -->
+
+<div class="wallet-modal-overlay" id="topupModalOverlay">
+
+  <div class="wallet-modal">
+
+    <div class="wallet-modal-header">
+      <h2>Top Up Wallet</h2>
+      <button type="button" class="wallet-modal-close" id="closeTopupModalButton">×</button>
+    </div>
+
+    <div class="wallet-tabs">
+      <button type="button" class="wallet-tab-button active" id="rubyTabButton">Rubies</button>
+      <button type="button" class="wallet-tab-button" id="diamondTabButton">Diamonds</button>
+    </div>
+
+    <div class="wallet-package-group active" id="rubyPackageGroup"></div>
+    <div class="wallet-package-group" id="diamondPackageGroup"></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  const SUPABASE_URL = "https://uniecvgkxhcbedppadgx.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_UhqP7y8Cjyiv8RebOSMUDA_lBj0QuTE";
+  const litdomSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+  const RUBY_PACKAGES = [
+    { id: "ruby_150", amount: 150, ngnPrice: 100, tier: "Basic Package" },
+    { id: "ruby_300", amount: 300, ngnPrice: 250, tier: "Basic Package" },
+    { id: "ruby_750", amount: 750, ngnPrice: 500, tier: "Basic Package" },
+    { id: "ruby_1000", amount: 1000, ngnPrice: 750, tier: "Basic Package" },
+    { id: "ruby_1500", amount: 1500, ngnPrice: 1000, tier: "Medium Package" },
+    { id: "ruby_3100", amount: 3100, ngnPrice: 2500, tier: "Medium Package" },
+    { id: "ruby_8000", amount: 8000, ngnPrice: 5000, tier: "Medium Package" },
+    { id: "ruby_16500", amount: 16500, ngnPrice: 10000, tier: "Medium Package" },
+    { id: "ruby_32000", amount: 32000, ngnPrice: 20000, tier: "Pro Package" },
+    { id: "ruby_81000", amount: 81000, ngnPrice: 50000, tier: "Pro Package" },
+    { id: "ruby_113500", amount: 113500, ngnPrice: 75000, tier: "Pro Package" },
+    { id: "ruby_200000", amount: 200000, ngnPrice: 100000, tier: "Pro Package" }
+  ];
+
+  const DIAMOND_PACKAGES = [
+    { id: "diamond_5", amount: 5, ngnPrice: 500, tier: "Basic Package" },
+    { id: "diamond_12", amount: 12, ngnPrice: 1000, tier: "Basic Package" },
+    { id: "diamond_23", amount: 23, ngnPrice: 2000, tier: "Basic Package" },
+    { id: "diamond_55", amount: 55, ngnPrice: 5000, tier: "Basic Package" },
+    { id: "diamond_75", amount: 75, ngnPrice: 7000, tier: "Medium Package" },
+    { id: "diamond_110", amount: 110, ngnPrice: 10000, tier: "Medium Package" },
+    { id: "diamond_163", amount: 163, ngnPrice: 15000, tier: "Medium Package" },
+    { id: "diamond_215", amount: 215, ngnPrice: 20000, tier: "Medium Package" },
+    { id: "diamond_320", amount: 320, ngnPrice: 30000, tier: "Pro Package" },
+    { id: "diamond_530", amount: 530, ngnPrice: 50000, tier: "Pro Package" },
+    { id: "diamond_760", amount: 760, ngnPrice: 75000, tier: "Pro Package" },
+    { id: "diamond_1000", amount: 1000, ngnPrice: 100000, tier: "Pro Package" }
+  ];
+
+  const CURRENCY_INFO = {
+    NGN: { locale: "en-NG", symbol: "\u20A6", decimals: 0 },
+    USD: { locale: "en-US", symbol: "$", decimals: 2 },
+    EUR: { locale: "en-IE", symbol: "\u20AC", decimals: 2 },
+    GBP: { locale: "en-GB", symbol: "\u00A3", decimals: 2 },
+    ZAR: { locale: "en-ZA", symbol: "R", decimals: 2 },
+    GHS: { locale: "en-GH", symbol: "GH\u20B5", decimals: 2 },
+    KES: { locale: "en-KE", symbol: "KSh", decimals: 2 },
+    UGX: { locale: "en-UG", symbol: "UGX", decimals: 0 },
+    RWF: { locale: "rw-RW", symbol: "FRw", decimals: 0 },
+    TZS: { locale: "sw-TZ", symbol: "TSh", decimals: 0 },
+    MWK: { locale: "en-MW", symbol: "MK", decimals: 2 },
+    XAF: { locale: "fr-CM", symbol: "FCFA", decimals: 0 },
+    XOF: { locale: "fr-SN", symbol: "CFA", decimals: 0 },
+    EGP: { locale: "ar-EG", symbol: "E\u00A3", decimals: 2 }
+  };
+
+  document.addEventListener("DOMContentLoaded", async function () {
+
+    const rubyBalanceValue = document.getElementById("rubyBalanceValue");
+    const diamondBalanceValue = document.getElementById("diamondBalanceValue");
+    const openTopupModalButton = document.getElementById("openTopupModalButton");
+    const closeTopupModalButton = document.getElementById("closeTopupModalButton");
+    const topupModalOverlay = document.getElementById("topupModalOverlay");
+    const rubyTabButton = document.getElementById("rubyTabButton");
+    const diamondTabButton = document.getElementById("diamondTabButton");
+    const rubyPackageGroup = document.getElementById("rubyPackageGroup");
+    const diamondPackageGroup = document.getElementById("diamondPackageGroup");
+
+    const { data: { user } } = await litdomSupabase.auth.getUser();
+
+    if (!user) {
+      document.getElementById("walletPage").innerHTML =
+        "<div class='wallet-modal-message'>Please log in to view your wallet.</div>";
+      return;
+    }
+
+    async function loadWalletBalance() {
+      const { data: wallet, error } = await litdomSupabase
+        .from("wallets")
+        .select("ruby_balance, diamond_balance")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Wallet load error:", error);
+        return;
+      }
+
+      rubyBalanceValue.textContent = String(wallet?.ruby_balance ?? 0);
+      diamondBalanceValue.textContent = String(wallet?.diamond_balance ?? 0);
+    }
+
+    await loadWalletBalance();
+
+    let detectedCurrency = "NGN";
+    let displayRate = 1;
+
+    try {
+      const locationResponse = await fetch("https://ipapi.co/json/");
+
+      if (locationResponse.ok) {
+        const locationData = await locationResponse.json();
+        const countryCode = String(locationData?.country_code || "NG").toUpperCase().trim();
+
+        const countryCurrencyMap = {
+          NG: "NGN",
+          US: "USD", CA: "USD",
+          GB: "GBP",
+          IE: "EUR", FR: "EUR", DE: "EUR", ES: "EUR", IT: "EUR", PT: "EUR", NL: "EUR", BE: "EUR", AT: "EUR", FI: "EUR", GR: "EUR",
+          ZA: "ZAR",
+          GH: "GHS",
+          KE: "KES",
+          UG: "UGX",
+          RW: "RWF",
+          TZ: "TZS",
+          MW: "MWK",
+          CM: "XAF",
+          SN: "XOF",
+          EG: "EGP"
+        };
+
+        detectedCurrency = countryCurrencyMap[countryCode] || "USD";
+      }
+    } catch (locationError) {
+      console.warn("Unable to detect currency. Using NGN:", locationError);
+      detectedCurrency = "NGN";
+    }
+
+    const displayCurrency = CURRENCY_INFO[detectedCurrency] || CURRENCY_INFO.NGN;
+
+    if (detectedCurrency !== "NGN") {
+      try {
+        const rateResponse = await fetch("https://open.er-api.com/v6/latest/NGN");
+
+        if (rateResponse.ok) {
+          const rateData = await rateResponse.json();
+          const rate = Number(rateData?.rates?.[detectedCurrency]);
+
+          if (Number.isFinite(rate) && rate > 0) {
+            displayRate = rate;
+          }
+        }
+      } catch (rateError) {
+        console.warn("Unable to obtain exchange rate. Showing NGN prices.", rateError);
+        detectedCurrency = "NGN";
+      }
+    }
+
+    function formatDisplayPrice(ngnPrice) {
+      const localAmount = ngnPrice * displayRate;
+
+      const safeAmount = displayCurrency.decimals === 0
+        ? Math.ceil(localAmount)
+        : Math.ceil(localAmount * 100) / 100;
+
+      return `${displayCurrency.symbol} ${safeAmount.toLocaleString(displayCurrency.locale, {
+        minimumFractionDigits: displayCurrency.decimals,
+        maximumFractionDigits: displayCurrency.decimals
+      })}`;
+    }
+
+    function buildPackageGrid(container, packages, iconUrlPlaceholder) {
+      container.innerHTML = "";
+
+      let currentTier = "";
+
+      packages.forEach(function (pkg) {
+        if (pkg.tier !== currentTier) {
+          currentTier = pkg.tier;
+
+          const tierLabel = document.createElement("div");
+          tierLabel.className = "wallet-package-tier-label";
+          tierLabel.textContent = currentTier;
+          container.appendChild(tierLabel);
+
+          const grid = document.createElement("div");
+          grid.className = "wallet-package-grid";
+          grid.dataset.tierGrid = currentTier;
+          container.appendChild(grid);
+        }
+
+        const grid = container.querySelector(`[data-tier-grid="${currentTier}"]`);
+
+        const card = document.createElement("div");
+        card.className = "wallet-package-card";
+
+        card.innerHTML = `
+          <div class="wallet-package-image-slot">
+            <img src="${iconUrlPlaceholder}" alt="" />
+          </div>
+          <div class="wallet-package-amount">${pkg.amount.toLocaleString()}</div>
+          <div class="wallet-package-price">${formatDisplayPrice(pkg.ngnPrice)}</div>
+        `;
+
+        card.addEventListener("click", function () {
+          startTopup(pkg);
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    buildPackageGrid(rubyPackageGroup, RUBY_PACKAGES, "PASTE_RUBY_ICON_URL_HERE");
+    buildPackageGrid(diamondPackageGroup, DIAMOND_PACKAGES, "PASTE_DIAMOND_ICON_URL_HERE");
+
+    openTopupModalButton.addEventListener("click", function () {
+      topupModalOverlay.classList.add("visible");
+    });
+
+    closeTopupModalButton.addEventListener("click", function () {
+      topupModalOverlay.classList.remove("visible");
+    });
+
+    topupModalOverlay.addEventListener("click", function (event) {
+      if (event.target === topupModalOverlay) {
+        topupModalOverlay.classList.remove("visible");
+      }
+    });
+
+    rubyTabButton.addEventListener("click", function () {
+      rubyTabButton.classList.add("active");
+      diamondTabButton.classList.remove("active");
+      rubyPackageGroup.classList.add("active");
+      diamondPackageGroup.classList.remove("active");
+    });
+
+    diamondTabButton.addEventListener("click", function () {
+      diamondTabButton.classList.add("active");
+      rubyTabButton.classList.remove("active");
+      diamondPackageGroup.classList.add("active");
+      rubyPackageGroup.classList.remove("active");
+    });
+
+    async function startTopup(pkg) {
+      if (!user.email) {
+        alert("Your account does not have an email address.");
+        return;
+      }
+
+      const { data, error } = await litdomSupabase.functions.invoke("create-wallet-topup", {
+        body: {
+          package_id: pkg.id,
+          email: user.email,
+          currency: detectedCurrency
+        }
+      });
+
+      if (error) {
+        console.error("Topup creation error:", error);
+        alert("We couldn't start this top-up. Please try again.");
+        return;
+      }
+
+      if (!data || !data.success || !data.payment_link) {
+        console.error("Topup response:", data);
+        alert(data?.error || "Unable to create the top-up payment.");
+        return;
+      }
+
+      window.location.href = data.payment_link;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const txRef = urlParams.get("tx_ref");
+
+    if (txRef) {
+      const { data, error } = await litdomSupabase.functions.invoke("verify-wallet-topup", {
+        body: { tx_ref: txRef }
+      });
+
+      if (error) {
+        console.error("Topup verification error:", error);
+        alert("We couldn't confirm your top-up. Please contact support if you were charged.");
+      } else if (data && data.success && data.verified) {
+        alert(`Success! ${data.currency_amount} ${data.currency_type === "ruby" ? "Rubies" : "Diamonds"} added to your wallet.`);
+        await loadWalletBalance();
+      } else {
+        alert(data?.message || "Payment could not be confirmed yet.");
+      }
+    }
+
   });
 
-  payRubyButton.addEventListener("click", async function () {
-    const { data: { user: unlockUser }, error: unlockUserError } = await litdomSupabase.auth.getUser();
-
-    if (unlockUserError || !unlockUser) {
-      alert("Please log in to unlock this chapter.");
-      return;
-    }
-
-    payRubyButton.disabled = true;
-    payRubyButton.textContent = "Unlocking...";
-
-    const { data: wallet, error: walletError } = await litdomSupabase
-      .from("wallets")
-      .select("ruby_balance")
-      .eq("user_id", unlockUser.id)
-      .maybeSingle();
-
-    if (walletError || !wallet) {
-      alert("We couldn't check your wallet balance right now.");
-      payRubyButton.disabled = false;
-      payRubyButton.textContent = `Pay ${chapter.unlock_cost} Rubies`;
-      return;
-    }
-
-    if (wallet.ruby_balance < chapter.unlock_cost) {
-      alert("You don't have enough Rubies. Please top up your wallet.");
-      payRubyButton.disabled = false;
-      payRubyButton.textContent = `Pay ${chapter.unlock_cost} Rubies`;
-      return;
-    }
-
-    const newBalance = wallet.ruby_balance - chapter.unlock_cost;
-
-    const { error: deductError } = await litdomSupabase
-      .from("wallets")
-      .update({ ruby_balance: newBalance, updated_at: new Date().toISOString() })
-      .eq("user_id", unlockUser.id);
-
-    if (deductError) {
-      console.error("Wallet deduction error:", deductError);
-      alert("We couldn't deduct Rubies from your wallet.");
-      payRubyButton.disabled = false;
-      payRubyButton.textContent = `Pay ${chapter.unlock_cost} Rubies`;
-      return;
-    }
-
-    const { error: unlockInsertError } = await litdomSupabase
-      .from("chapter_unlocks")
-      .insert([{
-        reader_id: unlockUser.id,
-        book_id: chapter.book_id,
-        chapter_id: chapter.id,
-        currency: "ruby",
-        currency_amount: chapter.unlock_cost
-      }]);
-
-    if (unlockInsertError) {
-      console.error("Chapter unlock insert error:", unlockInsertError);
-      alert("Rubies were deducted but we couldn't unlock the chapter. Please contact support.");
-      return;
-    }
-
-    await litdomSupabase
-      .from("wallet_transactions")
-      .insert([{
-        user_id: unlockUser.id,
-        currency: "ruby",
-        amount: -chapter.unlock_cost,
-        transaction_type: "chapter_unlock",
-        reference_id: chapter.id,
-        description: `Unlocked Chapter ${chapter.chapter_number}`
-      }]);
-
-    chapterContent.innerHTML = chapter.content || "";
-  });
-
-  payDiamondButton.addEventListener("click", async function () {
-    const { data: { user: unlockUser }, error: unlockUserError } = await litdomSupabase.auth.getUser();
-
-    if (unlockUserError || !unlockUser) {
-      alert("Please log in to unlock this book.");
-      return;
-    }
-
-    if (!diamondCost || diamondCost <= 0) {
-      alert("This book does not have a Diamond unlock price set yet.");
-      return;
-    }
-
-    payDiamondButton.disabled = true;
-    payDiamondButton.textContent = "Unlocking...";
-
-    const { data: wallet, error: walletError } = await litdomSupabase
-      .from("wallets")
-      .select("diamond_balance")
-      .eq("user_id", unlockUser.id)
-      .maybeSingle();
-
-    if (walletError || !wallet) {
-      alert("We couldn't check your wallet balance right now.");
-      payDiamondButton.disabled = false;
-      payDiamondButton.textContent = `Pay ${diamondCost} Diamonds`;
-      return;
-    }
-
-    if (wallet.diamond_balance < diamondCost) {
-      alert("You don't have enough Diamonds. Please top up your wallet.");
-      payDiamondButton.disabled = false;
-      payDiamondButton.textContent = `Pay ${diamondCost} Diamonds`;
-      return;
-    }
-
-    const newBalance = wallet.diamond_balance - diamondCost;
-
-    const { error: deductError } = await litdomSupabase
-      .from("wallets")
-      .update({ diamond_balance: newBalance, updated_at: new Date().toISOString() })
-      .eq("user_id", unlockUser.id);
-
-    if (deductError) {
-      console.error("Wallet deduction error:", deductError);
-      alert("We couldn't deduct Diamonds from your wallet.");
-      payDiamondButton.disabled = false;
-      payDiamondButton.textContent = `Pay ${diamondCost} Diamonds`;
-      return;
-    }
-
-    const { error: unlockInsertError } = await litdomSupabase
-      .from("book_unlocks")
-      .insert([{
-        reader_id: unlockUser.id,
-        book_id: bookId,
-        currency: "diamond",
-        currency_amount: diamondCost
-      }]);
-
-    if (unlockInsertError) {
-      console.error("Book unlock insert error:", unlockInsertError);
-      alert("Diamonds were deducted but we couldn't unlock the book. Please contact support.");
-      return;
-    }
-
-    await litdomSupabase
-      .from("wallet_transactions")
-      .insert([{
-        user_id: unlockUser.id,
-        currency: "diamond",
-        amount: -diamondCost,
-        transaction_type: "book_unlock",
-        reference_id: bookId,
-        description: `Unlocked full book access`
-      }]);
-
-    location.reload();
-  });
-}
-
-renderChapterAccess();
+</script>
