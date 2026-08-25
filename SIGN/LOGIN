@@ -263,3 +263,188 @@
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ================================
+   PROFILE — AUTHOR'S PUBLISHED BOOKS
+   ================================ */
+
+async function loadAuthorBooks() {
+
+  const booksContainer =
+    document.getElementById("profile-books");
+
+  const booksMessage =
+    document.getElementById("profile-books-message");
+
+  const booksCount =
+    document.getElementById("profile-works-count");
+
+
+  const {
+    data: { user },
+    error: userError
+  } = await supabaseClient.auth.getUser();
+
+
+  if (userError || !user) {
+
+    booksMessage.textContent =
+      "Please log in to view your books.";
+
+    return;
+  }
+
+
+  const { data: books, error } =
+    await supabaseClient
+      .from("books")
+      .select(`
+        id,
+        title,
+        cover_url,
+        description,
+        published_at
+      `)
+      .eq("author_id", user.id)
+      .eq("status", "published")
+      .order("published_at", {
+        ascending: false
+      });
+
+
+  if (error) {
+
+    console.error(
+      "Error loading author books:",
+      error
+    );
+
+    booksMessage.textContent =
+      "Unable to load your books.";
+
+    return;
+  }
+
+
+  booksMessage.remove();
+
+
+  if (!books || books.length === 0) {
+
+    booksCount.textContent = "0 books";
+
+    booksContainer.innerHTML = `
+      <p id="profile-books-message">
+        You don't have any published books yet.
+      </p>
+    `;
+
+    return;
+  }
+
+
+  booksCount.textContent =
+    books.length +
+    (books.length === 1 ? " book" : " books");
+
+
+  booksContainer.innerHTML = "";
+
+
+  books.forEach(function (book) {
+
+    const card =
+      document.createElement("a");
+
+    card.className =
+      "author-book-card";
+
+
+    /*
+      Change this URL later if your
+      book-reading page has a different URL.
+    */
+
+    card.href =
+      "/p/book.html?id=" +
+      encodeURIComponent(book.id);
+
+
+    const cover =
+      document.createElement("img");
+
+    cover.className =
+      "author-book-cover";
+
+    cover.src =
+      book.cover_url ||
+      "https://via.placeholder.com/600x800/0B0B0F/D4AF37?text=Litdom";
+
+    cover.alt =
+      book.title;
+
+
+    const info =
+      document.createElement("div");
+
+    info.className =
+      "author-book-info";
+
+
+    const title =
+      document.createElement("h3");
+
+    title.textContent =
+      book.title;
+
+
+    const description =
+      document.createElement("p");
+
+    description.textContent =
+      book.description ||
+      "No description available.";
+
+
+    const read =
+      document.createElement("span");
+
+    read.className =
+      "author-book-read";
+
+    read.textContent =
+      "Read book →";
+
+
+    info.appendChild(title);
+    info.appendChild(description);
+    info.appendChild(read);
+
+
+    card.appendChild(cover);
+    card.appendChild(info);
+
+
+    booksContainer.appendChild(card);
+
+  });
+
+}
+
+
+/* Load the author's books */
+
+loadAuthorBooks();
