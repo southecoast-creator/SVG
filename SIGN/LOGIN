@@ -637,3 +637,249 @@
   </div>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+/* ═══════════════════════════════════════
+   LITDOM — BEAUTIFUL INPUT FIELDS
+   ═══════════════════════════════════════ */
+
+.litdom-field {
+  position: relative;
+  width: 100%;
+  margin: 0 0 22px;
+}
+
+.litdom-field input,
+.litdom-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #111116;
+
+  border: 1px solid rgba(212, 175, 55, 0.22);
+
+  border-radius: 14px;
+
+  padding: 18px 18px 10px;
+
+  color: #FFF8E7;
+
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.litdom-field input {
+  height: 60px;
+}
+
+.litdom-field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Placeholder disappears */
+.litdom-field input::placeholder,
+.litdom-field textarea::placeholder {
+  color: transparent;
+}
+
+/* Floating label */
+.litdom-field label {
+  position: absolute;
+
+  left: 18px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #8C7625;
+
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+
+  pointer-events: none;
+
+  transition:
+    top 0.2s ease,
+    transform 0.2s ease,
+    font-size 0.2s ease,
+    color 0.2s ease;
+
+  background: #111116;
+
+  padding: 0 5px;
+}
+
+/* Textarea label */
+.litdom-field textarea + label {
+  top: 22px;
+  transform: none;
+}
+
+/* When focused OR has text */
+.litdom-field input:focus,
+.litdom-field textarea:focus {
+  background: #141419;
+
+  border-color: #D4AF37;
+
+  box-shadow:
+    0 0 0 3px rgba(212, 175, 55, 0.07),
+    0 8px 25px rgba(0, 0, 0, 0.25);
+
+  transform: translateY(-1px);
+}
+
+.litdom-field input:focus + label,
+.litdom-field input:not(:placeholder-shown) + label {
+  top: 0;
+
+  transform: translateY(-50%);
+
+  font-size: 11px;
+
+  color: #F4D58D;
+}
+
+.litdom-field textarea:focus + label,
+.litdom-field textarea:not(:placeholder-shown) + label {
+  top: 0;
+
+  transform: translateY(-50%);
+
+  font-size: 11px;
+
+  color: #F4D58D;
+}
+
+/* Small gold accent when focused */
+.litdom-field:focus-within::after {
+  content: "";
+
+  position: absolute;
+
+  left: 18px;
+  right: 18px;
+  bottom: -1px;
+
+  height: 1px;
+
+  background: #D4AF37;
+
+  opacity: 0.65;
+
+  border-radius: 50%;
+}
+
+
+/* ═══════════════════════════════════════
+   LITDOM BUTTON
+   ═══════════════════════════════════════ */
+
+.litdom-button {
+  width: 100%;
+
+  height: 56px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #D4AF37;
+
+  color: #0B0B0F;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.6px;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.litdom-button:hover {
+  background: #F4D58D;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 30px rgba(212, 175, 55, 0.16);
+}
+
+.litdom-button:active {
+  transform: translateY(0);
+}
+</style>
+
+
+<!-- EMAIL -->
+<div class="litdom-field">
+
+  <input
+    type="email"
+    id="login-email"
+    placeholder=" "
+    autocomplete="email"
+  >
+
+  <label for="login-email">
+    Email address
+  </label>
+
+</div>
+
+
+<!-- PASSWORD -->
+<div class="litdom-field">
+
+  <input
+    type="password"
+    id="login-password"
+    placeholder=" "
+    autocomplete="current-password"
+  >
+
+  <label for="login-password">
+    Password
+  </label>
+
+</div>
+
+
+<button
+  type="button"
+  id="login-button"
+  class="litdom-button"
+>
+  Log In
+</button>
