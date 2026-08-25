@@ -1,454 +1,566 @@
-<style>
-/* =====================================================
-   LITDOM AUTH — OBSIDIAN & GOLD
-   ===================================================== */
+/* =========================================================
+   LITDOM AUTHENTICATION PAGE
+   Obsidian • Royal Gold • Champagne • Ivory
+   CSS ONLY — DO NOT CHANGE YOUR JAVASCRIPT
+   ========================================================= */
 
-#litdom-auth {
-  min-height: 100vh;
-  width: 100%;
-  box-sizing: border-box;
-  background: #0B0B0F;
-  padding: 50px 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: Georgia, "Times New Roman", serif;
-}
 
-#litdom-auth .auth-card {
-  width: 100%;
-  max-width: 430px;
-  box-sizing: border-box;
-  background: #17171C;
-  border: 1px solid rgba(212, 175, 55, 0.25);
-  border-radius: 22px;
-  padding: 38px 32px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
-}
+/* ---------- PAGE ---------- */
 
-.litdom-brand {
-  text-align: center;
-  margin-bottom: 35px;
-}
-
-.litdom-brand-name {
-  margin: 0;
-  color: #D4AF37;
-  font-size: 31px;
-  font-weight: 600;
-  letter-spacing: 5px;
-}
-
-.litdom-brand-line {
-  width: 45px;
-  height: 1px;
-  background: #D4AF37;
-  margin: 13px auto;
-}
-
-.litdom-brand-text {
-  margin: 0;
-  color: #8C7625;
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-  letter-spacing: 1px;
+#litdom-signup,
+#litdom-login,
+#litdom-user-area {
+  box-sizing: border-box !important;
+  font-family: Arial, Helvetica, sans-serif !important;
 }
 
 
-/* HEADINGS */
+/* ---------- SIGN UP + LOGIN CARDS ---------- */
 
-#litdom-auth h2 {
-  margin: 0 0 7px;
-  color: #FFF8E7;
-  font-size: 24px;
-  font-weight: 500;
-}
+#litdom-signup,
+#litdom-login {
+  width: min(92%, 440px) !important;
+  margin: 35px auto !important;
+  padding: 38px 32px !important;
 
-.auth-description {
-  margin: 0 0 25px;
-  color: #8f8a7b;
-  font-family: Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
-}
+  box-sizing: border-box !important;
 
+  background:
+    linear-gradient(
+      145deg,
+      #1C1C22 0%,
+      #15151A 100%
+    ) !important;
 
-/* INPUTS */
+  border: 1px solid rgba(212, 175, 55, 0.28) !important;
 
-.litdom-input {
-  position: relative;
-  margin-bottom: 17px;
-}
+  border-radius: 24px !important;
 
-.litdom-input input,
-.litdom-input textarea {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 248, 231, 0.035) !important;
 
-  background: #0B0B0F;
-  color: #FFF8E7;
-
-  border: 1px solid #343129;
-  border-radius: 13px;
-
-  outline: none;
-
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-
-  transition: 0.2s ease;
-}
-
-.litdom-input input {
-  height: 55px;
-  padding: 0 17px;
-}
-
-.litdom-input textarea {
-  min-height: 110px;
-  padding: 17px;
-  resize: vertical;
-}
-
-.litdom-input input::placeholder,
-.litdom-input textarea::placeholder {
-  color: #77715f;
-}
-
-.litdom-input input:focus,
-.litdom-input textarea:focus {
-  border-color: #D4AF37;
-  background: #101015;
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.07);
+  text-align: left !important;
 }
 
 
-/* BUTTONS */
+/* ---------- HEADINGS ---------- */
 
-.litdom-auth-button {
-  width: 100%;
-  height: 54px;
+#litdom-signup h2,
+#litdom-login h2 {
+  margin: 0 0 28px !important;
 
-  border: 0;
-  border-radius: 13px;
+  color: #FFF8E7 !important;
 
-  background: #D4AF37;
-  color: #0B0B0F;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif !important;
 
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 25px !important;
 
-  cursor: pointer;
+  font-weight: 500 !important;
 
-  transition: 0.2s ease;
-}
+  line-height: 1.25 !important;
 
-.litdom-auth-button:hover {
-  background: #F4D58D;
-  transform: translateY(-1px);
-}
-
-.litdom-auth-button:active {
-  transform: translateY(0);
+  letter-spacing: -0.3px !important;
 }
 
 
-/* DIVIDER */
+/* Small gold line under heading */
 
-.litdom-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 30px 0;
-}
+#litdom-signup h2::after,
+#litdom-login h2::after {
+  content: "" !important;
 
-.litdom-divider::before,
-.litdom-divider::after {
-  content: "";
-  height: 1px;
-  flex: 1;
-  background: #302d25;
-}
+  display: block !important;
 
-.litdom-divider span {
-  color: #8C7625;
-  font-family: Arial, sans-serif;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  width: 42px !important;
+  height: 2px !important;
+
+  margin-top: 12px !important;
+
+  background: #D4AF37 !important;
+
+  border-radius: 10px !important;
 }
 
 
-/* MESSAGES */
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+#signup-email,
+#signup-password,
+#login-email,
+#login-password,
+#edit-display-name,
+#edit-username,
+#edit-bio {
+
+  display: block !important;
+
+  width: 100% !important;
+
+  box-sizing: border-box !important;
+
+  -webkit-appearance: none !important;
+  appearance: none !important;
+
+  background: #0B0B0F !important;
+
+  color: #FFF8E7 !important;
+
+  border: 1px solid #39362E !important;
+
+  border-radius: 15px !important;
+
+  outline: none !important;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif !important;
+
+  font-size: 15px !important;
+
+  line-height: 1.4 !important;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease !important;
+}
+
+
+/* Regular inputs */
+
+#signup-email,
+#signup-password,
+#login-email,
+#login-password,
+#edit-display-name,
+#edit-username {
+
+  height: 58px !important;
+
+  padding:
+    0 18px !important;
+
+  margin:
+    0 0 15px !important;
+}
+
+
+/* Textarea */
+
+#edit-bio {
+
+  min-height: 125px !important;
+
+  padding: 17px 18px !important;
+
+  margin-bottom: 18px !important;
+
+  resize: vertical !important;
+}
+
+
+/* Placeholder */
+
+#signup-email::placeholder,
+#signup-password::placeholder,
+#login-email::placeholder,
+#login-password::placeholder,
+#edit-display-name::placeholder,
+#edit-username::placeholder,
+#edit-bio::placeholder {
+
+  color: #77715F !important;
+
+  opacity: 1 !important;
+}
+
+
+/* INPUT HOVER */
+
+#signup-email:hover,
+#signup-password:hover,
+#login-email:hover,
+#login-password:hover,
+#edit-display-name:hover,
+#edit-username:hover,
+#edit-bio:hover {
+
+  border-color: #6E5D29 !important;
+
+  background: #101015 !important;
+}
+
+
+/* INPUT FOCUS */
+
+#signup-email:focus,
+#signup-password:focus,
+#login-email:focus,
+#login-password:focus,
+#edit-display-name:focus,
+#edit-username:focus,
+#edit-bio:focus {
+
+  border-color: #D4AF37 !important;
+
+  background: #111116 !important;
+
+  box-shadow:
+    0 0 0 3px rgba(212, 175, 55, 0.09),
+    0 8px 25px rgba(0, 0, 0, 0.25) !important;
+
+  transform: translateY(-1px) !important;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+#signup-button,
+#login-button,
+#save-profile-button,
+#logout-button {
+
+  display: block !important;
+
+  width: 100% !important;
+
+  min-height: 56px !important;
+
+  box-sizing: border-box !important;
+
+  -webkit-appearance: none !important;
+  appearance: none !important;
+
+  border-radius: 15px !important;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif !important;
+
+  font-size: 14px !important;
+
+  font-weight: 700 !important;
+
+  letter-spacing: 0.3px !important;
+
+  cursor: pointer !important;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease !important;
+}
+
+
+/* Primary buttons */
+
+#signup-button,
+#login-button,
+#save-profile-button {
+
+  background: #D4AF37 !important;
+
+  color: #0B0B0F !important;
+
+  border:
+    1px solid #D4AF37 !important;
+
+  box-shadow:
+    0 8px 20px rgba(212, 175, 55, 0.10) !important;
+}
+
+
+/* Primary hover */
+
+#signup-button:hover,
+#login-button:hover,
+#save-profile-button:hover {
+
+  background: #F4D58D !important;
+
+  border-color: #F4D58D !important;
+
+  transform: translateY(-2px) !important;
+
+  box-shadow:
+    0 12px 28px rgba(212, 175, 55, 0.18) !important;
+}
+
+
+/* Primary click */
+
+#signup-button:active,
+#login-button:active,
+#save-profile-button:active {
+
+  transform: translateY(0) !important;
+
+  box-shadow:
+    0 5px 12px rgba(212, 175, 55, 0.10) !important;
+}
+
+
+/* Logout */
+
+#logout-button {
+
+  margin-top: 20px !important;
+
+  background: transparent !important;
+
+  color: #F4D58D !important;
+
+  border:
+    1px solid #8C7625 !important;
+
+  box-shadow: none !important;
+}
+
+
+#logout-button:hover {
+
+  background: rgba(212, 175, 55, 0.08) !important;
+
+  border-color: #D4AF37 !important;
+
+  transform: translateY(-1px) !important;
+}
+
+
+/* =========================================================
+   STATUS MESSAGES
+   ========================================================= */
 
 #signup-message,
 #login-message,
 #profile-save-message,
 #logout-message {
-  min-height: 17px;
-  margin: 10px 0 0;
-  color: #8C7625;
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-  text-align: center;
+
+  min-height: 18px !important;
+
+  margin:
+    12px 0 0 !important;
+
+  color: #F4D58D !important;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif !important;
+
+  font-size: 12px !important;
+
+  line-height: 1.5 !important;
+
+  text-align: center !important;
 }
 
 
-/* USER AREA */
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+#litdom-signup + hr {
+
+  width: min(80%, 340px) !important;
+
+  margin: 5px auto !important;
+
+  border: 0 !important;
+
+  border-top:
+    1px solid rgba(140, 118, 37, 0.25) !important;
+
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   LOGGED-IN PROFILE AREA
+   ========================================================= */
 
 #litdom-user-area {
-  width: 100%;
-  max-width: 560px;
-  box-sizing: border-box;
 
-  background: #17171C;
-  border: 1px solid rgba(212, 175, 55, 0.25);
-  border-radius: 22px;
+  width: min(92%, 600px) !important;
 
-  padding: 35px;
+  margin: 35px auto !important;
 
-  color: #FFF8E7;
+  padding: 38px 32px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #1C1C22,
+      #15151A
+    ) !important;
+
+  border:
+    1px solid rgba(212, 175, 55, 0.28) !important;
+
+  border-radius: 24px !important;
+
+  color: #FFF8E7 !important;
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.45) !important;
 }
+
 
 #litdom-user-area h2 {
-  color: #D4AF37;
+
+  margin:
+    0 0 8px !important;
+
+  color: #F4D58D !important;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif !important;
+
+  font-size: 26px !important;
+
+  font-weight: 500 !important;
 }
+
 
 #litdom-user-email {
-  color: #8f8a7b;
-  font-family: Arial, sans-serif;
-  font-size: 13px;
+
+  display: block !important;
+
+  margin-bottom: 25px !important;
+
+  color: #8C7625 !important;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif !important;
+
+  font-size: 13px !important;
 }
+
+
+/* =========================================================
+   PROFILE INFORMATION
+   ========================================================= */
 
 #litdom-profile-info {
-  background: #0B0B0F;
-  border: 1px solid #302d25;
-  border-radius: 14px;
-  padding: 17px;
-  margin: 22px 0 28px;
+
+  margin:
+    0 0 30px !important;
+
+  padding:
+    18px 20px !important;
+
+  background: #0B0B0F !important;
+
+  border:
+    1px solid #302D25 !important;
+
+  border-radius: 16px !important;
 }
+
 
 #litdom-profile-info p {
-  margin: 8px 0;
-  color: #aaa28e;
-  font-family: Arial, sans-serif;
-  font-size: 13px;
+
+  margin:
+    7px 0 !important;
+
+  color: #AAA28E !important;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif !important;
+
+  font-size: 13px !important;
 }
+
 
 #litdom-profile-info strong {
-  color: #F4D58D;
+
+  color: #F4D58D !important;
+
+  font-weight: 600 !important;
 }
+
+
+/* =========================================================
+   EDIT PROFILE
+   ========================================================= */
 
 #litdom-edit-profile h3 {
-  color: #FFF8E7;
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 18px;
+
+  margin:
+    0 0 20px !important;
+
+  color: #FFF8E7 !important;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif !important;
+
+  font-size: 20px !important;
+
+  font-weight: 500 !important;
 }
 
-#logout-button {
-  margin-top: 20px;
-  background: transparent;
-  color: #F4D58D;
-  border: 1px solid #8C7625;
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media screen and (max-width: 600px) {
+
+  #litdom-signup,
+  #litdom-login,
+  #litdom-user-area {
+
+    width: calc(100% - 24px) !important;
+
+    padding: 30px 22px !important;
+
+    border-radius: 20px !important;
+  }
+
+
+  #litdom-signup h2,
+  #litdom-login h2 {
+
+    font-size: 22px !important;
+  }
+
+
+  #signup-email,
+  #signup-password,
+  #login-email,
+  #login-password,
+  #edit-display-name,
+  #edit-username {
+
+    height: 56px !important;
+  }
+
+
+  #signup-button,
+  #login-button,
+  #save-profile-button,
+  #logout-button {
+
+    min-height: 54px !important;
+  }
 }
-
-
-/* MOBILE */
-
-@media (max-width: 480px) {
-
-  #litdom-auth {
-    padding: 25px 14px;
-  }
-
-  #litdom-auth .auth-card {
-    padding: 30px 22px;
-    border-radius: 18px;
-  }
-
-  .litdom-brand-name {
-    font-size: 27px;
-  }
-
-}
-</style>
-
-
-<div id="litdom-auth">
-
-  <div class="auth-card">
-
-    <div class="litdom-brand">
-      <h1 class="litdom-brand-name">LITDOM</h1>
-      <div class="litdom-brand-line"></div>
-      <p class="litdom-brand-text">
-        STORIES. AUTHORS. WORLDS.
-      </p>
-    </div>
-
-
-    <!-- SIGN UP -->
-
-    <div id="litdom-signup">
-
-      <h2>Create your account</h2>
-
-      <p class="auth-description">
-        Join Litdom and discover your next world.
-      </p>
-
-      <div class="litdom-input">
-        <input
-          type="email"
-          id="signup-email"
-          placeholder="Email address"
-          autocomplete="email"
-        >
-      </div>
-
-      <div class="litdom-input">
-        <input
-          type="password"
-          id="signup-password"
-          placeholder="Password"
-          autocomplete="new-password"
-        >
-      </div>
-
-      <button
-        id="signup-button"
-        class="litdom-auth-button"
-      >
-        Create Account
-      </button>
-
-      <p id="signup-message"></p>
-
-    </div>
-
-
-    <div class="litdom-divider">
-      <span>Already a member</span>
-    </div>
-
-
-    <!-- LOGIN -->
-
-    <div id="litdom-login">
-
-      <h2>Welcome back</h2>
-
-      <p class="auth-description">
-        Log in to continue your Litdom journey.
-      </p>
-
-      <div class="litdom-input">
-        <input
-          type="email"
-          id="login-email"
-          placeholder="Email address"
-          autocomplete="email"
-        >
-      </div>
-
-      <div class="litdom-input">
-        <input
-          type="password"
-          id="login-password"
-          placeholder="Password"
-          autocomplete="current-password"
-        >
-      </div>
-
-      <button
-        id="login-button"
-        class="litdom-auth-button"
-      >
-        Log In
-      </button>
-
-      <p id="login-message"></p>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- LOGGED-IN USER AREA -->
-
-<div id="litdom-user-area" style="display:none;">
-
-  <h2>Welcome to Litdom! 🎉</h2>
-
-  <p id="litdom-user-email"></p>
-
-
-  <div id="litdom-profile-info">
-
-    <p>
-      <strong>Display name:</strong>
-      <span id="profile-display-name">Not set</span>
-    </p>
-
-    <p>
-      <strong>Username:</strong>
-      <span id="profile-username">Not set</span>
-    </p>
-
-  </div>
-
-
-  <div id="litdom-edit-profile">
-
-    <h3>Edit Profile</h3>
-
-    <div class="litdom-input">
-      <input
-        type="text"
-        id="edit-display-name"
-        placeholder="Display name"
-      >
-    </div>
-
-    <div class="litdom-input">
-      <input
-        type="text"
-        id="edit-username"
-        placeholder="Username"
-      >
-    </div>
-
-    <div class="litdom-input">
-      <textarea
-        id="edit-bio"
-        placeholder="Tell readers about yourself"
-      ></textarea>
-    </div>
-
-    <button
-      id="save-profile-button"
-      class="litdom-auth-button"
-    >
-      Save Profile
-    </button>
-
-    <p id="profile-save-message"></p>
-
-  </div>
-
-
-  <button
-    id="logout-button"
-    class="litdom-auth-button"
-  >
-    Log Out
-  </button>
-
-  <p id="logout-message"></p>
-
-</div>
