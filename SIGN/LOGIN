@@ -127,3 +127,139 @@
   }
 
 }
+
+
+
+
+
+
+
+/* ================================
+   PROFILE — WORKS BY AUTHOR
+   ================================ */
+
+#profile-works {
+  width: 100%;
+  max-width: 900px;
+  margin: 45px auto 0;
+  box-sizing: border-box;
+}
+
+.profile-works-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.profile-works-header h2 {
+  margin: 0;
+  color: #FFF8E7;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+#profile-works-count {
+  color: #8C7625;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+
+#profile-books {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.author-book-card {
+  display: block;
+  overflow: hidden;
+
+  background: #17171C;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 18px;
+
+  color: #FFF8E7;
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.author-book-card:hover {
+  transform: translateY(-4px);
+  border-color: #D4AF37;
+
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+.author-book-cover {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+
+  display: block;
+
+  object-fit: cover;
+
+  background: #0B0B0F;
+}
+
+.author-book-info {
+  padding: 18px;
+}
+
+.author-book-info h3 {
+  margin: 0 0 8px;
+
+  color: #F4D58D;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.author-book-info p {
+  margin: 0 0 14px;
+
+  color: #AAA28E;
+
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.author-book-read {
+  color: #D4AF37;
+
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#profile-books-message {
+  color: #8C7625;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+}
+
+@media screen and (max-width: 600px) {
+
+  #profile-books {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-works-header h2 {
+    font-size: 21px;
+  }
+
+}
