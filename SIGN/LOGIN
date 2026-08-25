@@ -1,450 +1,139 @@
-/* ================================
-   PROFILE — WORKS BY AUTHOR
-   ================================ */
+/* =================================
+   LITDOM — PROFILE BOOK CARD
+   ================================= */
 
-#profile-works {
-  width: 100%;
-  max-width: 900px;
-  margin: 45px auto 0;
-  box-sizing: border-box;
-}
+.profile-book-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
 
-.profile-works-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 22px;
-}
+  width: 100% !important;
+  max-width: 520px !important;
 
-.profile-works-header h2 {
-  margin: 0;
-  color: #FFF8E7;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 24px;
-  font-weight: 500;
-}
+  padding: 12px !important;
+  margin: 12px 0 !important;
 
-#profile-works-count {
-  color: #8C7625;
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-}
+  box-sizing: border-box !important;
 
-#profile-books {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 20px;
-}
+  background: #17171C !important;
+  border: 1px solid #8C7625 !important;
+  border-radius: 14px !important;
 
-.author-book-card {
-  display: block;
-  overflow: hidden;
-
-  background: #17171C;
-  border: 1px solid rgba(212, 175, 55, 0.22);
-  border-radius: 18px;
-
-  color: #FFF8E7;
-  text-decoration: none;
+  text-decoration: none !important;
 
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease !important;
 }
 
-.author-book-card:hover {
-  transform: translateY(-4px);
-  border-color: #D4AF37;
-
-  box-shadow:
-    0 15px 35px rgba(0, 0, 0, 0.35);
+.profile-book-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: #D4AF37 !important;
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.12) !important;
 }
 
-.author-book-cover {
-  width: 100%;
-  aspect-ratio: 3 / 4;
 
-  display: block;
+/* BOOK COVER */
 
-  object-fit: cover;
+.profile-book-cover {
+  width: 68px !important;
+  height: 92px !important;
 
-  background: #0B0B0F;
+  flex: 0 0 68px !important;
+
+  object-fit: cover !important;
+
+  border-radius: 8px !important;
+
+  display: block !important;
+
+  border: 1px solid #8C7625 !important;
 }
 
-.author-book-info {
-  padding: 18px;
+
+/* INFORMATION BESIDE COVER */
+
+.profile-book-info {
+  min-width: 0 !important;
+  flex: 1 !important;
 }
 
-.author-book-info h3 {
-  margin: 0 0 8px;
 
-  color: #F4D58D;
+/* TITLE */
 
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 18px;
-  font-weight: 500;
+.profile-book-info h3 {
+  margin: 0 0 6px 0 !important;
+
+  color: #F4D58D !important;
+
+  font-size: 17px !important;
+  font-weight: 600 !important;
+
+  line-height: 1.3 !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-.author-book-info p {
-  margin: 0 0 14px;
 
-  color: #AAA28E;
+/* GENRE */
 
-  font-family: Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
+.profile-book-genre {
+  margin: 0 0 5px 0 !important;
 
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  color: #D4AF37 !important;
+
+  font-size: 12px !important;
+  font-weight: 500 !important;
+
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
 }
 
-.author-book-read {
-  color: #D4AF37;
 
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 700;
+/* DESCRIPTION */
+
+.profile-book-description {
+  margin: 0 !important;
+
+  color: #FFF8E7 !important;
+
+  font-size: 13px !important;
+
+  line-height: 1.45 !important;
+
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+
+  overflow: hidden !important;
 }
 
-#profile-books-message {
-  color: #8C7625;
-  font-family: Arial, sans-serif;
-  font-size: 13px;
-}
 
-@media screen and (max-width: 600px) {
+/* MOBILE */
 
-  #profile-books {
-    grid-template-columns: 1fr;
+@media (max-width: 600px) {
+
+  .profile-book-card {
+    max-width: 100% !important;
+    gap: 12px !important;
+    padding: 10px !important;
   }
 
-  .profile-works-header h2 {
-    font-size: 21px;
+  .profile-book-cover {
+    width: 58px !important;
+    height: 80px !important;
+
+    flex-basis: 58px !important;
   }
 
-}
-
-
-
-
-
-
-
-/* ================================
-   PROFILE — WORKS BY AUTHOR
-   ================================ */
-
-#profile-works {
-  width: 100%;
-  max-width: 900px;
-  margin: 45px auto 0;
-  box-sizing: border-box;
-}
-
-.profile-works-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 22px;
-}
-
-.profile-works-header h2 {
-  margin: 0;
-  color: #FFF8E7;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 24px;
-  font-weight: 500;
-}
-
-#profile-works-count {
-  color: #8C7625;
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-}
-
-#profile-books {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 20px;
-}
-
-.author-book-card {
-  display: block;
-  overflow: hidden;
-
-  background: #17171C;
-  border: 1px solid rgba(212, 175, 55, 0.22);
-  border-radius: 18px;
-
-  color: #FFF8E7;
-  text-decoration: none;
-
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.author-book-card:hover {
-  transform: translateY(-4px);
-  border-color: #D4AF37;
-
-  box-shadow:
-    0 15px 35px rgba(0, 0, 0, 0.35);
-}
-
-.author-book-cover {
-  width: 100%;
-  aspect-ratio: 3 / 4;
-
-  display: block;
-
-  object-fit: cover;
-
-  background: #0B0B0F;
-}
-
-.author-book-info {
-  padding: 18px;
-}
-
-.author-book-info h3 {
-  margin: 0 0 8px;
-
-  color: #F4D58D;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.author-book-info p {
-  margin: 0 0 14px;
-
-  color: #AAA28E;
-
-  font-family: Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.author-book-read {
-  color: #D4AF37;
-
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-#profile-books-message {
-  color: #8C7625;
-  font-family: Arial, sans-serif;
-  font-size: 13px;
-}
-
-@media screen and (max-width: 600px) {
-
-  #profile-books {
-    grid-template-columns: 1fr;
+  .profile-book-info h3 {
+    font-size: 15px !important;
   }
 
-  .profile-works-header h2 {
-    font-size: 21px;
+  .profile-book-description {
+    font-size: 12px !important;
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ================================
-   PROFILE — AUTHOR'S PUBLISHED BOOKS
-   ================================ */
-
-async function loadAuthorBooks() {
-
-  const booksContainer =
-    document.getElementById("profile-books");
-
-  const booksMessage =
-    document.getElementById("profile-books-message");
-
-  const booksCount =
-    document.getElementById("profile-works-count");
-
-
-  const {
-    data: { user },
-    error: userError
-  } = await supabaseClient.auth.getUser();
-
-
-  if (userError || !user) {
-
-    booksMessage.textContent =
-      "Please log in to view your books.";
-
-    return;
-  }
-
-
-  const { data: books, error } =
-    await supabaseClient
-      .from("books")
-      .select(`
-        id,
-        title,
-        cover_url,
-        description,
-        published_at
-      `)
-      .eq("author_id", user.id)
-      .eq("status", "published")
-      .order("published_at", {
-        ascending: false
-      });
-
-
-  if (error) {
-
-    console.error(
-      "Error loading author books:",
-      error
-    );
-
-    booksMessage.textContent =
-      "Unable to load your books.";
-
-    return;
-  }
-
-
-  booksMessage.remove();
-
-
-  if (!books || books.length === 0) {
-
-    booksCount.textContent = "0 books";
-
-    booksContainer.innerHTML = `
-      <p id="profile-books-message">
-        You don't have any published books yet.
-      </p>
-    `;
-
-    return;
-  }
-
-
-  booksCount.textContent =
-    books.length +
-    (books.length === 1 ? " book" : " books");
-
-
-  booksContainer.innerHTML = "";
-
-
-  books.forEach(function (book) {
-
-    const card =
-      document.createElement("a");
-
-    card.className =
-      "author-book-card";
-
-
-    /*
-      Change this URL later if your
-      book-reading page has a different URL.
-    */
-
-    card.href =
-      "/p/book.html?id=" +
-      encodeURIComponent(book.id);
-
-
-    const cover =
-      document.createElement("img");
-
-    cover.className =
-      "author-book-cover";
-
-    cover.src =
-      book.cover_url ||
-      "https://via.placeholder.com/600x800/0B0B0F/D4AF37?text=Litdom";
-
-    cover.alt =
-      book.title;
-
-
-    const info =
-      document.createElement("div");
-
-    info.className =
-      "author-book-info";
-
-
-    const title =
-      document.createElement("h3");
-
-    title.textContent =
-      book.title;
-
-
-    const description =
-      document.createElement("p");
-
-    description.textContent =
-      book.description ||
-      "No description available.";
-
-
-    const read =
-      document.createElement("span");
-
-    read.className =
-      "author-book-read";
-
-    read.textContent =
-      "Read book →";
-
-
-    info.appendChild(title);
-    info.appendChild(description);
-    info.appendChild(read);
-
-
-    card.appendChild(cover);
-    card.appendChild(info);
-
-
-    booksContainer.appendChild(card);
-
-  });
-
-}
-
-
-/* Load the author's books */
-
-loadAuthorBooks();
