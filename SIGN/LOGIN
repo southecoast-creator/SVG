@@ -1,523 +1,327 @@
 <style>
-/* ================================
-   LITDOM AUTHENTICATION
-   Obsidian • Royal Gold • Champagne
-================================ */
+/* =====================================================
+   LITDOM AUTH — OBSIDIAN & GOLD
+   ===================================================== */
 
-:root {
-  --obsidian: #0B0B0F;
-  --royal-gold: #D4AF37;
-  --champagne: #F4D58D;
-  --ivory: #FFF8E7;
-  --smoked-gold: #8C7625;
-  --charcoal: #17171C;
-  --muted: #A99F87;
-  --danger: #C96B6B;
-  --success: #8FBF8F;
-}
-
-/* Page background */
-#litdom-auth-wrapper {
+#litdom-auth {
   min-height: 100vh;
-  background:
-    radial-gradient(
-      circle at top center,
-      rgba(212, 175, 55, 0.09),
-      transparent 38%
-    ),
-    var(--obsidian);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 40px 20px;
-  box-sizing: border-box;
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-}
-
-/* Main authentication card */
-.litdom-auth-card {
   width: 100%;
-  max-width: 460px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #1B1B20,
-      #111116
-    );
-
-  border: 1px solid rgba(212, 175, 55, 0.28);
-
-  border-radius: 24px;
-
-  padding: 42px 34px;
-
   box-sizing: border-box;
-
-  box-shadow:
-    0 25px 80px rgba(0, 0, 0, 0.65),
-    0 0 40px rgba(212, 175, 55, 0.05);
-
-  position: relative;
-  overflow: hidden;
-}
-
-/* Decorative gold glow */
-.litdom-auth-card::before {
-  content: "";
-  position: absolute;
-
-  width: 180px;
-  height: 180px;
-
-  background: rgba(212, 175, 55, 0.08);
-
-  border-radius: 50%;
-
-  top: -100px;
-  right: -80px;
-
-  filter: blur(10px);
-
-  pointer-events: none;
-}
-
-/* Logo */
-.litdom-auth-logo {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.litdom-auth-logo .litdom-mark {
-  width: 58px;
-  height: 58px;
-
-  margin: 0 auto 16px;
-
-  border: 1px solid var(--royal-gold);
-
-  border-radius: 50%;
-
+  background: #0B0B0F;
+  padding: 50px 20px;
   display: flex;
-  align-items: center;
   justify-content: center;
-
-  color: var(--champagne);
-
-  font-size: 25px;
-
-  box-shadow:
-    0 0 25px rgba(212, 175, 55, 0.12);
+  align-items: center;
+  font-family: Georgia, "Times New Roman", serif;
 }
 
-.litdom-auth-logo h1 {
+#litdom-auth .auth-card {
+  width: 100%;
+  max-width: 430px;
+  box-sizing: border-box;
+  background: #17171C;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 22px;
+  padding: 38px 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.litdom-brand {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.litdom-brand-name {
   margin: 0;
-
-  color: var(--ivory);
-
-  font-size: 32px;
-  letter-spacing: 3px;
-
+  color: #D4AF37;
+  font-size: 31px;
   font-weight: 600;
+  letter-spacing: 5px;
 }
 
-.litdom-auth-logo p {
-  margin: 8px 0 0;
+.litdom-brand-line {
+  width: 45px;
+  height: 1px;
+  background: #D4AF37;
+  margin: 13px auto;
+}
 
-  color: var(--muted);
-
-  font-family:
-    Arial,
-    sans-serif;
-
-  font-size: 13px;
-
-  letter-spacing: 0.8px;
+.litdom-brand-text {
+  margin: 0;
+  color: #8C7625;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
 }
 
 
-/* ================================
-   AUTH SECTIONS
-================================ */
+/* HEADINGS */
 
-#litdom-signup,
-#litdom-login {
-  position: relative;
-  z-index: 2;
-}
-
-#litdom-signup h2,
-#litdom-login h2 {
-  color: var(--ivory);
-
-  font-size: 22px;
-
-  margin: 0 0 8px;
-
+#litdom-auth h2 {
+  margin: 0 0 7px;
+  color: #FFF8E7;
+  font-size: 24px;
   font-weight: 500;
 }
 
-.litdom-auth-subtitle {
-  color: var(--muted);
-
+.auth-description {
+  margin: 0 0 25px;
+  color: #8f8a7b;
   font-family: Arial, sans-serif;
-
   font-size: 13px;
-
-  margin: 0 0 24px;
+  line-height: 1.6;
 }
 
 
-/* ================================
-   INPUTS
-================================ */
+/* INPUTS */
 
-#litdom-auth-wrapper input,
-#litdom-auth-wrapper textarea {
+.litdom-input {
+  position: relative;
+  margin-bottom: 17px;
+}
+
+.litdom-input input,
+.litdom-input textarea {
+  display: block;
   width: 100%;
-
   box-sizing: border-box;
 
-  background: #0F0F14;
+  background: #0B0B0F;
+  color: #FFF8E7;
 
-  border: 1px solid rgba(140, 118, 37, 0.45);
-
-  border-radius: 12px;
-
-  padding: 14px 15px;
-
-  margin-bottom: 13px;
-
-  color: var(--ivory);
+  border: 1px solid #343129;
+  border-radius: 13px;
 
   outline: none;
 
   font-family: Arial, sans-serif;
-
   font-size: 14px;
 
-  transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    background 0.25s ease;
+  transition: 0.2s ease;
 }
 
-#litdom-auth-wrapper input::placeholder,
-#litdom-auth-wrapper textarea::placeholder {
-  color: #77715F;
+.litdom-input input {
+  height: 55px;
+  padding: 0 17px;
 }
 
-#litdom-auth-wrapper input:focus,
-#litdom-auth-wrapper textarea:focus {
-  border-color: var(--royal-gold);
+.litdom-input textarea {
+  min-height: 110px;
+  padding: 17px;
+  resize: vertical;
+}
 
-  background: #121217;
+.litdom-input input::placeholder,
+.litdom-input textarea::placeholder {
+  color: #77715f;
+}
 
-  box-shadow:
-    0 0 0 3px rgba(212, 175, 55, 0.08),
-    0 0 18px rgba(212, 175, 55, 0.06);
+.litdom-input input:focus,
+.litdom-input textarea:focus {
+  border-color: #D4AF37;
+  background: #101015;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.07);
 }
 
 
-/* ================================
-   BUTTONS
-================================ */
+/* BUTTONS */
 
-#litdom-auth-wrapper button {
+.litdom-auth-button {
   width: 100%;
+  height: 54px;
 
-  border: none;
+  border: 0;
+  border-radius: 13px;
 
-  border-radius: 12px;
-
-  padding: 14px 18px;
-
-  margin-top: 5px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #D4AF37,
-      #B89224
-    );
-
+  background: #D4AF37;
   color: #0B0B0F;
 
   font-family: Arial, sans-serif;
-
   font-size: 14px;
-
   font-weight: 700;
-
-  letter-spacing: 0.5px;
 
   cursor: pointer;
 
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    filter 0.2s ease;
+  transition: 0.2s ease;
 }
 
-#litdom-auth-wrapper button:hover {
+.litdom-auth-button:hover {
+  background: #F4D58D;
   transform: translateY(-1px);
-
-  filter: brightness(1.08);
-
-  box-shadow:
-    0 8px 24px rgba(212, 175, 55, 0.18);
 }
 
-#litdom-auth-wrapper button:active {
+.litdom-auth-button:active {
   transform: translateY(0);
 }
 
 
-/* ================================
-   DIVIDER
-================================ */
+/* DIVIDER */
 
 .litdom-divider {
   display: flex;
-
   align-items: center;
-
-  gap: 14px;
-
-  margin: 28px 0;
+  gap: 12px;
+  margin: 30px 0;
 }
 
 .litdom-divider::before,
 .litdom-divider::after {
   content: "";
-
-  flex: 1;
-
   height: 1px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(140, 118, 37, 0.5)
-    );
-}
-
-.litdom-divider::after {
-  background:
-    linear-gradient(
-      90deg,
-      rgba(140, 118, 37, 0.5),
-      transparent
-    );
+  flex: 1;
+  background: #302d25;
 }
 
 .litdom-divider span {
-  color: var(--smoked-gold);
-
+  color: #8C7625;
   font-family: Arial, sans-serif;
-
-  font-size: 11px;
-
-  letter-spacing: 2px;
-
+  font-size: 10px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
 }
 
 
-/* ================================
-   MESSAGES
-================================ */
+/* MESSAGES */
 
 #signup-message,
 #login-message,
-#logout-message,
-#profile-save-message {
-  min-height: 18px;
-
+#profile-save-message,
+#logout-message {
+  min-height: 17px;
   margin: 10px 0 0;
-
-  text-align: center;
-
-  color: var(--muted);
-
+  color: #8C7625;
   font-family: Arial, sans-serif;
-
   font-size: 12px;
+  text-align: center;
 }
 
 
-/* ================================
-   USER AREA
-================================ */
+/* USER AREA */
 
 #litdom-user-area {
   width: 100%;
-  max-width: 600px;
+  max-width: 560px;
+  box-sizing: border-box;
 
-  background:
-    linear-gradient(
-      145deg,
-      #1B1B20,
-      #111116
-    );
-
-  border: 1px solid rgba(212, 175, 55, 0.28);
-
-  border-radius: 24px;
+  background: #17171C;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 22px;
 
   padding: 35px;
 
-  box-sizing: border-box;
-
-  color: var(--ivory);
-
-  box-shadow:
-    0 25px 80px rgba(0, 0, 0, 0.6);
+  color: #FFF8E7;
 }
 
 #litdom-user-area h2 {
-  color: var(--champagne);
-
-  margin-top: 0;
-
-  font-size: 26px;
+  color: #D4AF37;
 }
 
-#litdom-user-area h3 {
-  color: var(--ivory);
-
-  font-size: 19px;
-
-  margin-top: 30px;
-}
-
-#litdom-user-area p {
-  color: var(--muted);
-
+#litdom-user-email {
+  color: #8f8a7b;
   font-family: Arial, sans-serif;
-
-  font-size: 14px;
+  font-size: 13px;
 }
 
 #litdom-profile-info {
-  background: #101015;
-
-  border: 1px solid rgba(140, 118, 37, 0.25);
-
-  border-radius: 15px;
-
-  padding: 16px;
-
-  margin: 22px 0;
+  background: #0B0B0F;
+  border: 1px solid #302d25;
+  border-radius: 14px;
+  padding: 17px;
+  margin: 22px 0 28px;
 }
 
 #litdom-profile-info p {
   margin: 8px 0;
+  color: #aaa28e;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
 }
 
 #litdom-profile-info strong {
-  color: var(--champagne);
+  color: #F4D58D;
 }
 
-#litdom-edit-profile textarea {
-  min-height: 100px;
-
-  resize: vertical;
+#litdom-edit-profile h3 {
+  color: #FFF8E7;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 18px;
 }
 
 #logout-button {
-  margin-top: 25px !important;
-
-  background:
-    transparent !important;
-
-  border: 1px solid var(--smoked-gold) !important;
-
-  color: var(--champagne) !important;
-
-  box-shadow: none !important;
-}
-
-#logout-button:hover {
-  background: rgba(212, 175, 55, 0.08) !important;
+  margin-top: 20px;
+  background: transparent;
+  color: #F4D58D;
+  border: 1px solid #8C7625;
 }
 
 
-/* ================================
-   MOBILE
-================================ */
+/* MOBILE */
 
-@media (max-width: 520px) {
+@media (max-width: 480px) {
 
-  #litdom-auth-wrapper {
+  #litdom-auth {
     padding: 25px 14px;
   }
 
-  .litdom-auth-card {
-    padding: 32px 22px;
-
-    border-radius: 20px;
+  #litdom-auth .auth-card {
+    padding: 30px 22px;
+    border-radius: 18px;
   }
 
-  .litdom-auth-logo h1 {
-    font-size: 28px;
+  .litdom-brand-name {
+    font-size: 27px;
   }
 
 }
 </style>
 
 
-<div id="litdom-auth-wrapper">
+<div id="litdom-auth">
 
-  <div class="litdom-auth-card">
+  <div class="auth-card">
 
-    <!-- BRAND -->
-    <div class="litdom-auth-logo">
-
-      <div class="litdom-mark">
-        L
-      </div>
-
-      <h1>LITDOM</h1>
-
-      <p>
-        Where stories find their home.
+    <div class="litdom-brand">
+      <h1 class="litdom-brand-name">LITDOM</h1>
+      <div class="litdom-brand-line"></div>
+      <p class="litdom-brand-text">
+        STORIES. AUTHORS. WORLDS.
       </p>
-
     </div>
 
 
     <!-- SIGN UP -->
+
     <div id="litdom-signup">
 
-      <h2>Create your Litdom account</h2>
+      <h2>Create your account</h2>
 
-      <p class="litdom-auth-subtitle">
-        Join a growing world of stories, writers and readers.
+      <p class="auth-description">
+        Join Litdom and discover your next world.
       </p>
 
-      <input
-        type="email"
-        id="signup-email"
-        placeholder="Email address"
-        autocomplete="email"
-      >
+      <div class="litdom-input">
+        <input
+          type="email"
+          id="signup-email"
+          placeholder="Email address"
+          autocomplete="email"
+        >
+      </div>
 
-      <input
-        type="password"
-        id="signup-password"
-        placeholder="Create a password"
-        autocomplete="new-password"
-      >
+      <div class="litdom-input">
+        <input
+          type="password"
+          id="signup-password"
+          placeholder="Password"
+          autocomplete="new-password"
+        >
+      </div>
 
-      <button id="signup-button">
+      <button
+        id="signup-button"
+        class="litdom-auth-button"
+      >
         Create Account
       </button>
 
@@ -526,36 +330,43 @@
     </div>
 
 
-    <!-- DIVIDER -->
     <div class="litdom-divider">
-      <span>Already a member?</span>
+      <span>Already a member</span>
     </div>
 
 
     <!-- LOGIN -->
+
     <div id="litdom-login">
 
       <h2>Welcome back</h2>
 
-      <p class="litdom-auth-subtitle">
-        Sign in and continue your Litdom journey.
+      <p class="auth-description">
+        Log in to continue your Litdom journey.
       </p>
 
-      <input
-        type="email"
-        id="login-email"
-        placeholder="Email address"
-        autocomplete="email"
-      >
+      <div class="litdom-input">
+        <input
+          type="email"
+          id="login-email"
+          placeholder="Email address"
+          autocomplete="email"
+        >
+      </div>
 
-      <input
-        type="password"
-        id="login-password"
-        placeholder="Password"
-        autocomplete="current-password"
-      >
+      <div class="litdom-input">
+        <input
+          type="password"
+          id="login-password"
+          placeholder="Password"
+          autocomplete="current-password"
+        >
+      </div>
 
-      <button id="login-button">
+      <button
+        id="login-button"
+        class="litdom-auth-button"
+      >
         Log In
       </button>
 
@@ -565,321 +376,79 @@
 
   </div>
 
-
-  <!-- USER AREA -->
-  <div
-    id="litdom-user-area"
-    style="display:none;"
-  >
-
-    <h2>
-      Welcome to Litdom! 🎉
-    </h2>
-
-    <p id="litdom-user-email"></p>
+</div>
 
 
-    <div id="litdom-profile-info">
+<!-- LOGGED-IN USER AREA -->
 
-      <p>
-        <strong>Display name:</strong>
-        <span id="profile-display-name">
-          Not set
-        </span>
-      </p>
+<div id="litdom-user-area" style="display:none;">
 
-      <p>
-        <strong>Username:</strong>
-        <span id="profile-username">
-          Not set
-        </span>
-      </p>
+  <h2>Welcome to Litdom! 🎉</h2>
 
-    </div>
+  <p id="litdom-user-email"></p>
 
 
-    <div id="litdom-edit-profile">
+  <div id="litdom-profile-info">
 
-      <h3>Edit Profile</h3>
+    <p>
+      <strong>Display name:</strong>
+      <span id="profile-display-name">Not set</span>
+    </p>
 
+    <p>
+      <strong>Username:</strong>
+      <span id="profile-username">Not set</span>
+    </p>
+
+  </div>
+
+
+  <div id="litdom-edit-profile">
+
+    <h3>Edit Profile</h3>
+
+    <div class="litdom-input">
       <input
         type="text"
         id="edit-display-name"
         placeholder="Display name"
       >
+    </div>
 
+    <div class="litdom-input">
       <input
         type="text"
         id="edit-username"
         placeholder="Username"
       >
+    </div>
 
+    <div class="litdom-input">
       <textarea
         id="edit-bio"
         placeholder="Tell readers about yourself"
       ></textarea>
-
-      <button id="save-profile-button">
-        Save Profile
-      </button>
-
-      <p id="profile-save-message"></p>
-
     </div>
 
-
-    <button id="logout-button">
-      Log Out
+    <button
+      id="save-profile-button"
+      class="litdom-auth-button"
+    >
+      Save Profile
     </button>
 
-    <p id="logout-message"></p>
+    <p id="profile-save-message"></p>
 
   </div>
 
-</div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<style>
-/* ═══════════════════════════════════════
-   LITDOM — BEAUTIFUL INPUT FIELDS
-   ═══════════════════════════════════════ */
-
-.litdom-field {
-  position: relative;
-  width: 100%;
-  margin: 0 0 22px;
-}
-
-.litdom-field input,
-.litdom-field textarea {
-  width: 100%;
-  box-sizing: border-box;
-
-  background: #111116;
-
-  border: 1px solid rgba(212, 175, 55, 0.22);
-
-  border-radius: 14px;
-
-  padding: 18px 18px 10px;
-
-  color: #FFF8E7;
-
-  font-family: Arial, sans-serif;
-  font-size: 15px;
-
-  outline: none;
-
-  transition:
-    border-color 0.25s ease,
-    background 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.25s ease;
-}
-
-.litdom-field input {
-  height: 60px;
-}
-
-.litdom-field textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-/* Placeholder disappears */
-.litdom-field input::placeholder,
-.litdom-field textarea::placeholder {
-  color: transparent;
-}
-
-/* Floating label */
-.litdom-field label {
-  position: absolute;
-
-  left: 18px;
-  top: 50%;
-
-  transform: translateY(-50%);
-
-  color: #8C7625;
-
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-
-  pointer-events: none;
-
-  transition:
-    top 0.2s ease,
-    transform 0.2s ease,
-    font-size 0.2s ease,
-    color 0.2s ease;
-
-  background: #111116;
-
-  padding: 0 5px;
-}
-
-/* Textarea label */
-.litdom-field textarea + label {
-  top: 22px;
-  transform: none;
-}
-
-/* When focused OR has text */
-.litdom-field input:focus,
-.litdom-field textarea:focus {
-  background: #141419;
-
-  border-color: #D4AF37;
-
-  box-shadow:
-    0 0 0 3px rgba(212, 175, 55, 0.07),
-    0 8px 25px rgba(0, 0, 0, 0.25);
-
-  transform: translateY(-1px);
-}
-
-.litdom-field input:focus + label,
-.litdom-field input:not(:placeholder-shown) + label {
-  top: 0;
-
-  transform: translateY(-50%);
-
-  font-size: 11px;
-
-  color: #F4D58D;
-}
-
-.litdom-field textarea:focus + label,
-.litdom-field textarea:not(:placeholder-shown) + label {
-  top: 0;
-
-  transform: translateY(-50%);
-
-  font-size: 11px;
-
-  color: #F4D58D;
-}
-
-/* Small gold accent when focused */
-.litdom-field:focus-within::after {
-  content: "";
-
-  position: absolute;
-
-  left: 18px;
-  right: 18px;
-  bottom: -1px;
-
-  height: 1px;
-
-  background: #D4AF37;
-
-  opacity: 0.65;
-
-  border-radius: 50%;
-}
-
-
-/* ═══════════════════════════════════════
-   LITDOM BUTTON
-   ═══════════════════════════════════════ */
-
-.litdom-button {
-  width: 100%;
-
-  height: 56px;
-
-  border: none;
-
-  border-radius: 14px;
-
-  background: #D4AF37;
-
-  color: #0B0B0F;
-
-  font-family: Arial, sans-serif;
-
-  font-size: 14px;
-
-  font-weight: 700;
-
-  letter-spacing: 0.6px;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.litdom-button:hover {
-  background: #F4D58D;
-
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 10px 30px rgba(212, 175, 55, 0.16);
-}
-
-.litdom-button:active {
-  transform: translateY(0);
-}
-</style>
-
-
-<!-- EMAIL -->
-<div class="litdom-field">
-
-  <input
-    type="email"
-    id="login-email"
-    placeholder=" "
-    autocomplete="email"
+  <button
+    id="logout-button"
+    class="litdom-auth-button"
   >
+    Log Out
+  </button>
 
-  <label for="login-email">
-    Email address
-  </label>
-
-</div>
-
-
-<!-- PASSWORD -->
-<div class="litdom-field">
-
-  <input
-    type="password"
-    id="login-password"
-    placeholder=" "
-    autocomplete="current-password"
-  >
-
-  <label for="login-password">
-    Password
-  </label>
+  <p id="logout-message"></p>
 
 </div>
-
-
-<button
-  type="button"
-  id="login-button"
-  class="litdom-button"
->
-  Log In
-</button>
