@@ -1102,6 +1102,626 @@ if (type === "fiction") {
 
 
   document
+.getElementById("close-book-modal")
+    .addEventListener(
+      "click",
+      function () {
+        modal.style.display = "none";
+      }
+    );
+
+
+  /* =========================
+     CREATE BOOK
+  ========================= */
+
+    form.addEventListener(
+  "submit",
+  async function (event) {
+
+    event.preventDefault();
+
+    const title =
+      titleInput.value.trim();
+
+    const type =
+      selectedType.value;
+
+    const message =
+      document.getElementById(
+        "create-book-message"
+      );
+
+
+    /* =========================
+       BASIC VALIDATION
+    ========================= */
+
+    if (!title) {
+
+      message.textContent =
+        "Please enter a book title.";
+
+      return;
+
+    }
+
+
+    if (!type) {
+
+      message.textContent =
+        "Please select a book type.";
+
+      return;
+
+    }
+    
+    
+        const isEditing =
+      editingBookId !== null;
+
+
+    message.textContent =
+      isEditing
+        ? "Saving your changes..."
+        : "Creating your book...";
+
+
+    /* =========================
+       CREATE OR IDENTIFY BOOK
+    ========================= */
+
+    let bookId;
+
+
+    if (isEditing) {
+
+      bookId =
+        editingBookId;
+
+    } else {
+
+      const {
+        data: createdBookId,
+        error: createError
+      } = await supabaseClient.rpc(
+        "create_author_book",
+        {
+          p_title: title,
+          p_book_type: type
+        }
+      );
+
+
+      if (createError) {
+
+        console.error(createError);
+
+        message.textContent =
+          createError.message;
+
+        return;
+
+      }
+      
+      
+            if (!createdBookId) {
+
+        message.textContent =
+          "The book was created, but no book ID was returned.";
+
+        return;
+
+      }
+
+
+      bookId =
+        createdBookId;
+
+    }
+
+
+    /* =========================
+       BASIC BOOK DETAILS
+    ========================= */
+
+    const description =
+      document
+        .getElementById(
+          "book-description"
+        )
+        .value
+        .trim();
+
+
+    const genre =
+      document
+        .getElementById(
+          "book-genre"
+        )
+        .value;
+
+
+    const ageRating =
+      type === "fiction"
+        ? document
+            .getElementById(
+              "age-rating"
+            )
+            .value || null
+        : null;
+    
+        const {
+      data: updatedBook,
+      error: updateError
+    } = await supabaseClient
+      .from("books")
+      .update({
+
+        title:
+          title,
+
+        description:
+          description || null,
+
+        genre:
+          genre || null,
+
+        age_rating:
+          ageRating,
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        bookId
+      )
+      .select("id");
+
+
+    if (updateError) {
+
+      console.error(updateError);
+
+      message.textContent =
+        isEditing
+          ? "The book was not updated: " +
+            updateError.message
+          : "Book was created, but its details could not be saved: " +
+            updateError.message;
+
+      return;
+
+    }
+    
+        if (
+      !updatedBook ||
+      updatedBook.length === 0
+    ) {
+
+      console.error(
+        "BOOK UPDATE MATCHED NO ROWS",
+        bookId
+      );
+
+      message.textContent =
+        "The book details could not be saved.";
+
+      return;
+
+    }
+
+
+    /* =========================
+       SAVE TYPE DETAILS
+    ========================= */
+    
+        const typeDetails = {};
+
+
+    if (type === "fiction") {
+
+      const subgenre =
+        document
+          .getElementById(
+            "fiction-subgenre"
+          )
+          .value;
+
+
+      const tagsText =
+        document
+          .getElementById(
+            "fiction-tags"
+          )
+          .value
+          .trim();
+      
+      
+            const tags =
+        tagsText
+          ? tagsText
+              .split(",")
+              .map(function (tag) {
+                return tag.trim();
+              })
+              .filter(Boolean)
+          : [];
+
+
+      typeDetails.subgenre =
+        subgenre || null;
+
+      typeDetails.tags =
+        tags;
+
+
+    } else {
+
+      const subgenre =
+        document
+          .getElementById(
+            "nonfiction-subgenre"
+          )
+          .value;
+      
+      
+            const tagsText =
+        document
+          .getElementById(
+            "nonfiction-tags"
+          )
+          .value
+          .trim();
+
+
+      const tags =
+        tagsText
+          ? tagsText
+              .split(",")
+              .map(function (tag) {
+                return tag.trim();
+              })
+              .filter(Boolean)
+          : [];
+
+
+      const intendedAudience =
+        document
+          .getElementById(
+            "intended-audience"
+          )
+          .value || null;
+
+
+      const contentLevel =
+        document
+          .getElementById(
+            "nonfiction-content-level"
+          )
+          .value || null;
+      
+      
+            typeDetails.subgenre =
+        subgenre || null;
+
+      typeDetails.tags =
+        tags;
+
+      typeDetails.intended_audience =
+        intendedAudience;
+
+      typeDetails.content_level =
+        contentLevel;
+
+    }
+
+
+    const {
+      error: typeDetailsError
+    } = await supabaseClient
+      .from("books")
+      .update({
+
+        type_details:
+          typeDetails,
+
+        updated_at:
+          new Date().toISOString()
+        
+              })
+      .eq(
+        "id",
+        bookId
+      );
+
+
+    if (typeDetailsError) {
+
+      console.error(
+        typeDetailsError
+      );
+
+      message.textContent =
+        isEditing
+          ? "The book was updated, but its type details could not be saved: " +
+            typeDetailsError.message
+          : "Book was created, but its type details could not be saved: " +
+            typeDetailsError.message;
+
+      return;
+
+    }
+    
+    
+        /* =========================
+       GET COVER
+    ========================= */
+
+    let coverFile =
+      null;
+
+
+    if (type === "fiction") {
+
+      coverFile =
+        document
+          .getElementById(
+            "fiction-book-cover"
+          )
+          .files[0] || null;
+
+    } else {
+
+      coverFile =
+        document
+          .getElementById(
+            "book-cover"
+          )
+          .files[0] || null;
+
+    }
+
+
+    /*
+      IMPORTANT:
+
+      Creating a book requires a cover.
+
+      Editing a book does NOT require
+      selecting a new cover.
+    */
+
+    if (
+      !coverFile &&
+      !isEditing
+    ) {
+      
+            message.textContent =
+        "Please upload a book cover.";
+
+      return;
+
+    }
+
+
+    /* =========================
+       UPLOAD NEW COVER
+       ONLY IF ONE WAS SELECTED
+    ========================= */
+
+    if (coverFile) {
+
+      message.textContent =
+        "Uploading your book cover...";
+
+
+      const extension =
+        coverFile.name
+          .split(".")
+          .pop()
+          .toLowerCase();
+      
+      
+            const {
+        data: {
+          user
+        }
+      } =
+        await supabaseClient
+          .auth
+          .getUser();
+
+
+      if (!user) {
+
+        message.textContent =
+          "Your login session could not be verified.";
+
+        return;
+
+      }
+
+
+      const coverPath =
+        user.id +
+        "/" +
+        bookId +
+        "." +
+        extension;
+      
+      
+            const {
+        error: uploadError
+      } = await supabaseClient
+        .storage
+        .from("book-covers")
+        .upload(
+          coverPath,
+          coverFile,
+          {
+            upsert: true,
+            contentType:
+              coverFile.type
+          }
+        );
+
+
+      if (uploadError) {
+
+        console.error(
+          uploadError
+        );
+
+        message.textContent =
+          "UPLOAD ERROR: " +
+          uploadError.message +
+          " | " +
+          uploadError.statusCode;
+
+        return;
+
+      }
+      
+      
+            /* =========================
+         GET PUBLIC COVER URL
+      ========================= */
+
+      const {
+        data: publicUrlData
+      } =
+        supabaseClient
+          .storage
+          .from("book-covers")
+          .getPublicUrl(
+            coverPath
+          );
+
+
+      const coverUrl =
+  publicUrlData.publicUrl +
+  "?v=" +
+  Date.now();
+
+
+      /* =========================
+         SAVE COVER URL
+      ========================= */
+
+      const {
+        error: coverUpdateError
+      } = await supabaseClient
+        .from("books")
+        .update({
+
+          cover_url:
+            coverUrl,
+
+          updated_at:
+            new Date().toISOString()
+
+        })
+        .eq(
+          "id",
+          bookId
+        );
+      
+      
+            if (coverUpdateError) {
+
+        console.error(
+          coverUpdateError
+        );
+
+        message.textContent =
+          "The cover uploaded, but its URL could not be saved: " +
+          coverUpdateError.message;
+
+        return;
+
+      }
+
+    }
+    
+    
+        /* =========================
+       SUCCESS
+    ========================= */
+
+    message.textContent =
+      isEditing
+        ? "Book updated successfully."
+        : "Book created successfully.";
+
+
+    modal.style.display =
+      "none";
+
+
+    editingBookId =
+      null;
+
+
+    await loadBooks();
+
+  }
+);
+  /* =========================
+     LOG OUT
+  ========================= */
+
+  document
+    .getElementById("logout-button")
+    .addEventListener(
+      "click",
+      async function () {
+
+        await supabaseClient.auth.signOut();
+
+        window.location.href =
+          "https://litdom.blogspot.com/p/profile.html";
+
+      }
+    );
+
+});
+  
+  
+ /* =========================
+   PUBLICATION MODAL
+   OPEN / CLOSE
+========================= */
+
+const publicationModal =
+  document.getElementById(
+    "publication-application-modal"
+  );
+
+const closePublicationApplication =
+  document.getElementById(
+    "close-publication-application"
+  );
+
+
+if (
+  publicationModal &&
+  closePublicationApplication
+) {
+
+  closePublicationApplication.addEventListener(
+    "click",
+    function () {
+
+      publicationModal.style.display =
+        "none";
+
+    }
+  );
+
+}
 
 
 
