@@ -785,7 +785,323 @@ const fictionCoverPreview =
   fictionCoverInput.addEventListener("change", function () {
 
   validateCover(
-    fictionCoverInput.files[
+    fictionCoverInput.files[0],
+    fictionCoverMessage,
+    fictionCoverPreview,
+    fictionCoverInput
+  );
+
+});
+
+  const message =
+    document.getElementById("create-book-message");
+
+  function openCreateBook(type) {
+    editingBookId =
+  null;
+
+modalLabel.textContent =
+  "NEW BOOK";
+
+saveBookButton.textContent =
+  "Create Draft";
+
+    selectedType.value = type;
+
+    typeHeading.textContent =
+      type === "fiction"
+        ? "Create Fiction Book"
+        : "Create Non-fiction Book";
+    
+        const fictionFields =
+      document.getElementById("fiction-fields");
+
+    const nonfictionFields =
+      document.getElementById("nonfiction-fields");
+
+    const genreSelect =
+      document.getElementById("book-genre");
+
+    fictionFields.style.display =
+      type === "fiction" ? "block" : "none";
+    
+        nonfictionFields.style.display =
+      type === "non-fiction" ? "block" : "none";
+
+    genreSelect.innerHTML =
+      '<option value="">Select a genre</option>';
+
+    const genres =
+      type === "fiction"
+        ? fictionGenres
+        : nonfictionGenres;
+    
+    const fictionSubgenreSelect =
+  document.getElementById("fiction-subgenre");
+
+const fictionTagContainer =
+  document.getElementById("fiction-tag-chips");
+
+if (type === "fiction") {
+
+  fictionSubgenreSelect.innerHTML =
+    '<option value="">Select a subgenre</option>';
+
+  fictionTagContainer.innerHTML = "";
+
+  document.getElementById(
+    "fiction-tags"
+  ).value = "";
+
+}
+    
+    if (type === "fiction") {
+
+  fictionSubgenreSelect.onchange = function () {
+
+    fictionTagContainer.innerHTML = "";
+
+    document.getElementById(
+      "fiction-tags"
+    ).value = "";
+
+    const selectedSubgenre =
+      fictionSubgenreSelect.value;
+
+    const tags =
+      fictionTags[selectedSubgenre] || [];
+    
+        tags.forEach(function (tag) {
+
+      const tagButton =
+        document.createElement("button");
+
+      tagButton.type = "button";
+      tagButton.className =
+        "fiction-tag";
+
+      tagButton.textContent =
+        tag;
+
+      tagButton.addEventListener(
+        "click",
+        function () {
+
+          tagButton.classList.toggle(
+            "selected"
+          );
+
+          const selectedTags = [];
+
+          document
+            .querySelectorAll(
+              "#fiction-tag-chips .fiction-tag.selected"
+            )
+            .forEach(function (selectedTag) {
+            
+                          selectedTags.push(
+                selectedTag.textContent
+              );
+
+            });
+
+          document.getElementById(
+            "fiction-tags"
+          ).value =
+            selectedTags.join(", ");
+
+        }
+      );
+
+      fictionTagContainer.appendChild(
+        tagButton
+      );
+
+    });
+
+  };
+
+}
+    
+        genres.forEach(function (genre) {
+
+      const option =
+        document.createElement("option");
+
+      option.value = genre;
+      option.textContent = genre;
+
+      genreSelect.appendChild(option);
+
+    });
+
+
+    const nicheSelect =
+      document.getElementById("nonfiction-subgenre");
+
+    if (type === "non-fiction") {
+
+      nicheSelect.innerHTML =
+        '<option value="">Select a niche</option>';
+
+    }
+    
+        genreSelect.onchange = function () {
+
+  const selectedGenre =
+    genreSelect.value;
+
+
+  /* =========================
+     FICTION
+  ========================= */
+
+  if (type === "fiction") {
+
+    const fictionSubgenreSelect =
+      document.getElementById("fiction-subgenre");
+    
+    const fictionTagContainer =
+  document.getElementById("fiction-tag-chips");
+
+    fictionSubgenreSelect.innerHTML =
+      '<option value="">Select a subgenre</option>';
+    
+        const subgenres =
+      fictionSubgenres[selectedGenre] || [];
+
+    subgenres.forEach(function (subgenre) {
+
+      const option =
+        document.createElement("option");
+
+      option.value = subgenre;
+      option.textContent = subgenre;
+
+      fictionSubgenreSelect.appendChild(option);
+
+    });
+
+    return;
+
+  }
+          
+            /* =========================
+     NON-FICTION
+  ========================= */
+
+  const tagContainer =
+    document.getElementById("nonfiction-tag-chips");
+
+  const nicheSelect =
+    document.getElementById("nonfiction-subgenre");
+
+  tagContainer.innerHTML = "";
+
+  nicheSelect.innerHTML =
+    '<option value="">Select a niche</option>';
+
+  const tags =
+    nonfictionTags[selectedGenre] || [];
+
+  tags.forEach(function (tag) {
+
+    const tagButton =
+      document.createElement("button");
+    
+        tagButton.type = "button";
+    tagButton.className =
+      "nonfiction-tag";
+
+    tagButton.textContent =
+      tag;
+
+    tagButton.addEventListener(
+      "click",
+      function () {
+
+        tagButton.classList.toggle(
+          "selected"
+        );
+
+        const selectedTags = [];
+
+        document
+          .querySelectorAll(
+            ".nonfiction-tag.selected"
+          )
+          .forEach(function (selectedTag) {
+
+            selectedTags.push(
+              selectedTag.textContent
+            );
+
+          });
+        
+                document.getElementById(
+          "nonfiction-tags"
+        ).value =
+          selectedTags.join(", ");
+
+      }
+    );
+
+    tagContainer.appendChild(
+      tagButton
+    );
+
+  });
+
+
+  const niches =
+    nonfictionNiches[selectedGenre] || [];
+
+  niches.forEach(function (niche) {
+
+    const option =
+      document.createElement("option");
+
+    option.value = niche;
+    option.textContent = niche;
+
+    nicheSelect.appendChild(option);
+
+  });
+
+};
+
+    titleInput.value = "";
+
+    message.textContent = "";
+
+    modal.style.display = "flex";
+
+    titleInput.focus();
+
+  }
+
+
+  document
+    .getElementById("create-fiction")
+    .addEventListener(
+      "click",
+      function () {
+        openCreateBook("fiction");
+      }
+    );
+
+
+  document
+    .getElementById("create-nonfiction")
+    .addEventListener(
+      "click",
+      function () {
+        openCreateBook("non-fiction");
+      }
+    );
+
+
+  document
 
 
 
