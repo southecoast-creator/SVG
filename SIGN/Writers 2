@@ -70,4 +70,37 @@ const value =
     const chapterTitle =
       chapterTitleInput.value.trim();
     
-        const chapterContent
+        const chapterContent =
+
+chapterContentInput.innerHTML.trim();
+
+    const plainText =
+      chapterContentInput.innerText.trim();
+
+    const wordCount =
+      plainText
+        ? plainText
+            .split(/\s+/)
+            .filter(Boolean)
+            .length
+        : 0;
+    
+    const MAX_CHAPTER_WORDS = 1200;
+
+if (wordCount > MAX_CHAPTER_WORDS) {
+
+  chapterEditorMessage.textContent =
+    "Chapter cannot exceed 1,200 words.";
+
+  return;
+}
+
+
+    if (!managingBookId) {
+
+      chapterEditorMessage.textContent =
+        "The book could not be identified.";
+
+      return;
+
+    }
