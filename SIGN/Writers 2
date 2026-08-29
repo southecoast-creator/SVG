@@ -163,3 +163,41 @@ if (
 
       updated_at:
         new Date().toISOString()
+
+})
+    .eq(
+      "id",
+      editingChapterId
+    );
+
+      error =
+        result.error;
+
+    }
+
+
+    /* =========================
+       CREATE NEW DRAFT
+    ========================= */
+
+    else {
+      
+            const result =
+        await supabaseClient
+          .from("chapters")
+          .insert({
+
+            book_id:
+              managingBookId,
+
+            chapter_number:
+              chapterNumber,
+
+            title:
+              chapterTitle || null,
+
+            content:
+              chapterContent,
+
+            status:
+              "draft",
