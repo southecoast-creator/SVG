@@ -1757,6 +1757,51 @@ if (publicationApplicationForm) {
 
       if (
         !book ||
+!book.id
+      ) {
+
+        message.textContent =
+          "The book being submitted could not be identified.";
+
+        console.error(
+          "PUBLICATION: current book missing",
+          book
+        );
+
+        return;
+      }
+
+      const bookId =
+        book.id;
+      
+      
+            /* =========================
+         GET CURRENT SESSION
+      ========================= */
+
+      const publicationSession =
+  window.currentAuthorSession;
+
+if (!publicationSession) {
+
+  console.error(
+    "PUBLICATION: author session is missing."
+  );
+
+  message.textContent =
+    "Your login session could not be verified.";
+
+  return;
+}
+
+const user =
+  publicationSession.user;
+      
+            /* =========================
+         AUTHOR INFORMATION
+      ========================= */
+
+      const fullName =
 
 
 
