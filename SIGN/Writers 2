@@ -452,5 +452,39 @@ statusBadge.className =
   (
     chapter.status === "changes_requested"
       ? "changes-requested"
-      : chapter.status || "
+      : chapter.status || "draft"
+  );
+
+const statusLabels = {
+  draft: "Draft",
+  changes_requested: "Changes Requested",
+  published: "Published",
+  pending: "Pending",
+  rejected: "Rejected"
+};
+
+statusBadge.textContent =
+  statusLabels[
+    chapter.status
+  ] ||
+  "Draft";
+
+chapterMeta.appendChild(
+  statusBadge
+);
+
+
+    /* =========================
+       BUILD CARD
+    ========================= */
+
+    chapterCard.appendChild(
+      chapterTitle
+    );
+
+    chapterCard.appendChild(
+      chapterMeta
+    );
+
+    chaptersList.appendChild(
 
