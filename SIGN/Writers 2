@@ -592,5 +592,39 @@ book.description || "";
       .value =
         details.subgenre || "";
 
+document
+      .getElementById("fiction-tags")
+      .value =
+        Array.isArray(details.tags)
+          ? details.tags.join(", ")
+          : "";
+
+  }
+
+
+  /* =========================
+     NON-FICTION DETAILS
+  ========================= */
+
+  if (book.book_type === "non-fiction") {
+
+    const details =
+      book.type_details || {};
+
+
+    document
+      .getElementById("nonfiction-subgenre")
+      .value =
+        details.subgenre || "";
+    
+        document
+      .getElementById("nonfiction-tags")
+      .value =
+        Array.isArray(details.tags)
+          ? details.tags.join(", ")
+          : "";
+
+
+
 
 
