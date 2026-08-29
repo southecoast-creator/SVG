@@ -342,3 +342,40 @@ await loadChapters(
       0
     );
 
+chapterWordCount.textContent =
+    totalWords.toLocaleString();
+
+
+  if (!chapters.length) {
+
+    chaptersList.innerHTML =
+      '<p class="empty-chapters">No chapters yet.</p>';
+
+    return;
+  }
+
+
+  chaptersList.innerHTML =
+  "";
+
+chapters.forEach(
+  function (chapter) {
+
+    const chapterCard =
+      document.createElement(
+        "div"
+      );
+
+    chapterCard.className =
+      "chapter-card";
+
+
+    /* =========================
+       CLICK TO EDIT DRAFT
+    ========================= */
+
+    if (
+      chapter.status === "draft" ||
+      chapter.status === "changes_requested"
+    ) {
+
