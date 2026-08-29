@@ -487,4 +487,38 @@ chapterMeta.appendChild(
     );
 
     chaptersList.appendChild(
+chapterCard
+    );
+
+  }
+);
+
+}
+  
+  closeManageChapters.addEventListener(
+  "click",
+  function () {
+
+    manageChaptersModal.style.display =
+      "none";
+
+    managingBookId =
+      null;
+
+  }
+);
+
+  async function openEditBook(book) {
+
+  const editingId =
+    book.id;
+    
+  modalLabel.textContent =
+    "EDIT BOOK";
+
+  typeHeading.textContent =
+    book.book_type === "fiction"
+      ? "Edit Fiction Book"
+      : "Edit Non-fiction Book";
+
 
