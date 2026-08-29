@@ -1802,6 +1802,82 @@ const user =
       ========================= */
 
       const fullName =
+document.getElementById(
+          "publication-full-name"
+        ).value.trim();
+
+      const penName =
+        document.getElementById(
+          "publication-pen-name"
+        ).value.trim();
+
+      const email =
+        document.getElementById(
+          "publication-email"
+        ).value.trim();
+
+      const phone =
+        document.getElementById(
+          "publication-phone"
+        ).value.trim();
+
+      const bio =
+        document.getElementById(
+          "publication-bio"
+        ).value.trim();
+
+
+      const authorDetails = {
+
+        full_name:
+          fullName,
+
+        pen_name:
+          penName,
+
+        email:
+          email,
+
+        phone:
+          phone,
+
+        bio:
+          bio
+
+      };
+      
+            /* =========================
+         PAYMENT INFORMATION
+      ========================= */
+
+      const bankName =
+        document.getElementById(
+          "publication-bank-name"
+        ).value.trim();
+
+      const accountName =
+        document.getElementById(
+          "publication-account-name"
+        ).value.trim();
+
+      const accountNumber =
+        document.getElementById(
+          "publication-account-number"
+        ).value.trim();
+
+
+      const additionalDetails = {
+
+        bank_name:
+          bankName,
+
+        account_name:
+          accountName,
+
+        account_number:
+          accountNumber
+
+      
 
 
 
