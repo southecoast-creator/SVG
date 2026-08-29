@@ -104,3 +104,35 @@ if (wordCount > MAX_CHAPTER_WORDS) {
       return;
 
     }
+
+if (
+      !chapterNumber ||
+      chapterNumber < 1
+    ) {
+
+      chapterEditorMessage.textContent =
+        "Please enter a valid chapter number.";
+
+      return;
+
+    }
+    
+    
+        if (!plainText) {
+
+      chapterEditorMessage.textContent =
+        "Please write some chapter content.";
+
+      return;
+
+    }
+
+
+    saveChapterDraft.disabled =
+      true;
+
+
+    let error = null;
+
+
+    /* =======================
