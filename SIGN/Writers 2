@@ -1877,6 +1877,45 @@ document.getElementById(
         account_number:
           accountNumber
 
+bank_name:
+          bankName,
+
+        account_name:
+          accountName,
+
+        account_number:
+          accountNumber
+
+      };
+
+
+      /* =========================
+         BOOK INFORMATION
+      ========================= */
+
+      const genre =
+        document.getElementById(
+          "publication-genre"
+        ).value;
+
+      const description =
+        document.getElementById(
+          "publication-description"
+        ).value.trim();
+      
+      
+            const outline =
+        document.getElementById(
+          "publication-outline"
+        ).value.trim();
+
+
+      /* =========================
+         FICTION INFORMATION
+      ========================= */
+
+      let protagonist = {};
+
       
 
 
