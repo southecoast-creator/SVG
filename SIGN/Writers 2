@@ -379,3 +379,41 @@ chapters.forEach(
       chapter.status === "changes_requested"
     ) {
 
+chapterCard.style.cursor =
+        "pointer";
+
+      chapterCard.addEventListener(
+        "click",
+        function () {
+
+          openEditChapter(
+            chapter
+          );
+
+        }
+      );
+
+    }
+    
+    
+        /* =========================
+       CHAPTER TITLE
+    ========================= */
+
+    const chapterTitle =
+      document.createElement(
+        "h3"
+      );
+
+    chapterTitle.textContent =
+      "Chapter " +
+      (
+        chapter.chapter_number ||
+        "\u2014"
+      ) +
+      (
+        chapter.title
+          ? " \u2014 " +
+            chapter.title
+          : ""
+
