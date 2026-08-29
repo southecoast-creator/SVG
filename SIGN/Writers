@@ -1,3 +1,4 @@
+
 <div id="author-dashboard">
 
   <div id="dashboard-loading">
@@ -4174,3 +4175,39 @@ const chapterEditorModal =
   );
 
 const closeChapterEditor =
+document.getElementById(
+    "close-chapter-editor"
+  );
+
+const chapterEditorBookTitle =
+  document.getElementById(
+    "chapter-editor-book-title"
+  );
+
+const chapterNumberInput =
+  document.getElementById(
+    "chapter-number"
+  );
+
+const chapterTitleInput =
+  document.getElementById(
+    "chapter-title"
+  );
+
+const chapterContentInput =
+  document.getElementById(
+    "chapter-content"
+  );
+
+const chapterEditorWordCount =
+  document.getElementById(
+    "chapter-editor-word-count"
+  );
+
+const saveChapterDraft =
+  document.getElementById(
+    "save-chapter-draft"
+  );
+  
+const chapterEditorMessage =
+  document.getElementById(
