@@ -472,3 +472,151 @@ style="display:none; width:120px; height:160px; object-fit:cover; margin:10px au
 
       <input
         id="chapter-number"
+type="number"
+        min="1"
+        placeholder="e.g. 1"
+      >
+
+    </div>
+
+
+    <div class="chapter-editor-title">
+
+      <label for="chapter-title">
+        Chapter Title
+      </label>
+
+      <input
+        id="chapter-title"
+        type="text"
+        placeholder="Enter chapter title"
+      >
+
+    </div>
+    
+    
+        <div class="chapter-editor-content">
+
+      <label for="chapter-content">
+        Chapter Content
+      </label>
+
+      <div class="chapter-editor-toolbar">
+
+  <button
+    type="button"
+    class="chapter-format-button"
+    data-command="bold"
+    title="Bold"
+  >
+    <strong>B</strong>
+  </button>
+
+  <button
+    type="button"
+    class="chapter-format-button"
+    data-command="italic"
+    title="Italic"
+  >
+    <em>I</em>
+  </button>
+
+  <button
+    type="button"
+    class="chapter-format-button"
+    data-command="underline"
+    title="Underline"
+  >
+    <u>U</u>
+  </button>
+        
+          <span class="chapter-toolbar-divider"></span>
+
+  <button
+    type="button"
+    class="chapter-format-button"
+    data-command="formatBlock"
+    data-value="h2"
+    title="Heading"
+  >
+    H
+  </button>
+
+  <button
+    type="button"
+    class="chapter-format-button"
+    data-command="insertUnorderedList"
+    title="Bullet list"
+  >
+    •
+  </button>
+
+  <button
+    type="button"
+    class="chapter-format-button"
+    data-command="insertOrderedList"
+    title="Numbered list"
+  >
+    1.
+  </button>
+
+  <span class="chapter-toolbar-divider"></span>
+        
+          <button
+    type="button"
+    class="chapter-format-button"
+    data-command="undo"
+    title="Undo"
+  >
+    ↶
+  </button>
+
+  <button
+    type="button"
+    class="chapter-format-button"
+    data-command="redo"
+    title="Redo"
+  >
+    ↷
+  </button>
+
+</div>
+
+<div
+  id="chapter-content"
+  class="chapter-content-editor"
+  contenteditable="true"
+  spellcheck="true"
+  data-placeholder="Start writing your chapter..."
+></div>
+
+    </div>
+
+
+    <div class="chapter-editor-footer">
+
+      <span>
+        Words:
+        <strong id="chapter-editor-word-count">
+          0
+        </strong>
+      </span>
+      
+            <button
+        id="save-chapter-draft"
+        type="button"
+        class="book-action-button"
+      >
+        Save Draft
+      </button>
+      
+      <button
+  id="delete-chapter-request"
+  type="button"
+  style="display:none;"
+>
+  Delete This Draft
+</button>
+ 
+
+    </div>
