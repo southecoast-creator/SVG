@@ -101,3 +101,43 @@ class="dashboard-label"
 
   <select id="book-genre">
     <option value="">
+
+
+Select a genre
+    </option>
+  </select>
+
+
+  <!-- FICTION -->
+
+  <div id="fiction-fields">
+
+    <div class="type-field-group">
+
+      <label for="age-rating">
+        Age Rating
+      </label>
+      
+            <select id="age-rating">
+        <option value="">
+          Select age rating
+        </option>
+        <option value="all-ages">
+          All Ages
+        </option>
+        <option value="13+">
+          13+
+        </option>
+        <option value="16+">
+          16+
+        </option>
+        <option value="18+">
+          18+
+        </option>
+      </select>
+      
+      <div class="type-field-group">
+
+  <label for="fiction-subgenre">
+    Subgenre
+  </label>
