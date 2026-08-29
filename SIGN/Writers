@@ -64,3 +64,40 @@
 
     <p
   id="book-modal-label"
+class="dashboard-label"
+>
+  NEW BOOK
+</p>
+
+<h2 id="book-type-heading">
+  Create Book
+</h2>
+ 
+       <form id="create-book-form">
+
+  <label for="book-title">
+    Book title
+  </label>
+
+  <input
+    id="book-title"
+    type="text"
+    placeholder="Enter your book title"
+    required
+  >
+
+  <label for="book-description">
+    Blurb
+  </label>
+         
+           <textarea
+    id="book-description"
+    placeholder="Tell readers what your book is about"
+  ></textarea>
+
+  <label for="book-genre">
+    Genre
+  </label>
+
+  <select id="book-genre">
+    <option value="">
