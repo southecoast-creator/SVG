@@ -141,3 +141,41 @@ Select a genre
   <label for="fiction-subgenre">
     Subgenre
   </label>
+
+
+<select id="fiction-subgenre">
+    <option value="">
+      Select a subgenre
+    </option>
+  </select>
+
+</div>
+
+      <label for="fiction-tags">
+  Story Tags
+</label>
+
+<input
+  id="fiction-tags"
+  type="text"
+  placeholder="Select tags below"
+  readonly
+>
+
+<div id="fiction-tag-chips"></div>
+
+    </div>
+
+
+    <div class="type-field-group">
+
+      <label>
+        Book Cover
+      </label>
+
+      <label
+        for="fiction-book-cover"
+        class="cover-upload-box"
+      >
+
+        <span class="cover-upload-icon">
