@@ -1723,5 +1723,40 @@ if (
 
 }
 
+/* =====================================================
+   PUBLICATION APPLICATION SUBMISSION
+===================================================== */
+
+const publicationApplicationForm =
+  document.getElementById(
+    "publication-application-form"
+  );
+
+if (publicationApplicationForm) {
+
+  publicationApplicationForm.addEventListener(
+    "submit",
+    async function (event) {
+
+      event.preventDefault();
+
+      const message =
+        document.getElementById(
+          "publication-application-message"
+        );
+
+      message.textContent =
+        "Submitting your application...";
+
+      /* =========================
+         CHECK CURRENT BOOK
+      ========================= */
+
+      const book =
+        window.currentPublicationBook;
+
+      if (
+        !book ||
+
 
 
