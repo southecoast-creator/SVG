@@ -306,3 +306,39 @@ await loadChapters(
     .order(
       "chapter_number",
 
+{
+        ascending: true
+      }
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+    chaptersList.innerHTML =
+      "<p>Unable to load chapters.</p>";
+
+    return;
+  }
+
+
+  chapterCount.textContent =
+    chapters.length;
+    
+    
+      const totalWords =
+    chapters.reduce(
+      function (total, chapter) {
+
+        return total +
+          (
+            Number(
+              chapter.word_count
+            ) || 0
+          );
+
+      },
+      0
+    );
+
