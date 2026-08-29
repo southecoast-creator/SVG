@@ -624,7 +624,57 @@ document
           ? details.tags.join(", ")
           : "";
 
+document
+      .getElementById("intended-audience")
+      .value =
+        details.intended_audience || "";
 
+
+    document
+      .getElementById("nonfiction-content-level")
+      .value =
+        details.content_level || "";
+
+  }
+
+
+  /* =========================
+     OPEN MODAL
+  ========================= */
+
+  modal.style.display =
+    "flex";
+
+}
+
+  await loadBooks();
+
+
+  /* =========================
+     CREATE BOOK MODAL
+  ========================= */
+
+  const modal =
+    document.getElementById("create-book-modal");
+
+  const typeHeading =
+    document.getElementById("book-type-heading");
+  
+  const modalLabel =
+  document.getElementById("book-modal-label");
+
+const saveBookButton =
+  document.getElementById("save-book-button");
+  
+  let editingBookId = null;
+
+  const selectedType =
+    document.getElementById("selected-book-type");
+
+  const titleInput =
+    document.getElementById("book-title");
+
+  const form =
 
 
 
