@@ -675,6 +675,117 @@ const saveBookButton =
     document.getElementById("book-title");
 
   const form =
+document.getElementById("create-book-form");
+  
+  const coverInput =
+  document.getElementById("book-cover");
+
+const coverMessage =
+  document.getElementById("cover-message");
+  
+  function validateCover(file, messageElement, previewElement, inputElement) {
+
+  messageElement.textContent = "";
+  previewElement.style.display = "none";
+  previewElement.src = "";
+
+  if (!file) {
+    return;
+  }
+    
+    if (
+    file.type !== "image/jpeg" &&
+    file.type !== "image/webp"
+  ) {
+
+    messageElement.textContent =
+      "Cover must be a JPEG or WebP image.";
+
+    inputElement.value = "";
+
+    return;
+  }
+
+  if (file.size >= 1 * 1024 * 1024) {
+
+    messageElement.textContent =
+      "Cover must be under 1 MB.";
+
+    inputElement.value = "";
+
+    return;
+  }
+
+  const image =
+    new Image();
+
+  image.onload = function () {
+
+    if (
+      image.width !== 600 ||
+      image.height !== 800
+    ) {
+
+      messageElement.textContent =
+        "Cover must be exactly 600 by 800 px.";
+      
+            inputElement.value = "";
+
+      return;
+    }
+
+    previewElement.src =
+      URL.createObjectURL(file);
+
+    previewElement.style.display =
+      "block";
+
+    messageElement.textContent =
+  "Cover accepted " + String.fromCharCode(10003);
+
+  };
+
+  image.onerror = function () {
+
+    messageElement.textContent =
+      "Please select a valid image.";
+
+    inputElement.value = "";
+
+  };
+
+  image.src =
+    URL.createObjectURL(file);
+
+}
+  
+  
+  coverInput.addEventListener("change", function () {
+
+  validateCover(
+    coverInput.files[0],
+    coverMessage,
+    document.getElementById("cover-preview"),
+    coverInput
+  );
+
+});
+
+
+const fictionCoverInput =
+  document.getElementById("fiction-book-cover");
+
+const fictionCoverMessage =
+  document.getElementById("fiction-cover-message");
+
+const fictionCoverPreview =
+  document.getElementById("fiction-cover-preview");
+  
+  
+  fictionCoverInput.addEventListener("change", function () {
+
+  validateCover(
+    fictionCoverInput.files[
 
 
 
