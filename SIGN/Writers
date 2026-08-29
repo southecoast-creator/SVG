@@ -4346,5 +4346,40 @@ deleteChapterRequest.style.display =
 
   editingChapterId =
     chapter.id;
+
+chapterEditorBookTitle.textContent =
+    manageChaptersBookTitle.textContent;
+
+  chapterNumberInput.value =
+    chapter.chapter_number || "";
+
+  chapterTitleInput.value =
+    chapter.title || "";
+
+  chapterContentInput.innerHTML =
+    chapter.content || "";
+
+  chapterEditorWordCount.textContent =
+    (
+      Number(
+        chapter.word_count
+      ) || 0
+    ).toLocaleString();
+
+  chapterEditorMessage.textContent =
+    "";
+    
+    deleteChapterRequest.style.display =
+  "block";
+
+  chapterEditorModal.style.display =
+    "flex";
+
+}
+  
+  chapterContentInput.addEventListener(
+  "input",
+  function () {
+
     
 
