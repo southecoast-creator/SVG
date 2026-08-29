@@ -287,3 +287,52 @@ Select a genre
                 <option value="">
           Select content level
         </option>
+
+<option value="medium">
+          Medium-content
+        </option>
+
+        <option value="high">
+          High-content
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="type-field-group">
+
+      <label>
+        Book Cover
+      </label>
+
+      <label
+        for="book-cover"
+        class="cover-upload-box"
+      >
+
+        <span class="cover-upload-icon">
+          ＋
+        </span>
+        
+                <strong>
+          Upload Your Book Cover
+        </strong>
+
+        <span>
+          600 × 800 px • Under 1 MB <br/>WebP/Jpeg 
+        </span>
+
+      </label>
+
+      <input
+        id="book-cover"
+        type="file"
+        accept="image/jpeg,image/webp"
+        style="display:none;"
+      >
+
+      <p id="cover-message"></p>
+      <img
+  id="cover-preview"
