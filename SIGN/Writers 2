@@ -272,3 +272,37 @@ let managingBookId =
   manageChaptersModal.style.display =
     "flex";
 
+await loadChapters(
+    book.id
+  );
+}
+  
+  async function loadChapters(bookId) {
+
+  chaptersList.innerHTML =
+    "<p>Loading chapters...</p>";
+
+  chapterCount.textContent =
+    "0";
+
+  chapterWordCount.textContent =
+    "0";
+
+
+  const {
+    data: chapters,
+    error
+  } = await supabaseClient
+    .from("chapters")
+    .select(
+  "id,book_id,chapter_number,title,content,status,word_count,is_locked,deletion_requested,created_at,updated_at,published_at,submitted_at"
+)
+  
+  
+      .eq(
+      "book_id",
+      bookId
+    )
+    .order(
+      "chapter_number",
+
