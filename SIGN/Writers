@@ -213,3 +213,38 @@ Select a genre
 
 
   <!-- NON-FICTION -->
+
+<div id="nonfiction-fields">
+
+    <label for="nonfiction-tags">
+      Tags
+    </label>
+
+    <input
+      id="nonfiction-tags"
+      type="text"
+      placeholder="e.g. confidence, mindset, personal growth"
+    >
+
+    <p>
+      Add tags that describe your book. Separate each tag with a comma.
+    </p>
+
+    <div id="nonfiction-tag-chips"></div>
+    
+        <div class="type-field-group">
+
+      <label for="nonfiction-subgenre">
+        Subgenre / Niche
+      </label>
+
+      <select id="nonfiction-subgenre">
+        <option value="">
+          Select a niche
+        </option>
+      </select>
+
+    </div>
+
+
+    <div class="type-field-group">
