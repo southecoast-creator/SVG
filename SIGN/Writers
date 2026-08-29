@@ -3854,3 +3854,285 @@ applyPublicationButton.style.display =
    CHECK PUBLICATION
    ELIGIBILITY
 ========================= */
+
+checkPublicationEligibility(
+  book,
+  applyPublicationButton
+);
+     
+     applyPublicationButton.addEventListener(
+  "click",
+  function () {
+
+
+    openPublicationApplication(
+      book
+    );
+
+  }
+);
+
+
+card.appendChild(actions);
+
+
+  booksList.appendChild(card);
+
+});
+    
+}
+  
+  async function checkPublicationEligibility(
+  book,
+  applyButton
+) {
+
+  /* =========================
+     ALREADY SUBMITTED?
+  ========================== */
+
+  const {
+    data: existingSubmission,
+    error: submissionCheckError
+  } =
+    await supabaseClient
+      .from("book_submissions")
+      .select("id,status")
+      .eq(
+        "book_id",
+        book.id
+      )
+      .limit(1);
+
+
+  if (submissionCheckError) {
+
+    console.error(
+      "PUBLICATION SUBMISSION CHECK ERROR:",
+      submissionCheckError
+    );
+
+    applyButton.style.display =
+      "none";
+
+    return;
+
+  }
+    
+      /* =========================
+     HIDE AFTER SUBMISSION
+  ========================== */
+
+  if (
+    existingSubmission &&
+    existingSubmission.length > 0
+  ) {
+
+    applyButton.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  /* =========================
+     ALREADY PUBLISHED?
+  ========================== */
+
+  if (
+    book.status === "published"
+  ) {
+
+    applyButton.style.display =
+      "none";
+
+    return;
+
+  }
+    
+    
+      /* =========================
+     CHECK WORD COUNT
+  ========================== */
+
+  const {
+    data: chapters,
+    error
+  } = await supabaseClient
+    .from("chapters")
+    .select("word_count")
+    .eq(
+      "book_id",
+      book.id
+    );
+
+
+  if (error) {
+
+    console.error(
+      "PUBLICATION WORD COUNT ERROR:",
+      error
+    );
+
+    applyButton.style.display =
+      "none";
+
+    return;
+
+  }
+    
+    
+      const totalWords =
+    (chapters || []).reduce(
+      function (total, chapter) {
+
+        return total +
+          (
+            Number(
+              chapter.word_count
+            ) || 0
+          );
+
+      },
+      0
+    );
+
+
+  if (
+    totalWords >= 5000
+  ) {
+
+    applyButton.style.display =
+      "inline-flex";
+
+  } else {
+
+    applyButton.style.display =
+      "none";
+
+  }
+
+}
+  
+  function openPublicationApplication(
+  book
+) {
+    
+    window.currentPublicationBook =
+  book;
+
+  const publicationModal =
+    document.getElementById(
+      "publication-application-modal"
+    );
+
+  if (!publicationModal) {
+
+    alert(
+      "ERROR: publication-application-modal was not found."
+    );
+
+    return;
+
+  }
+
+
+  /* =========================
+     BOOK TYPE
+  ========================= */
+
+  const publicationBookType =
+    document.getElementById(
+      "publication-book-type"
+    );
+
+  if (
+    publicationBookType
+  ) {
+    
+    publicationBookType.textContent =
+      book.book_type === "fiction"
+        ? "Fiction"
+        : "Non-fiction";
+
+  }
+
+
+  /* =========================
+     FICTION-ONLY FIELDS
+  ========================= */
+
+  const fictionFields =
+    document.getElementById(
+      "fiction-publication-fields"
+    );
+
+  if (fictionFields) {
+
+    if (
+      book.book_type === "fiction"
+    ) {
+
+      fictionFields.style.display =
+        "block";
+
+    } else {
+
+      fictionFields.style.display =
+        "none";
+
+    }
+
+  }
+    
+    /* =========================
+   GENRE DROPDOWN
+========================= */
+
+const publicationGenre =
+  document.getElementById(
+    "publication-genre"
+  );
+
+if (publicationGenre) {
+
+  publicationGenre.innerHTML =
+    '<option value="">Select a genre</option>';
+
+  const genres =
+    book.book_type === "fiction"
+      ? fictionGenres
+      : nonfictionGenres;
+
+  genres.forEach(
+    function (genre) {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        genre;
+
+      option.textContent =
+        genre;
+
+      publicationGenre.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+    
+    /* =========================
+     OPEN MODAL
+  ========================= */
+
+  publicationModal.style.display =
+    "flex";
+
+}
