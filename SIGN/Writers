@@ -4211,3 +4211,35 @@ const saveChapterDraft =
   
 const chapterEditorMessage =
   document.getElementById(
+"chapter-editor-message"
+  );
+  
+  const deleteChapterRequest =
+  document.getElementById(
+    "delete-chapter-request"
+  );
+  
+  deleteChapterRequest.addEventListener(
+  "click",
+  async function () {
+
+    if (!editingChapterId) {
+
+      chapterEditorMessage.textContent =
+        "Only an existing chapter can be requested for deletion.";
+
+      return;
+
+    }
+    
+        const confirmed =
+      window.confirm(
+        "Request deletion of this chapter? The chapter will not be deleted immediately. An editor must approve the deletion."
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    deleteChapterRequest.disabled =
+      true;
