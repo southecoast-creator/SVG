@@ -2112,7 +2112,64 @@ let antagonist = {};
           submissionResult.error
         );
 
-        message.textContent 
+        message.textContent
+"Your application could not be submitted: " +
+          submissionResult.error.message;
+
+        return;
+      }
+      
+      /* =========================
+   UPDATE BOOK STATUS
+========================= */
+
+const {
+  error: bookStatusError
+} =
+  await supabaseClient
+    .from("books")
+    .update({
+
+      status:
+        "pending",
+
+      submission_status:
+        "pending"
+
+    })
+    .eq(
+      "id",
+      submission.id
+    );
+
+
+if (
+  submissionStatusError
+) {
+
+  console.error(
+    "SUBMISSION STATUS UPDATE ERROR:",
+    submissionStatusError
+  );
+
+  message.textContent =
+    "Your application was submitted, but its review status could not be updated.";
+
+  return;
+}
+      
+      
+      
+            /* =========================
+         SUCCESS
+      ========================= */
+
+      console.log(
+  "PUBLICATION SUBMISSION CREATED:",
+  submission
+);
+
+window.location.href =
 
       
 
