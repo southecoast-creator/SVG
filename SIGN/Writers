@@ -4136,3 +4136,41 @@ if (publicationGenre) {
     "flex";
 
 }
+
+
+const manageChaptersModal =
+  document.getElementById(
+    "manage-chapters-modal"
+  );
+
+const closeManageChapters =
+  document.getElementById(
+    "close-manage-chapters"
+  );
+
+const manageChaptersBookTitle =
+  document.getElementById(
+    "manage-chapters-book-title"
+  );
+
+const chapterCount =
+  document.getElementById(
+    "chapter-count"
+  );
+
+const chapterWordCount =
+  document.getElementById(
+    "chapter-word-count"
+  );
+
+const chaptersList =
+  document.getElementById(
+    "chapters-list"
+  );
+  
+const chapterEditorModal =
+  document.getElementById(
+    "chapter-editor-modal"
+  );
+
+const closeChapterEditor =
