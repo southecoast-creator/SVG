@@ -2445,3 +2445,66 @@ background: white;
   flex-shrink: 0;
   background: #f2f2f2;
 }
+
+.book-card-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.book-card-info h3 {
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+
+.book-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.book-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: #f2f2f2;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.empty-books {
+  opacity: .6;
+}
+
+.book-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.book-modal-box {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.close-modal {
+  position: absolute;
+  right: 15px;
+  top: 12px;
+  border: 0;
+  background: none;
+  font-size: 28px;
+  cursor: pointer;
+}
