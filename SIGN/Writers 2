@@ -557,5 +557,40 @@ saveBookButton.textContent =
   document
     .getElementById("book-description")
     .value =
+book.description || "";
+
+
+  /* =========================
+     GENRE
+  ========================= */
+
+  const genreSelect =
+    document.getElementById("book-genre");
+
+  genreSelect.value =
+    book.genre || "";
+
+
+  /* =========================
+     FICTION DETAILS
+  ========================= */
+
+  if (book.book_type === "fiction") {
+
+    document
+      .getElementById("age-rating")
+      .value =
+        book.age_rating || "";
+
+
+    const details =
+      book.type_details || {};
+    
+    
+        document
+      .getElementById("fiction-subgenre")
+      .value =
+        details.subgenre || "";
+
 
 
