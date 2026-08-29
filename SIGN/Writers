@@ -248,3 +248,42 @@ Select a genre
 
 
     <div class="type-field-group">
+
+<label for="intended-audience">
+        Intended Audience
+      </label>
+
+      <select id="intended-audience">
+        
+                <option value="">
+          Select intended audience
+        </option>
+
+        <option value="13+">
+          13+
+        </option>
+
+        <option value="16+">
+          16+
+        </option>
+
+        <option value="18+">
+          18+
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="type-field-group">
+
+      <label for="nonfiction-content-level">
+        Content Level
+      </label>
+
+      <select id="nonfiction-content-level">
+        
+                <option value="">
+          Select content level
+        </option>
