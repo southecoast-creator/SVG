@@ -2212,3 +2212,52 @@ background: #fff;
   font-size: 28px;
   line-height: 1;
 }
+
+.cover-upload-box strong {
+  font-size: 14px;
+}
+
+.cover-upload-box span:last-child {
+  font-size: 12px;
+  opacity: .6;
+}
+  
+  #create-book-form select {
+  padding: 13px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  background: white;
+  width: 100%;
+  box-sizing: border-box;
+}
+  
+  #nonfiction-tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.nonfiction-tag {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  background: #f8f8f8;
+  cursor: pointer;
+  font-size: 13px;
+  transition: .2s ease;
+}
+
+.nonfiction-tag:hover {
+  transform: translateY(-1px);
+}
+
+.nonfiction-tag.selected {
+  background: #e8d8ff;
+  border-color: #b88cff;
+  color: #4d287a;
+}
+  
+  .fiction-tag {
