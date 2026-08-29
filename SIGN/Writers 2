@@ -237,3 +237,38 @@ word_count:
       "Draft saved successfully.";
 
     await loadChapters(
+managingBookId
+    );
+
+  }
+);
+  closeChapterEditor.addEventListener(
+  "click",
+  function () {
+
+    chapterEditorModal.style.display =
+      "none";
+
+    editingChapterId =
+      null;
+
+  }
+);
+
+let editingChapterId =
+  null;
+
+let managingBookId =
+  null;
+  
+  async function openManageChapters(book) {
+
+  managingBookId =
+    book.id;
+
+  manageChaptersBookTitle.textContent =
+    book.title || "Book Chapters";
+
+  manageChaptersModal.style.display =
+    "flex";
+
