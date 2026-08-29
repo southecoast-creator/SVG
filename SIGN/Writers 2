@@ -34,3 +34,40 @@ updateChapterWordCount();
 
           const command =
             button.dataset.command;
+
+const value =
+            button.dataset.value ||
+            null;
+
+          chapterContentInput.focus();
+
+          document.execCommand(
+            command,
+            false,
+            value
+          );
+
+          updateChapterWordCount();
+
+        }
+      );
+
+    }
+  );
+  
+  saveChapterDraft.addEventListener(
+  "click",
+  async function () {
+
+    chapterEditorMessage.textContent =
+      "Saving draft...";
+
+    const chapterNumber =
+      Number(
+        chapterNumberInput.value
+      );
+
+    const chapterTitle =
+      chapterTitleInput.value.trim();
+    
+        const chapterContent
