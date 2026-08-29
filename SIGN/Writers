@@ -1,0 +1,66 @@
+<div id="author-dashboard">
+
+  <div id="dashboard-loading">
+    Loading your dashboard...
+  </div>
+
+  <div id="dashboard-content" style="display:none;">
+
+    <div class="dashboard-header">
+      <div>
+        <p class="dashboard-label">WRITER'S SPACE</p>
+        <h1>Author Dashboard</h1>
+        <p id="author-name"></p>
+      </div>
+
+      <button id="logout-button" type="button">
+        Log out
+      </button>
+    </div>
+
+    <div class="dashboard-actions">
+
+      <button id="create-fiction" type="button">
+        <span>＋</span>
+        Create Fiction Book
+      </button>
+
+      <button id="create-nonfiction" type="button">
+        <span>＋</span>
+        Create Non-fiction Book
+      </button>
+
+    </div>
+
+<section class="my-books">
+
+      <div class="section-heading">
+        <h2>My Books</h2>
+        <span id="book-count">0 books</span>
+      </div>
+
+      <div id="books-list">
+        <p class="empty-books">
+          You haven't created any books yet.
+        </p>
+      </div>
+
+    </section>
+
+  </div>
+
+</div>
+
+
+<!-- CREATE BOOK MODAL -->
+
+<div id="create-book-modal" class="book-modal" style="display:none;">
+
+  <div class="book-modal-box">
+
+    <button id="close-book-modal" class="close-modal" type="button">
+      ×
+    </button>
+
+    <p
+  id="book-modal-label"
