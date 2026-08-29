@@ -521,4 +521,41 @@ chapterCard
       ? "Edit Fiction Book"
       : "Edit Non-fiction Book";
 
+saveBookButton.textContent =
+    "Save Changes";
+
+
+  /* =========================
+     SET BOOK TYPE
+  ========================= */
+
+  selectedType.value =
+    book.book_type || "";
+
+
+  /* =========================
+     INITIALIZE BOOK TYPE FIELDS
+  ========================= */
+
+  openCreateBook(
+    book.book_type === "fiction"
+      ? "fiction"
+      : "non-fiction"
+  );
+    
+    editingBookId =
+  editingId;
+    
+    
+      /* =========================
+     BASIC INFORMATION
+  ========================= */
+
+  titleInput.value =
+    book.title || "";
+
+  document
+    .getElementById("book-description")
+    .value =
+
 
