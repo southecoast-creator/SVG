@@ -417,3 +417,40 @@ chapterCard.style.cursor =
             chapter.title
           : ""
 
+);
+
+
+    /* =========================
+       CHAPTER META
+    ========================= */
+
+    const chapterMeta =
+      document.createElement(
+        "div"
+      );
+
+    chapterMeta.className =
+      "chapter-meta";
+    
+    
+        const wordCountText =
+  (
+    Number(
+      chapter.word_count
+    ) || 0
+  ).toLocaleString() +
+  " words";
+
+chapterMeta.textContent =
+  wordCountText + " \u2022 ";
+
+const statusBadge =
+  document.createElement("span");
+
+statusBadge.className =
+  "chapter-status " +
+  (
+    chapter.status === "changes_requested"
+      ? "changes-requested"
+      : chapter.status || "
+
