@@ -4243,3 +4243,38 @@ const chapterEditorMessage =
 
     deleteChapterRequest.disabled =
       true;
+
+chapterEditorMessage.textContent =
+      "Sending deletion request...";
+
+
+    const {
+      error
+    } = await supabaseClient
+      .from("chapters")
+      .update({
+
+        deletion_requested:
+          true,
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        editingChapterId
+      );
+    
+    
+        deleteChapterRequest.disabled =
+      false;
+
+
+    if (error) {
+
+      console.error(
+        "CHAPTER DELETION REQUEST ERROR:",
+        error
+      );
+
