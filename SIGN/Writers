@@ -1807,5 +1807,89 @@ textarea:focus {
   align-items: flex-start;
   gap: 10px;
 }
+
+.publication-check input {
+  width: auto !important;
+  margin: 3px 0 0 0;
+}
+
+#submit-publication-application {
+  margin-top: 20px;
+  padding: 12px 20px;
+  cursor: pointer;
+}
+  
+  .chapter-meta {
+  font-size: 13px;
+}
+
+.chapter-status {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chapter-status.draft {
+  background: #e8f1ff;
+  color: #2563eb;
+}
+
+.chapter-status.changes-requested {
+  background: #fff4cc;
+  color: #b77900;
+}
+
+.chapter-status.published {
+  background: #e7f7ed;
+  color: #218739;
+}
+  
+  #delete-chapter-request {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px 16px;
+
+  border: 1px solid #dc3545;
+  border-radius: 8px;
+
+  background: #fff;
+  color: #dc3545;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+#delete-chapter-request:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+#delete-chapter-request:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+  
+  .chapter-editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 10px;
+
+  border: 1px solid #ddd;
+  border-bottom: none;
+
+  border-radius: 12px 12px 0 0
 }
   
