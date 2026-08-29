@@ -1916,6 +1916,204 @@ bank_name:
 
       let protagonist = {};
 
+let antagonist = {};
+
+
+      if (
+        book.book_type === "fiction"
+      ) {
+
+        const protagonistName =
+          document.getElementById(
+            "protagonist-name"
+          ).value.trim();
+
+        const protagonistProfile =
+          document.getElementById(
+            "protagonist-profile"
+          ).value.trim();
+
+        const protagonistTraits =
+          document.getElementById(
+            "protagonist-traits"
+          ).value.trim();
+
+
+        protagonist = {
+
+          name:
+            protagonistName,
+
+          profile:
+            protagonistProfile,
+
+          traits:
+            protagonistTraits
+
+        };
+        
+        
+                const antagonistName =
+          document.getElementById(
+            "antagonist-name"
+          ).value.trim();
+
+        const antagonistProfile =
+          document.getElementById(
+            "antagonist-profile"
+          ).value.trim();
+
+        const antagonistTraits =
+          document.getElementById(
+            "antagonist-traits"
+          ).value.trim();
+
+
+        antagonist = {
+
+          name:
+            antagonistName,
+
+          profile:
+            antagonistProfile,
+
+          traits:
+            antagonistTraits
+
+        };
+
+      }
+      
+            /* =========================
+         CREATE SUBMISSION
+      ========================= */
+
+      message.textContent =
+        "Sending your application for review...";
+
+
+      let submissionResult;
+
+      try {
+
+        submissionResult =
+          await Promise.race([
+
+            window.supabaseClient
+  .from("book_submissions")
+              .insert({
+
+                author_id:
+                  user.id,
+
+                book_id:
+                  bookId,
+
+                title:
+                  book.title ||
+                  null,
+
+                description:
+                  description ||
+                  book.description ||
+                  null,
+                
+                                genre:
+                  genre ||
+                  book.genre ||
+                  null,
+
+                cover_url:
+                  book.cover_url ||
+                  null,
+
+                status:
+                  "pending",
+
+                submitted_at:
+                  new Date().toISOString(),
+
+                book_outline:
+                  outline ||
+                  null,
+
+                protagonist:
+                  protagonist,
+
+                antagonist:
+                  antagonist,
+
+                author_details:
+                  authorDetails,
+
+                additional_details:
+                  additionalDetails
+
+              })
+              .select(
+                "id,book_id,status,submitted_at"
+              )
+              .single(),
+
+            new Promise(function (
+              resolve
+            ) {
+
+              setTimeout(
+                function () {
+
+                  resolve({
+
+                    data: null,
+
+                    error: {
+                      message:
+                        "Submission request timed out. Please check your connection and try again."
+                                          }
+
+                  });
+
+                },
+                15000
+              );
+
+            })
+
+          ]);
+
+      } catch (error) {
+
+  console.error(
+    "PUBLICATION INSERT ERROR:",
+    error
+  );
+
+  message.textContent =
+    "Submission error: " +
+    (
+      error.message ||
+      "Unknown error"
+    );
+
+  return;
+}
+
+
+      /* =========================
+         HANDLE SUBMISSION ERROR
+      ========================= */
+
+      if (
+        submissionResult.error
+      ) {
+
+        console.error(
+          "PUBLICATION SUBMISSION ERROR:",
+          submissionResult.error
+        );
+
+        message.textContent 
+
       
 
 
