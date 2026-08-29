@@ -4278,3 +4278,39 @@ chapterEditorMessage.textContent =
         error
       );
 
+
+return;
+
+    }
+
+
+    chapterEditorMessage.textContent =
+      "Deletion request sent to the editor.";
+
+    await loadChapters(
+      managingBookId
+    );
+
+  }
+);
+  
+  const createChapterButton =
+  document.getElementById(
+    "create-chapter-button"
+  );
+  
+  createChapterButton.addEventListener(
+  "click",
+  function () {
+
+    openNewChapter();
+
+  }
+);
+  
+  function openNewChapter() {
+
+  editingChapterId =
+    null;
+    
+
