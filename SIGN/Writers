@@ -4312,5 +4312,39 @@ return;
 
   editingChapterId =
     null;
+
+deleteChapterRequest.style.display =
+  "none";
+
+  chapterEditorBookTitle.textContent =
+    manageChaptersBookTitle.textContent;
+
+  chapterNumberInput.value =
+    "";
+
+  chapterTitleInput.value =
+    "";
+
+  chapterContentInput.innerHTML =
+  "";
+
+  chapterEditorWordCount.textContent =
+    "0";
+
+  chapterEditorMessage.textContent =
+    "";
+    
+    deleteChapterRequest.style.display =
+  "block";
+
+  chapterEditorModal.style.display =
+    "flex";
+
+}
+  
+  function openEditChapter(chapter) {
+
+  editingChapterId =
+    chapter.id;
     
 
