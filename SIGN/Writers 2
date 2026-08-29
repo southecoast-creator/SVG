@@ -1,0 +1,36 @@
+updateChapterWordCount();
+
+  }
+);
+  
+  function updateChapterWordCount() {
+
+  const plainText =
+    chapterContentInput.innerText
+      .trim();
+
+  const words =
+    plainText
+      ? plainText
+          .split(/\s+/)
+          .filter(Boolean)
+      : [];
+
+  chapterEditorWordCount.textContent =
+    words.length;
+
+}
+  
+  document
+  .querySelectorAll(
+    ".chapter-format-button"
+  )
+  .forEach(
+    function (button) {
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          const command =
+            button.dataset.command;
