@@ -179,3 +179,37 @@ Select a genre
       >
 
         <span class="cover-upload-icon">
+
+＋
+        </span>
+        
+                <strong>
+          Upload Your Book Cover
+        </strong>
+
+        <span>
+          600 × 800 px • Under 1 MB <br/>WebP/Jpeg 
+        </span>
+
+      </label>
+
+      <input
+        id="fiction-book-cover"
+        type="file"
+        accept="image/jpeg,image/webp"
+        style="display:none;"
+      >
+
+      <p id="fiction-cover-message"></p>
+      <img
+  id="fiction-cover-preview"
+  style="display:none; width:120px; height:160px; object-fit:cover; margin:10px auto; border-radius:8px;"
+  alt="Fiction book cover preview"
+>
+
+    </div>
+    
+      </div>
+
+
+  <!-- NON-FICTION -->
