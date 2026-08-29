@@ -201,3 +201,39 @@ if (
 
             status:
               "draft",
+
+word_count:
+              wordCount
+
+          });
+
+      error =
+        result.error;
+
+    }
+    
+    
+        saveChapterDraft.disabled =
+      false;
+
+
+    if (error) {
+
+      console.error(
+        "CHAPTER SAVE ERROR:",
+        error
+      );
+
+      chapterEditorMessage.textContent =
+        "Unable to save chapter: " +
+        error.message;
+
+      return;
+
+    }
+
+
+    chapterEditorMessage.textContent =
+      "Draft saved successfully.";
+
+    await loadChapters(
