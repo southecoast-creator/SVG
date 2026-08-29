@@ -3817,4 +3817,40 @@ manageChaptersButton.addEventListener(
     openManageChapters(book);
 
   }
-)
+);
+
+actions.appendChild(editButton);
+
+actions.appendChild(
+  manageChaptersButton
+);
+
+
+/* =========================
+   APPLY FOR PUBLICATION
+========================= */
+
+const applyPublicationButton =
+  document.createElement("button");
+
+applyPublicationButton.type =
+  "button";
+
+applyPublicationButton.className =
+  "book-action-button";
+
+applyPublicationButton.textContent =
+  "Apply for Publication";
+
+applyPublicationButton.style.display =
+  "none";
+     
+     actions.appendChild(
+  applyPublicationButton
+);
+
+
+/* =========================
+   CHECK PUBLICATION
+   ELIGIBILITY
+========================= */
