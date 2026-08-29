@@ -2261,3 +2261,100 @@ background: #fff;
 }
   
   .fiction-tag {
+display: inline-block;
+  border: 1px solid #e5d8ee;
+  background: #faf7fc;
+  color: #5f4b68;
+  padding: 8px 14px;
+  margin: 4px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.fiction-tag:hover {
+  background: #f3eafa;
+  border-color: #c9addb;
+}
+
+.fiction-tag.selected {
+  background: #ead8f3;
+  border-color: #b98dce;
+  color: #3f2948;
+  font-weight: 600;
+}
+  
+/* BOOK FORM FIELDS */
+
+#create-book-form textarea,
+#create-book-form select {
+  padding: 13px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+#create-book-form textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+  
+  #fiction-fields,
+#nonfiction-fields {
+  display: none;
+}
+
+.type-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.type-field-group label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.type-field-group input,
+.type-field-group select {
+  padding: 13px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+#author-dashboard {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 35px;
+}
+
+.dashboard-label {
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  opacity: .65;
+}
+
+.dashboard-header h1 {
+  margin: 5px 0;
+}
+
+#author-name {
+  opacity: .7;
+}
+
+#logout-button {
+  border: 1px solid #ddd;
