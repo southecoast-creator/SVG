@@ -135,4 +135,31 @@ if (
     let error = null;
 
 
-    /* =======================
+    /* =========================
+       UPDATE EXISTING DRAFT
+    ========================= */
+
+    if (editingChapterId) {
+
+      const result =
+  await supabaseClient
+    .from("chapters")
+    .update({
+
+      chapter_number:
+        chapterNumber,
+
+      title:
+        chapterTitle || null,
+
+      content:
+        chapterContent,
+
+      word_count:
+        wordCount,
+
+      status:
+        "changes_requested",
+
+      updated_at:
+        new Date().toISOString()
