@@ -2358,3 +2358,90 @@ display: inline-block;
 
 #logout-button {
   border: 1px solid #ddd;
+
+background: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.dashboard-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 45px;
+}
+
+.dashboard-actions button {
+  border: 0;
+  padding: 22px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  text-align: left;
+}
+
+.dashboard-actions span {
+  font-size: 22px;
+  margin-right: 8px;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-heading h2 {
+  margin-bottom: 20px;
+}
+
+#book-count {
+  opacity: .6;
+  font-size: 14px;
+}
+
+#books-list {
+  display: grid;
+  gap: 15px;
+}
+
+.book-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 18px;
+  background: white;
+}
+
+.book-card h3 {
+  margin: 0 0 8px;
+}
+
+.book-meta {
+  font-size: 13px;
+  opacity: .65;
+}
+
+.book-status {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #f2f2f2;
+  font-size: 12px;
+}
+  
+.book-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.book-card-cover {
+  width: 70px;
+  height: 94px;
+  object-fit: cover;
+  border-radius: 7px;
+  flex-shrink: 0;
+  background: #f2f2f2;
+}
