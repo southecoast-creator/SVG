@@ -2548,3 +2548,1273 @@ background: white;
 }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", async function () {
+
+    const fictionGenres = [
+    "Romance",
+    "Fantasy",
+    "Paranormal",
+    "Mystery",
+    "Thriller",
+    "Science Fiction",
+    "Contemporary",
+    "Historical",
+    "Adventure",
+    "Crime",
+    "Horror",
+    "Young Adult"
+  ];
+  
+    const fictionSubgenres = {
+
+  "Romance": [
+    "Contemporary Romance",
+    "Dark Romance",
+    "Billionaire Romance",
+    "Sports Romance",
+    "Historical Romance",
+    "Paranormal Romance",
+    "Romantic Suspense"
+  ],
+
+  "Paranormal": [
+    "Paranormal Romance",
+    "Vampire",
+    "Werewolf",
+    "Witchcraft",
+    "Supernatural",
+    "Urban Paranormal"
+  ],
+
+  "Mystery": [
+    "Cozy Mystery",
+    "Detective Mystery",
+    "Amateur Sleuth",
+    "Whodunit",
+    "Psychological Mystery"
+  ],
+      
+  "Thriller": [
+    "Psychological Thriller",
+    "Domestic Thriller",
+    "Legal Thriller",
+    "Crime Thriller",
+    "Suspense Thriller"
+  ],
+
+  "Science Fiction": [
+    "Dystopian",
+    "Space Opera",
+    "Cyberpunk",
+    "Time Travel",
+    "Post-Apocalyptic",
+    "Science Fiction Romance"
+  ],
+
+  "Contemporary": [
+    "Contemporary Romance",
+    "Coming of Age",
+    "Family Drama"
+  ],
+      
+  "Historical": [
+  "Historical Romance",
+  "Historical Fiction",
+  "Historical Mystery",
+  "Historical Thriller",
+  "Historical Drama",
+  "Historical Adventure"
+],
+
+"Crime": [
+  "Crime Thriller",
+  "Detective Fiction",
+  "Police Procedural",
+  "Organized Crime",
+  "Heist",
+  "Legal Crime"
+],
+
+"Horror": [
+  "Psychological Horror",
+  "Supernatural Horror",
+  "Gothic Horror",
+  "Paranormal Horror",
+  "Body Horror",
+  "Survival Horror"
+],
+    
+  "Young Adult": [
+    "YA Romance",
+    "YA Fantasy",
+    "YA Mystery",
+    "YA Contemporary",
+    "YA Paranormal",
+    "YA Adventure"
+  ]
+
+};
+  
+  const fictionTags = {
+
+  "Contemporary Romance": [
+    "Enemies to Lovers",
+    "Friends to Lovers",
+    "Second Chance",
+    "Slow Burn",
+    "Fake Relationship",
+    "Forbidden Love"
+  ],
+
+  "Dark Romance": [
+    "Morally Grey",
+    "Possessive",
+    "Obsessive",
+    "Forbidden Love",
+    "Enemies to Lovers",
+    "Age Gap"
+  ],
+
+  "Billionaire Romance": [
+    "Billionaire",
+    "Boss & Employee",
+    "Fake Relationship",
+    "Arranged Marriage",
+    "Enemies to Lovers",
+    "Office Romance"
+  ],
+
+  "Sports Romance": [
+    "Athlete",
+    "Sports Team",
+    "Coach",
+    "Friends to Lovers",
+    "Enemies to Lovers",
+    "Second Chance"
+  ],
+
+  "Historical Romance": [
+    "Regency",
+    "Forbidden Love",
+    "Arranged Marriage",
+    "Noble Family",
+    "Marriage of Convenience",
+    "Historical Setting"
+  ],
+
+  "Paranormal Romance": [
+    "Vampire",
+    "Werewolf",
+    "Witch",
+    "Supernatural",
+    "Fated Mates",
+    "Forbidden Love"
+  ],
+
+  "Romantic Suspense": [
+    "Protective Hero",
+    "Danger",
+    "Investigation",
+    "Enemies to Lovers",
+    "Forbidden Love",
+    "Second Chance"
+  ],
+
+  "High Fantasy": [
+    "Magic",
+    "Kingdoms",
+    "Royalty",
+    "Chosen One",
+    "Quest",
+    "Political Intrigue"
+  ],
+
+  "Urban Fantasy": [
+    "Magic",
+    "Supernatural",
+    "Hidden World",
+    "Mythical Creatures",
+    "Chosen One",
+    "Secret Identity"
+  ],
+
+  "Dark Fantasy": [
+    "Dark Magic",
+    "Antihero",
+    "Monsters",
+    "Curses",
+    "Morally Grey",
+    "Forbidden Magic"
+  ],
+
+  "Romantic Fantasy": [
+    "Fated Mates",
+    "Magic",
+    "Royalty",
+    "Forbidden Love",
+    "Enemies to Lovers",
+    "Slow Burn"
+  ],
+
+  "Epic Fantasy": [
+    "Magic",
+    "Kingdoms",
+    "War",
+    "Prophecy",
+    "Chosen One",
+    "Quest"
+  ],
+
+    "Portal Fantasy": [
+    "Other World",
+    "Magic",
+    "Adventure",
+    "Chosen One",
+    "Quest",
+    "Hidden World"
+  ],
+
+  "Paranormal Romance": [
+    "Fated Mates",
+    "Forbidden Love",
+    "Vampire",
+    "Werewolf",
+    "Witch",
+    "Supernatural"
+  ],
+
+  "Vampire": [
+    "Vampire",
+    "Fated Mates",
+    "Immortal",
+    "Forbidden Love",
+    "Human & Vampire",
+    "Supernatural"
+  ],
+
+  "Werewolf": [
+    "Werewolf",
+    "Fated Mates",
+    "Alpha",
+    "Pack",
+    "Forbidden Love",
+    "Supernatural"
+  ],
+    
+   "Witchcraft": [
+    "Witches",
+    "Magic",
+    "Spells",
+    "Curses",
+    "Secret Identity",
+    "Supernatural"
+  ],
+
+  "Supernatural": [
+    "Ghosts",
+    "Demons",
+    "Angels",
+    "Supernatural Powers",
+    "Hidden World",
+    "Forbidden Knowledge"
+  ],
+    
+  "Urban Paranormal": [
+    "Supernatural",
+    "Hidden World",
+    "Secret Identity",
+    "Magic",
+    "Mythical Creatures",
+    "Forbidden Love"
+  ],
+
+  "Cozy Mystery": [
+    "Amateur Sleuth",
+    "Small Town",
+    "Murder Mystery",
+    "Secrets",
+    "Whodunit",
+    "Detective"
+  ],
+
+  "Detective Mystery": [
+    "Detective",
+    "Investigation",
+    "Murder Mystery",
+    "Clues",
+    "Serial Killer",
+    "Whodunit"
+  ],
+    
+   "Amateur Sleuth": [
+    "Amateur Detective",
+    "Small Town",
+    "Murder Mystery",
+    "Investigation",
+    "Secrets",
+    "Whodunit"
+  ],
+
+  "Whodunit": [
+    "Murder Mystery",
+    "Multiple Suspects",
+    "Clues",
+    "Investigation",
+    "Detective",
+    "Plot Twist"
+  ],
+
+  "Psychological Mystery": [
+    "Psychological",
+    "Secrets",
+    "Unreliable Narrator",
+    "Investigation",
+    "Plot Twist",
+    "Mind Games"
+  ],
+
+  "Psychological Thriller": [
+    "Mind Games",
+    "Unreliable Narrator",
+    "Obsession",
+    "Secrets",
+    "Plot Twist",
+    "Suspense"
+  ],
+    
+  "Domestic Thriller": [
+    "Marriage",
+    "Family Secrets",
+    "Gaslighting",
+    "Betrayal",
+    "Unreliable Narrator",
+    "Plot Twist"
+  ],
+
+  "Legal Thriller": [
+    "Lawyer",
+    "Courtroom",
+    "Investigation",
+    "Corruption",
+    "Conspiracy",
+    "Justice"
+  ],
+
+  "Crime Thriller": [
+    "Crime",
+    "Investigation",
+    "Serial Killer",
+    "Conspiracy",
+    "Detective",
+    "Suspense"
+  ],
+
+  "Suspense Thriller": [
+    "Danger",
+    "Secrets",
+    "Investigation",
+    "Chase",
+    "Conspiracy",
+    "Plot Twist"
+  ],
+    
+    "Dystopian": [
+    "Oppression",
+    "Survival",
+    "Rebellion",
+    "Government Control",
+    "Forbidden Love",
+    "Resistance"
+  ],
+
+  "Space Opera": [
+    "Space",
+    "Aliens",
+    "Galactic War",
+    "Empire",
+    "Space Travel",
+    "Political Intrigue"
+  ],
+
+  "Cyberpunk": [
+    "Artificial Intelligence",
+    "Technology",
+    "Megacorporations",
+    "Cybernetics",
+    "Dystopia",
+    "Hacking"
+  ],
+
+  "Time Travel": [
+    "Time Travel",
+    "Historical Setting",
+    "Paradox",
+    "Alternate Timeline",
+    "Romance",
+    "Fate"
+  ],
+    
+    "Post-Apocalyptic": [
+    "Survival",
+    "Apocalypse",
+    "Dystopia",
+    "Scarcity",
+    "Rebellion",
+    "Found Family"
+  ],
+
+  "Science Fiction Romance": [
+    "Forbidden Love",
+    "Aliens",
+    "Space",
+    "Enemies to Lovers",
+    "Fated Mates",
+    "Future Society"
+  ],
+
+  "Coming of Age": [
+    "First Love",
+    "Friendship",
+    "Identity",
+    "Growing Up",
+    "Family",
+    "Self-Discovery"
+  ],
+
+  "Family Drama": [
+    "Family Secrets",
+    "Sibling Rivalry",
+    "Betrayal",
+    "Parent-Child",
+    "Family Conflict",
+    "Reconciliation"
+  ],
+    
+    "Women's Fiction": [
+    "Friendship",
+    "Family",
+    "Self-Discovery",
+    "Career",
+    "Relationships",
+    "Personal Growth"
+  ],
+
+  "New Adult": [
+    "College",
+    "First Love",
+    "Career",
+    "Coming of Age",
+    "Independence",
+    "Relationships"
+  ],
+
+  "Historical Drama": [
+    "Historical Setting",
+    "Family",
+    "Forbidden Love",
+    "War",
+    "Social Class",
+    "Political Intrigue"
+  ],
+
+  "Historical Mystery": [
+    "Historical Setting",
+    "Detective",
+    "Murder Mystery",
+    "Investigation",
+    "Secrets",
+    "Secrets"
+  ],
+    
+    "Regency": [
+    "Regency",
+    "Society",
+    "Nobility",
+    "Marriage of Convenience",
+    "Forbidden Love",
+    "Scandal"
+  ],
+
+  "Ancient History Fiction": [
+    "Ancient World",
+    "War",
+    "Royalty",
+    "Political Intrigue",
+    "Historical Setting",
+    "Forbidden Love"
+  ],
+
+  "Action Adventure": [
+    "Chase",
+    "Combat",
+    "Survival",
+    "Treasure Hunt",
+    "Danger",
+    "Quest"
+  ],
+    
+    "Survival": [
+    "Survival",
+    "Danger",
+    "Isolation",
+    "Scarcity",
+    "Resilience",
+    "Adventure"
+  ],
+
+  "Treasure Hunt": [
+    "Treasure",
+    "Clues",
+    "Adventure",
+    "Exploration",
+    "Danger",
+    "Hidden Secrets"
+  ],
+
+  "Exploration": [
+    "Discovery",
+    "Adventure",
+    "Unknown World",
+    "Expedition",
+    "Danger",
+    "Mystery"
+  ],
+    
+    "Quest": [
+    "Chosen One",
+    "Journey",
+    "Adventure",
+    "Companions",
+    "Danger",
+    "Final Battle"
+  ],
+
+  "Crime Fiction": [
+    "Crime",
+    "Investigation",
+    "Detective",
+    "Murder",
+    "Secrets",
+    "Plot Twist"
+  ],
+
+  "Detective": [
+    "Detective",
+    "Investigation",
+    "Clues",
+    "Murder Mystery",
+    "Whodunit",
+    "Serial Killer"
+  ],
+    
+    "Gangster": [
+    "Gangster",
+    "Crime",
+    "Power",
+    "Betrayal",
+    "Violence",
+    "Loyalty"
+  ],
+
+  "Mafia": [
+    "Mafia",
+    "Crime",
+    "Boss",
+    "Betrayal",
+    "Forbidden Love",
+    "Enemies to Lovers"
+  ],
+
+  "Heist": [
+    "Heist",
+    "Thieves",
+    "Mastermind",
+    "Crime",
+    "Team",
+    "Double Cross"
+  ],
+    
+    "Organized Crime": [
+    "Crime Family",
+    "Mafia",
+    "Power",
+    "Betrayal",
+    "Corruption",
+    "Loyalty"
+  ],
+
+  "Psychological Horror": [
+    "Fear",
+    "Mind Games",
+    "Unreliable Narrator",
+    "Isolation",
+    "Paranoia",
+    "Dark Secrets"
+  ],
+
+  "Supernatural Horror": [
+    "Ghosts",
+    "Demons",
+    "Haunted House",
+    "Possession",
+    "Supernatural",
+    "Curses"
+  ],
+    
+    "Gothic Horror": [
+    "Gothic",
+    "Haunted House",
+    "Dark Secrets",
+    "Forbidden Love",
+    "Mystery",
+    "Supernatural"
+  ],
+
+  "Paranormal Horror": [
+    "Ghosts",
+    "Vampires",
+    "Werewolves",
+    "Demons",
+    "Supernatural",
+    "Possession"
+  ],
+
+  "Body Horror": [
+    "Transformation",
+    "Mutation",
+    "Monsters",
+    "Fear",
+    "Dark Science",
+    "Survival"
+  ],
+    
+    "YA Romance": [
+    "First Love",
+    "Friends to Lovers",
+    "Enemies to Lovers",
+    "Slow Burn",
+    "Coming of Age",
+    "School"
+  ],
+
+  "YA Fantasy": [
+    "Magic",
+    "Chosen One",
+    "Kingdoms",
+    "Quest",
+    "Friendship",
+    "Coming of Age"
+  ],
+
+  "YA Mystery": [
+    "Teen Detective",
+    "Secrets",
+    "Investigation",
+    "Murder Mystery",
+    "Friendship",
+    "Plot Twist"
+  ],
+    
+      "YA Contemporary": [
+    "Coming of Age",
+    "Friendship",
+    "First Love",
+    "School",
+    "Family",
+    "Self-Discovery"
+  ],
+
+  "YA Paranormal": [
+    "Vampire",
+    "Werewolf",
+    "Supernatural",
+    "Fated Mates",
+    "Secret Identity",
+    "First Love"
+  ],
+
+  "YA Adventure": [
+    "Quest",
+    "Survival",
+    "Friendship",
+    "Danger",
+    "Exploration",
+    "Coming of Age"
+  ]
+
+};
+
+  const nonfictionGenres = [
+    "Education",
+    "Health & Medicine",
+    "Self-Development",
+    "Business",
+    "Finance",
+    "Psychology",
+    "Science",
+    "Technology",
+    "History",
+    "Biography & Memoir",
+    "Religion & Spirituality",
+    "Lifestyle"
+  ];
+  
+  const nonfictionNiches = {
+
+  "Education": [
+    "Study Skills",
+    "Exam Preparation",
+    "Teaching Methods",
+    "Academic Success",
+    "Learning Strategies"
+  ],
+  "Health & Medicine": [
+    "Nutrition",
+    "Public Health",
+    "Medical Education",
+    "Fitness & Wellness",
+    "Health Education"
+  ],
+    
+    "Self-Development": [
+    "Motivation",
+    "Confidence",
+    "Productivity",
+    "Personal Growth",
+    "Habits & Discipline"
+  ],
+
+  "Business": [
+    "Entrepreneurship",
+    "Marketing",
+    "Leadership",
+    "Management",
+    "Career Development"
+  ],
+
+  "Finance": [
+    "Personal Finance",
+    "Budgeting",
+    "Investing",
+    "Financial Literacy",
+    "Money Management"
+  ],
+    
+    "Psychology": [
+    "Human Behavior",
+    "Relationships",
+    "Child Psychology",
+    "Social Psychology",
+    "Mental Processes"
+  ],
+
+  "Science": [
+    "Biology",
+    "Chemistry",
+    "Physics",
+    "Environmental Science",
+    "Life Sciences"
+  ],
+
+  "Technology": [
+    "Programming",
+    "Artificial Intelligence",
+    "Web Development",
+    "Cybersecurity",
+    "Digital Skills"
+  ],
+    
+    "History": [
+    "World History",
+    "African History",
+    "Nigerian History",
+    "Ancient History",
+    "Modern History"
+  ],
+
+  "Biography & Memoir": [
+    "Autobiography",
+    "Memoir",
+    "Personal Stories",
+    "Professional Biography",
+    "Life Experiences"
+  ],
+
+  "Religion & Spirituality": [
+    "Faith & Spiritual Growth",
+    "Bible Study",
+    "Prayer",
+    "Christian Living",
+    "Spirituality"
+  ],
+
+  "Lifestyle": [
+    "Parenting",
+    "Relationships",
+    "Travel",
+    "Food & Nutrition",
+    "Home & Living"
+  ]
+
+};
+  
+  const nonfictionTags = {
+
+  "Education": [
+    "Study Tips",
+    "Learning",
+    "Exams",
+    "Teaching",
+    "Students"
+  ],
+
+  "Health & Medicine": [
+    "Wellness",
+    "Nutrition",
+    "Fitness",
+    "Healthy Living",
+    "Health Education"
+  ],
+
+  "Self-Development": [
+    "Motivation",
+    "Mindset",
+    "Confidence",
+    "Discipline",
+    "Personal Growth"
+  ],
+
+  "Business": [
+    "Entrepreneurship",
+    "Marketing",
+    "Leadership",
+    "Small Business",
+    "Career"
+  ],
+
+  "Finance": [
+    "Money",
+    "Budgeting",
+    "Saving",
+    "Investing",
+    "Financial Literacy"
+  ],
+
+  "Psychology": [
+    "Human Behavior",
+    "Relationships",
+    "Emotions",
+    "Personality",
+    "Social Psychology"
+  ],
+
+  "Science": [
+    "Research",
+    "Biology",
+    "Physics",
+    "Chemistry",
+    "Environment"
+  ],
+
+  "Technology": [
+    "Programming",
+    "AI",
+    "Web Development",
+    "Digital Skills",
+    "Cybersecurity"
+  ],
+
+  "History": [
+    "World History",
+    "African History",
+    "Nigerian History",
+    "Ancient History",
+    "Culture"
+  ],
+
+  "Biography & Memoir": [
+    "Life Story",
+    "Memoir",
+    "Inspiration",
+    "Personal Journey",
+    "Achievement"
+  ],
+
+  "Religion & Spirituality": [
+    "Faith",
+    "Prayer",
+    "Bible Study",
+    "Christian Living",
+    "Spiritual Growth"
+  ],
+
+  "Lifestyle": [
+    "Parenting",
+    "Relationships",
+    "Travel",
+    "Food",
+    "Home & Living"
+  ]
+
+};
+
+  const SUPABASE_URL =
+    "https://uniecvgkxhcbedppadgx.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_UhqP7y8Cjyiv8RebOSMUDA_lBj0QuTE";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+  
+  window.supabaseClient =
+  supabaseClient;
+
+
+  const loading =
+    document.getElementById("dashboard-loading");
+
+  const dashboard =
+    document.getElementById("dashboard-content");
+
+  const authorName =
+    document.getElementById("author-name");
+
+  const booksList =
+    document.getElementById("books-list");
+
+  const bookCount =
+    document.getElementById("book-count");
+
+
+  /* =========================
+     CHECK LOGIN
+  ========================= */
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+
+  if (!session) {
+
+    loading.textContent =
+      "Please log in to access your author dashboard.";
+
+    return;
+
+  }
+  
+  window.currentAuthorSession =
+  session;
+
+
+  /* =========================
+     LOAD PROFILE
+  ========================= */
+
+  const {
+    data: profile,
+    error: profileError
+  } = await supabaseClient
+    .from("profiles")
+    .select("username, display_name, role")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+
+  if (profileError) {
+
+    console.error(profileError);
+
+    loading.textContent =
+      "We couldn't load your profile.";
+
+    return;
+
+  }
+
+
+  if (profile) {
+
+    authorName.textContent =
+      profile.display_name ||
+      profile.username ||
+      session.user.email;
+
+  } else {
+
+    authorName.textContent =
+      session.user.email;
+
+  }
+
+
+  loading.style.display = "none";
+  dashboard.style.display = "block";
+
+
+  /* =========================
+     LOAD AUTHOR BOOKS
+  ========================= */
+
+  async function loadBooks() {
+
+    booksList.innerHTML =
+      "<p>Loading your books...</p>";
+
+
+    const {
+      data: books,
+      error
+    } = await supabaseClient
+      .from("books")
+      .select(
+  "id,title,description,genre,age_rating,cover_url,book_type,status,submission_status,type_details,created_at"
+)
+      .eq("author_id", session.user.id)
+      .order("created_at", {
+        ascending: false
+      });
+
+
+    if (error) {
+
+      console.error(error);
+
+      booksList.innerHTML =
+        "<p>Unable to load your books.</p>";
+
+      return;
+
+    }
+
+
+    bookCount.textContent =
+      books.length +
+      (books.length === 1 ? " book" : " books");
+
+
+    if (!books.length) {
+
+      booksList.innerHTML =
+        '<p class="empty-books">You haven\'t created any books yet.</p>';
+
+      return;
+
+    }
+
+
+    booksList.innerHTML = "";
+
+   books.forEach(function (book) {
+
+  const card =
+    document.createElement("div");
+
+  card.className =
+    "book-card";
+
+
+  /* =========================
+     BOOK HEADER
+  ========================= */
+
+  const bookHeader =
+    document.createElement("div");
+
+  bookHeader.className =
+    "book-card-header";
+     
+
+
+  /* =========================
+     COVER
+  ========================= */
+     
+       const cover =
+    document.createElement("img");
+
+  cover.className =
+    "book-card-cover";
+
+  cover.alt =
+    book.title + " cover";
+
+  if (book.cover_url) {
+
+    cover.src =
+      book.cover_url;
+
+  } else {
+
+    cover.style.display =
+      "none";
+
+  }
+
+
+  /* =========================
+     BOOK INFORMATION
+  ========================= */
+     
+       const info =
+    document.createElement("div");
+
+  info.className =
+    "book-card-info";
+
+
+  const title =
+    document.createElement("h3");
+
+  title.textContent =
+    book.title;
+     
+     
+       const meta =
+    document.createElement("div");
+
+  meta.className =
+    "book-meta";
+
+  meta.textContent =
+    book.book_type === "non-fiction"
+      ? "Non-fiction"
+      : "Fiction";
+     
+     
+       /* =========================
+     TAGS
+  ========================= */
+
+  const tagsContainer =
+    document.createElement("div");
+
+  tagsContainer.className =
+    "book-card-tags";
+
+
+  const tags =
+    book.type_details &&
+    Array.isArray(book.type_details.tags)
+      ? book.type_details.tags
+      : [];
+
+
+  tags.slice(0, 3).forEach(function (tag) {
+    
+        const tagElement =
+      document.createElement("span");
+
+    tagElement.className =
+      "book-tag";
+
+    tagElement.textContent =
+      tag;
+
+    tagsContainer.appendChild(
+      tagElement
+    );
+
+  });
+     
+     
+       /* =========================
+     STATUS
+  ========================= */
+
+  const status =
+    document.createElement("span");
+
+  status.className =
+    "book-status";
+
+  status.textContent =
+    (
+      book.submission_status ||
+      book.status ||
+      "draft"
+    ).toUpperCase();
+
+
+  info.appendChild(title);
+  info.appendChild(meta);
+  info.appendChild(tagsContainer);
+  info.appendChild(status);
+
+
+  bookHeader.appendChild(cover);
+  bookHeader.appendChild(info);
+
+
+  card.appendChild(bookHeader);
+
+
+/* =========================
+   BOOK ACTIONS
+========================= */
+
+const actions =
+  document.createElement("div");
+
+actions.className =
+  "book-card-actions";
+
+
+const editButton =
+  document.createElement("button");
+
+editButton.type =
+  "button";
+
+editButton.className =
+  "book-action-button";
+
+editButton.textContent =
+  "Edit Book";
+
+
+editButton.addEventListener(
+  "click",
+  function () {
+
+    openEditBook(book);
+
+  }
+);
+
+const manageChaptersButton =
+  document.createElement("button");
+
+manageChaptersButton.type =
+  "button";
+
+manageChaptersButton.className =
+  "book-action-button";
+
+manageChaptersButton.textContent =
+  "Manage Chapters";
+
+manageChaptersButton.addEventListener(
+  "click",
+  function () {
+
+    openManageChapters(book);
+
+  }
+)
