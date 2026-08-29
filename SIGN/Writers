@@ -438,3 +438,37 @@ style="display:none; width:120px; height:160px; object-fit:cover; margin:10px au
   </div>
 
 </div>
+<!-- CHAPTER EDITOR MODAL -->
+
+<div
+  id="chapter-editor-modal"
+  class="book-modal"
+  style="display:none;"
+>
+
+  <div class="book-modal-box chapter-editor-box">
+
+    <button
+      id="close-chapter-editor"
+      class="close-modal"
+      type="button"
+    >
+      ×
+    </button>
+
+    <p class="dashboard-label">
+      CHAPTER EDITOR
+    </p>
+
+    <h2 id="chapter-editor-book-title">
+      Chapter
+    </h2>
+    
+        <div class="chapter-editor-number">
+
+      <label for="chapter-number">
+        Chapter Number
+      </label>
+
+      <input
+        id="chapter-number"
