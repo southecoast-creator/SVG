@@ -1,62 +1,30 @@
-/* =========================================================
-   BOOK CARD — PROTECT COVER / BOOKMARK SPACE
-========================================================= */
+/* RESET COVER PREVIEW FOR NEW BOOK */
 
-/* Keep the cover column completely separate */
-.book-card-header {
-  display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
-  column-gap: 16px;
-  align-items: start;
-}
+const fictionCoverInput =
+  document.getElementById("fiction-book-cover");
 
-/* Cover stays inside its own lane */
-.book-card-cover {
-  grid-column: 1;
-  grid-row: 1;
-}
+const fictionCoverPreview =
+  document.getElementById("fiction-cover-preview");
 
-/* Everything containing the title/details stays in column 2 */
-.book-card-info {
-  grid-column: 2;
-  grid-row: 1;
-  min-width: 0;
-  overflow: visible;
-}
+const fictionCoverMessage =
+  document.getElementById("fiction-cover-message");
 
-/* Make sure the title can never slide underneath the cover */
-.book-card-info h3,
-.book-card-info .book-meta,
-.book-card-info .book-card-tags,
-.book-card-info .book-status {
-  max-width: 100%;
-}
+const nonfictionCoverInput =
+  document.getElementById("book-cover");
 
-/* Keep the status/bookmark inside the information column */
-.book-card-info .book-status {
-  position: static;
-  margin-left: 0;
-}
+const nonfictionCoverPreview =
+  document.getElementById("cover-preview");
 
-/* =========================================================
-   NO-COVER CARDS
-   The cover lane still exists even when there is no image.
-========================================================= */
+const nonfictionCoverMessage =
+  document.getElementById("cover-message");
 
-.book-card-header:has(.book-card-cover[src=""]) .book-card-info,
-.book-card-header:not(:has(.book-card-cover)) .book-card-info {
-  grid-column: 2;
-}
 
-/* =========================================================
-   MOBILE
-========================================================= */
+fictionCoverInput.value = "";
+fictionCoverPreview.src = "";
+fictionCoverPreview.style.display = "none";
+fictionCoverMessage.textContent = "";
 
-@media (max-width: 600px) {
-
-  .book-card-header {
-    grid-template-columns: 76px minmax(0, 1fr);
-    column-gap: 14px;
-  }
-
-}
+nonfictionCoverInput.value = "";
+nonfictionCoverPreview.src = "";
+nonfictionCoverPreview.style.display = "none";
+nonfictionCoverMessage.textContent = "";
