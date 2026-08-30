@@ -1,426 +1,62 @@
 /* =========================================================
-   BOOK CARD — KEEP TEXT CLEAR OF COVER
+   BOOK CARD — PROTECT COVER / BOOKMARK SPACE
 ========================================================= */
 
+/* Keep the cover column completely separate */
 .book-card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: start;
 }
 
+/* Cover stays inside its own lane */
 .book-card-cover {
-  position: relative;
-  z-index: 2;
-  flex: 0 0 88px;
+  grid-column: 1;
+  grid-row: 1;
 }
 
+/* Everything containing the title/details stays in column 2 */
 .book-card-info {
-  position: relative;
-  z-index: 3;
-
+  grid-column: 2;
+  grid-row: 1;
   min-width: 0;
-  flex: 1;
-
-  overflow: hidden;
+  overflow: visible;
 }
 
-.book-card-info h3 {
-  position: relative;
-  z-index: 3;
-
-  margin: 1px 0 7px;
-
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
+/* Make sure the title can never slide underneath the cover */
+.book-card-info h3,
 .book-card-info .book-meta,
+.book-card-info .book-card-tags,
 .book-card-info .book-status {
-  position: relative;
-  z-index: 3;
+  max-width: 100%;
 }
 
-
-/* When there is no actual cover,
-   keep the information in its own column */
-.book-card-header .book-card-info {
-  min-width: 0;
+/* Keep the status/bookmark inside the information column */
+.book-card-info .book-status {
+  position: static;
+  margin-left: 0;
 }
 
+/* =========================================================
+   NO-COVER CARDS
+   The cover lane still exists even when there is no image.
+========================================================= */
 
-/* Mobile */
+.book-card-header:has(.book-card-cover[src=""]) .book-card-info,
+.book-card-header:not(:has(.book-card-cover)) .book-card-info {
+  grid-column: 2;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 600px) {
 
   .book-card-header {
-    gap: 12px;
+    grid-template-columns: 76px minmax(0, 1fr);
+    column-gap: 14px;
   }
 
-  .book-card-cover {
-    flex: 0 0 76px;
-  }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =========================================================
-   MODAL CLOSE BUTTON — CLEAN WHITE X
-========================================================= */
-
-.close-modal {
-  position: absolute;
-
-  top: 18px;
-  right: 20px;
-
-  width: auto;
-  height: auto;
-
-  padding: 0;
-
-  border: none !important;
-  border-radius: 0;
-
-  background: transparent !important;
-
-  color: #FFF8E7 !important;
-
-  font-size: 30px;
-  font-weight: 300;
-  line-height: 1;
-
-  cursor: pointer;
-
-  z-index: 20;
-
-  box-shadow: none !important;
-
-  transition:
-    color .18s ease,
-    transform .18s ease;
-}
-
-.close-modal:hover {
-  color: #F4D58D !important;
-
-  transform:
-    scale(1.12);
-}
-
-
-
-/* =========================================================
-   CREATE BOOK — FORM SPACING
-========================================================= */
-
-#create-book-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-
-/* Every form field gets breathing room */
-
-#create-book-form > label,
-#create-book-form > input,
-#create-book-form > textarea,
-#create-book-form > select,
-
-#create-book-form .type-field-group {
-  margin-bottom: 18px;
-}
-
-
-/* Labels have a little space before their input */
-
-#create-book-form label {
-  margin-top: 2px;
-  margin-bottom: 8px;
-}
-
-
-/* Groups keep their internal fields organized */
-
-#create-book-form .type-field-group {
-  display: flex;
-  flex-direction: column;
-}
-
-#create-book-form .type-field-group > label {
-  margin-bottom: 8px;
-}
-
-
-/* =========================================================
-   DARK DROPDOWNS
-========================================================= */
-
-#create-book-form select,
-#book-genre,
-#age-rating,
-#fiction-subgenre,
-#nonfiction-subgenre,
-#intended-audience,
-#nonfiction-content-level {
-
-  background-color: #0E0E13 !important;
-
-  color: #FFF8E7 !important;
-
-  border: 1px solid #343129 !important;
-}
-
-
-/* Dropdown options */
-
-#create-book-form select option {
-  background: #17171C;
-  color: #FFF8E7;
-}
-
-
-/* Placeholder/default option */
-
-#create-book-form select:invalid,
-#create-book-form select option[value=""] {
-  color: #8F887B;
-}
-
-
-/* Give the select a little more visual weight */
-
-#create-book-form select {
-  min-height: 46px;
-
-  padding: 12px 14px;
-
-  border-radius: 12px;
-
-  outline: none;
-}
-
-
-/* Focus */
-
-#create-book-form select:focus {
-  border-color: var(--litdom-gold) !important;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(212,175,55,.10);
-}
-
-
-
-
-
-
-
-
-
-
-/* =========================================================
-   LITDOM — STORY TAGS
-   Normal → Bold selection behavior
-========================================================= */
-
-#fiction-tag-chips,
-#nonfiction-tag-chips {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-
-  gap: 7px;
-
-  margin-top: 10px;
-}
-
-
-/* UNSELECTED */
-
-.fiction-tag,
-.nonfiction-tag {
-
-  display: inline-flex;
-
-  align-items: center;
-  justify-content: center;
-
-  width: auto;
-
-  padding: 5px 10px;
-
-  border:
-    1px solid
-    rgba(212,175,55,.55);
-
-  border-radius: 999px;
-
-  background: #0B0B0F;
-
-  color: #FFF8E7;
-
-  font-size: 11px;
-
-  font-weight: 400;
-
-  line-height: 1.2;
-
-  white-space: nowrap;
-
-  cursor: pointer;
-
-  transition:
-    color .18s ease,
-    font-weight .18s ease,
-    background .18s ease,
-    border-color .18s ease,
-    box-shadow .18s ease,
-    transform .18s ease;
-}
-
-
-/* HOVER — still unselected */
-
-.fiction-tag:hover,
-.nonfiction-tag:hover {
-
-  color: #FFF8E7;
-
-  border-color:
-    var(--litdom-gold);
-
-  background:
-    #111116;
-
-  transform:
-    translateY(-1px);
-}
-
-
-/* SELECTED */
-
-.fiction-tag.selected,
-.nonfiction-tag.selected {
-
-  background:
-    var(--litdom-gold);
-
-  border-color:
-    var(--litdom-champagne);
-
-  color:
-    #0B0B0F;
-
-  font-weight:
-    800;
-
-  box-shadow:
-    0 0 10px
-    rgba(212,175,55,.28),
-
-    0 0 22px
-    rgba(212,175,55,.10);
-}
-
-
-/* SELECTED HOVER */
-
-.fiction-tag.selected:hover,
-.nonfiction-tag.selected:hover {
-
-  color:
-    #0B0B0F;
-
-  font-weight:
-    800;
-
-  background:
-    var(--litdom-champagne);
-
-  border-color:
-    var(--litdom-champagne);
-
-  box-shadow:
-    0 0 14px
-    rgba(244,213,141,.38),
-
-    0 0 28px
-    rgba(212,175,55,.14);
-}
-
-
-/* MOBILE */
-
-@media (max-width: 600px) {
-
-  #fiction-tag-chips,
-  #nonfiction-tag-chips {
-    gap: 6px;
-  }
-
-  .fiction-tag,
-  .nonfiction-tag {
-    padding: 5px 9px;
-    font-size: 10.5px;
-  }
-
-}
-
-
-
-
-
-
-
-
-/* =========================================================
-   BOOK CARD — PROTECT COVER LANE
-   Nothing can enter the cover's territory
-========================================================= */
-
-.book-card-header {
-  display: flex;
-  align-items: flex-start;
-}
-
-
-/* The cover permanently owns its lane */
-
-.book-card-cover {
-  flex: 0 0 88px;
-  width: 88px;
-  min-width: 88px;
-  height: 117px;
-}
-
-
-/* Everything else must stay in the remaining lane */
-
-.book-card-info {
-  flex: 1 1 auto;
-  min-width: 0;
-  width: 0;
-  margin-left: 16px;
-}
-
-
-/* Prevent long titles from escaping their lane */
-
-.book-card-info h3 {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  word-break: break-word;
 }
