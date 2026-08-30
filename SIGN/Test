@@ -1,461 +1,839 @@
-const {
-  error: bookStatusError
-} =
-  await supabaseClient
-    .from("books")
-    .update({
-
-      status:
-        "pending",
-
-      submission_status:
-        "pending"
-
-    })
-    .eq(
-      "id",
-      submissionResult.data.id
-        ? bookId
-        : bookId
-    );
-
-
-if (
-  bookStatusError
-) {
-
-  console.error(
-    "SUBMISSION STATUS UPDATE ERROR:",
-    bookStatusError
-  );
-
-  message.textContent =
-    "Your application was submitted, but its review status could not be updated.";
-
-  return;
-}
-
-
-
-
-
-
-
-
-
-if (!books.length) {
-
-      booksList.innerHTML =
-        '<p class="empty-books">You haven\'t created any books yet.</p>';
-
-      return;
-
-    }
-
-
-    /* =========================
-       BATCH: PUBLICATION SUBMISSIONS
-       (one query for all books, replaces
-       N separate per-book queries)
-    ========================= */
-
-    const bookIds =
-      books.map(function (b) { return b.id; });
-
-    const {
-      data: existingSubmissions,
-      error: submissionsError
-    } = await supabaseClient
-      .from("book_submissions")
-      .select("book_id")
-      .in("book_id", bookIds);
-
-    if (submissionsError) {
-      console.error(
-        "PUBLICATION SUBMISSIONS BATCH ERROR:",
-        submissionsError
-      );
-    }
-
-    const submittedBookIds =
-      new Set(
-        (existingSubmissions || []).map(
-          function (s) { return s.book_id; }
-        )
-      );
-
-
-    booksList.innerHTML = "";
-
-
-
-
-
-
-
-
-
-
-function setPublicationButtonVisibility(
-    book,
-    applyButton,
-    submittedBookIds
-  ) {
-
-    if (submittedBookIds.has(book.id)) {
-      applyButton.style.display = "none";
-      return;
-    }
-
-    if (book.status === "published") {
-      applyButton.style.display = "none";
-      return;
-    }
-
-    const totalWords =
-      Number(book.total_word_count) || 0;
-
-    applyButton.style.display =
-      totalWords >= 5000
-        ? "inline-flex"
-        : "none";
-
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <style>
 /* =========================================================
-   LITDOM BRAND THEME — OVERRIDE LAYER
+   LITDOM — PUBLICATION APPLICATION
+   Brand System
+   Scoped ONLY to the publication modal
 ========================================================= */
 
-body {
-  background: #0B0B0F;
+.publication-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(11, 11, 15, 0.86);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  overflow-y: auto;
 }
 
-#author-dashboard {
-  background: #0B0B0F;
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.publication-modal-box {
+  position: relative;
+
+  width: min(720px, 100%);
+
+  max-height: 92vh;
+  overflow-y: auto;
+
+  padding: 38px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #17171C 0%,
+      #111116 52%,
+      #0B0B0F 100%
+    );
+
+  border: 1px solid rgba(212, 175, 55, 0.22);
+
+  border-radius: 28px;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.60),
+    0 10px 35px rgba(212, 175, 55, 0.08);
+
   color: #FFF8E7;
+
+  box-sizing: border-box;
+
+  animation:
+    publicationModalIn
+    0.28s ease-out;
 }
 
-.dashboard-label {
-  color: #8C7625;
+
+@keyframes publicationModalIn {
+  from {
+    opacity: 0;
+    transform:
+      translateY(18px)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1);
+  }
 }
 
-.dashboard-header h1 {
-  color: #FFF8E7;
-}
 
-#author-name {
-  color: #B9AE9A;
-}
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
 
-#logout-button {
-  background: #17171C;
-  border: 1px solid #8C7625;
-  color: #FFF8E7;
-}
-
-#logout-button:hover {
-  background: #1f1f26;
-  border-color: #D4AF37;
-}
-
-.dashboard-actions button {
-  background: #17171C;
-  border: 1px solid #8C7625;
-  color: #FFF8E7;
-}
-
-.dashboard-actions button:hover {
-  border-color: #D4AF37;
-  background: #1c1c22;
-}
-
-.dashboard-actions span {
-  color: #D4AF37;
-}
-
-.section-heading h2 {
-  color: #FFF8E7;
-}
-
-#book-count {
-  color: #B9AE9A;
-}
-
-/* BOOK CARDS */
-
-.book-card {
-  background: #17171C;
-  border: 1px solid #2a2a30;
-}
-
-.book-card h3,
-.book-card-info h3 {
-  color: #FFF8E7;
-}
-
-.book-meta {
-  color: #B9AE9A;
-}
-
-.book-tag {
-  background: #1f1f26;
-  color: #F4D58D;
-  border: 1px solid #8C7625;
-}
-
-.book-action-button {
-  background: #0B0B0F;
-  border: 1px solid #8C7625;
-  color: #FFF8E7;
-}
-
-.book-action-button:hover {
-  background: #1c1c22;
-  border-color: #D4AF37;
-  color: #F4D58D;
-}
-
-.empty-books,
-.empty-chapters {
-  color: #B9AE9A;
-}
-
-/* STATUS BADGES — book cards */
-
-.book-status {
-  font-weight: 700;
-  letter-spacing: .5px;
-}
-
-.book-status.status-draft {
-  background: rgba(90, 140, 255, 0.15);
-  color: #7FA8FF;
-}
-
-.book-status.status-pending {
-  background: rgba(244, 213, 141, 0.15);
-  color: #F4D58D;
-}
-
-.book-status.status-changes_requested {
-  background: rgba(244, 213, 141, 0.15);
-  color: #F4D58D;
-}
-
-.book-status.status-approved {
-  background: rgba(90, 200, 130, 0.15);
-  color: #6FDB9B;
-}
-
-.book-status.status-published {
-  background: rgba(90, 200, 130, 0.15);
-  color: #6FDB9B;
-}
-
-.book-status.status-rejected {
-  background: rgba(220, 90, 90, 0.15);
-  color: #F0908C;
-}
-
-/* CHAPTER STATUS BADGES */
-
-.chapter-status.draft {
-  background: rgba(90, 140, 255, 0.15);
-  color: #7FA8FF;
-}
-
-.chapter-status.changes-requested {
-  background: rgba(244, 213, 141, 0.15);
-  color: #F4D58D;
-}
-
-.chapter-status.published {
-  background: rgba(90, 200, 130, 0.15);
-  color: #6FDB9B;
-}
-
-/* MODALS */
-
-.book-modal-box,
-.publication-modal-box,
-.chapter-editor-box {
-  background: #17171C;
-  color: #FFF8E7;
-  border: 1px solid #2a2a30;
-}
-
-.close-modal,
 .publication-close {
-  color: #B9AE9A;
-  background: #0B0B0F;
+  position: absolute;
+
+  top: 18px;
+  right: 18px;
+
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: 50%;
+
+  background: #17171C;
+
+  color: #F4D58D;
+
+  font-size: 25px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.close-modal:hover,
+
 .publication-close:hover {
-  color: #F4D58D;
-  background: #1c1c22;
-}
+  background: #211F18;
 
-.book-modal-box label,
-.publication-modal-box label,
-.type-field-group label {
-  color: #F4D58D;
-}
-
-.book-modal-box input,
-.book-modal-box textarea,
-.book-modal-box select,
-.publication-modal-box input,
-.publication-modal-box textarea,
-.publication-modal-box select,
-.type-field-group input,
-.type-field-group select,
-#create-book-form select {
-  background: #0B0B0F;
-  border: 1px solid #8C7625;
   color: #FFF8E7;
+
+  border-color: rgba(212, 175, 55, 0.50);
+
+  transform:
+    rotate(8deg)
+    scale(1.05);
 }
 
-.book-modal-box input:focus,
-.book-modal-box textarea:focus,
-.book-modal-box select:focus,
-.publication-modal-box input:focus,
-.publication-modal-box textarea:focus,
-.publication-modal-box select:focus {
-  border-color: #D4AF37;
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
-}
 
-#save-book-button,
-#submit-publication-application {
-  background: linear-gradient(135deg, #D4AF37, #B9962E);
-  color: #0B0B0F;
+/* =========================================================
+   HEADER
+========================================================= */
+
+.publication-label {
+  margin: 0 0 8px;
+
+  color: #F4D58D;
+
+  font-size: 11px;
   font-weight: 800;
+
+  letter-spacing: 2.2px;
+
+  text-transform: uppercase;
 }
 
-#save-book-button:hover,
+
+.publication-modal-box > h2 {
+  margin: 0;
+
+  color: #FFF8E7;
+
+  font-size: clamp(28px, 5vw, 38px);
+
+  line-height: 1.15;
+
+  letter-spacing: -0.8px;
+}
+
+
+.publication-book-name {
+  margin: 10px 0 25px;
+
+  color: #B8AA8B;
+
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   BOOK SUMMARY
+========================================================= */
+
+.publication-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
+
+  margin-bottom: 32px;
+}
+
+
+.publication-summary > div {
+  padding: 17px 18px;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #17171C,
+      #1D1B18
+    );
+
+  border: 1px solid rgba(212, 175, 55, 0.16);
+}
+
+
+.publication-summary span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #9F967F;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+}
+
+
+.publication-summary strong {
+  color: #FFF8E7;
+
+  font-size: 16px;
+}
+
+
+/* =========================================================
+   SECTION HEADINGS
+========================================================= */
+
+.publication-modal-box h3 {
+  position: relative;
+
+  margin: 34px 0 8px;
+
+  padding-left: 14px;
+
+  color: #F4D58D;
+
+  font-size: 20px;
+}
+
+
+.publication-modal-box h3::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 3px;
+  bottom: 3px;
+
+  width: 4px;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #F4D58D,
+      #8C7625
+    );
+}
+
+
+.publication-modal-box h4 {
+  margin: 28px 0 15px;
+
+  color: #D4AF37;
+
+  font-size: 16px;
+}
+
+
+/* =========================================================
+   SECTION NOTES
+========================================================= */
+
+.publication-section-note {
+  margin: 0 0 20px;
+
+  color: #A9A092;
+
+  font-size: 13px;
+
+  line-height: 1.65;
+}
+
+
+/* =========================================================
+   LABELS
+========================================================= */
+
+.publication-modal-box form > label,
+.publication-modal-box label[for] {
+  display: block;
+
+  margin:
+    18px 0 7px;
+
+  color: #E8DDC8;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.publication-modal-box
+input[type="text"],
+.publication-modal-box
+input[type="email"],
+.publication-modal-box
+input[type="tel"],
+.publication-modal-box
+select,
+.publication-modal-box
+textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid #302D25;
+
+  border-radius: 15px;
+
+  background: #111116;
+
+  color: #FFF8E7;
+
+  padding: 14px 16px;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.publication-modal-box
+input[type="text"],
+.publication-modal-box
+input[type="email"],
+.publication-modal-box
+input[type="tel"],
+.publication-modal-box
+select {
+  min-height: 50px;
+}
+
+
+.publication-modal-box textarea {
+  min-height: 120px;
+
+  resize: vertical;
+
+  line-height: 1.6;
+}
+
+
+.publication-modal-box
+input::placeholder,
+.publication-modal-box
+textarea::placeholder {
+  color: #716B60;
+}
+
+
+/* =========================================================
+   FOCUS
+========================================================= */
+
+.publication-modal-box
+input[type="text"]:focus,
+.publication-modal-box
+input[type="email"]:focus,
+.publication-modal-box
+input[type="tel"]:focus,
+.publication-modal-box
+select:focus,
+.publication-modal-box
+textarea:focus {
+  border-color: #D4AF37;
+
+  background: #15140F;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(212, 175, 55, 0.10);
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* =========================================================
+   FICTION SECTION
+========================================================= */
+
+#fiction-publication-fields {
+  margin-top: 30px;
+
+  padding: 22px;
+
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #17171C,
+      #121216
+    );
+
+  border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+
+/* =========================================================
+   AGREEMENTS
+========================================================= */
+
+.publication-agreements {
+  margin-top: 32px;
+
+  padding: 20px;
+
+  border-radius: 20px;
+
+  background: #121216;
+
+  border: 1px solid #2C2923;
+}
+
+
+.publication-check {
+  display: flex !important;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  margin: 0 0 15px !important;
+
+  color: #BEB5A5 !important;
+
+  font-size: 13px !important;
+
+  font-weight: 500 !important;
+
+  line-height: 1.55;
+}
+
+
+.publication-check:last-child {
+  margin-bottom: 0 !important;
+}
+
+
+.publication-check input[type="checkbox"] {
+  flex: 0 0 auto;
+
+  width: 18px;
+  height: 18px;
+
+  margin-top: 2px;
+
+  accent-color: #D4AF37;
+
+  cursor: pointer;
+}
+
+
+.publication-check span {
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
+
+#submit-publication-application {
+  width: 100%;
+
+  min-height: 56px;
+
+  margin-top: 28px;
+
+  padding: 15px 22px;
+
+  border: 1px solid #D4AF37;
+
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #D4AF37,
+      #A98520
+    );
+
+  color: #0B0B0F;
+
+  font-family: inherit;
+
+  font-size: 15px;
+  font-weight: 900;
+
+  letter-spacing: 0.2px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 12px 28px
+    rgba(212, 175, 55, 0.18);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+
 #submit-publication-application:hover {
-  filter: brightness(1.08);
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 16px 35px
+    rgba(212, 175, 55, 0.25);
+
+  filter: brightness(1.06);
 }
 
-.fiction-tag,
-.nonfiction-tag {
-  background: #0B0B0F;
-  border: 1px solid #8C7625;
-  color: #FFF8E7;
+
+#submit-publication-application:active {
+  transform:
+    translateY(0)
+    scale(0.99);
 }
 
-.fiction-tag.selected,
-.nonfiction-tag.selected {
-  background: rgba(212, 175, 55, 0.18);
-  border-color: #D4AF37;
-  color: #F4D58D;
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+#publication-application-message {
+  margin: 15px 0 0;
+
+  padding: 0;
+
+  text-align: center;
+
+  color: #CDBF9D;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  line-height: 1.5;
 }
 
-.cover-upload-box {
-  background: #0B0B0F;
-  border: 2px dashed #8C7625;
+
+/* =========================================================
+   STATUS COLORS
+   Semantic colors intentionally remain distinct
+   from Litdom's brand gold.
+========================================================= */
+
+:root {
+  --status-published: #35C759;
+  --status-approved: #35C759;
+
+  --status-draft: #3B82F6;
+
+  --status-pending: #F2C94C;
+
+  --status-changes: #F2994A;
+
+  --status-rejected: #E5484D;
 }
 
-.cover-upload-box:hover {
-  border-color: #D4AF37;
-  background: #17171C;
+
+/* =========================================================
+   CORNER BOOKMARK
+   Small status marker for book covers
+========================================================= */
+
+.book-status-bookmark {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  z-index: 5;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 76px;
+  height: 24px;
+
+  padding: 0 10px;
+
+  border-radius:
+    0 0 8px 0;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  line-height: 1;
+
+  letter-spacing: 0.8px;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    2px 3px 8px rgba(0, 0, 0, 0.25);
+
+  transform-origin: top left;
 }
 
-.cover-upload-icon {
-  background: #2a2416;
-  color: #F4D58D;
+
+/* Small folded corner behind the bookmark */
+
+.book-status-bookmark::after {
+  content: "";
+
+  position: absolute;
+
+  right: -7px;
+  bottom: -7px;
+
+  width: 8px;
+  height: 8px;
+
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+
+  opacity: 0.65;
 }
 
-/* CHAPTER EDITOR */
 
-.chapter-editor-toolbar {
-  background: #0B0B0F;
-  border-color: #8C7625;
+/* =========================================================
+   APPROVED
+========================================================= */
+
+.book-status-bookmark.approved {
+  background: var(--status-approved);
+
+  color: #071108;
 }
 
-.chapter-format-button {
-  background: #17171C;
-  border-color: #8C7625;
-  color: #FFF8E7;
+
+.book-status-bookmark.approved::after {
+  background: #187A32;
 }
 
-.chapter-format-button:hover {
-  background: #1f1f26;
-  border-color: #D4AF37;
+
+/* =========================================================
+   PUBLISHED
+========================================================= */
+
+.book-status-bookmark.published {
+  background: var(--status-published);
+
+  color: #071108;
 }
 
-.chapter-content-editor,
-#chapter-content {
-  background: #0B0B0F;
-  border-color: #8C7625;
-  color: #FFF8E7;
+
+.book-status-bookmark.published::after {
+  background: #187A32;
 }
 
-.chapter-content-editor:focus,
-#chapter-content:focus,
-#chapter-number:focus,
-#chapter-title:focus {
-  border-color: #D4AF37;
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+
+/* =========================================================
+   DRAFT
+========================================================= */
+
+.book-status-bookmark.draft {
+  background: var(--status-draft);
+
+  color: #FFFFFF;
 }
 
-#chapter-number,
-#chapter-title {
-  background: #0B0B0F;
-  border-color: #8C7625;
-  color: #FFF8E7;
+
+.book-status-bookmark.draft::after {
+  background: #174A94;
 }
 
-#delete-chapter-request {
-  border-color: #F0908C;
-  color: #F0908C;
+
+/* =========================================================
+   PENDING
+========================================================= */
+
+.book-status-bookmark.pending {
+  background: var(--status-pending);
+
+  color: #1C1603;
+}
+
+
+.book-status-bookmark.pending::after {
+  background: #A17B08;
+}
+
+
+/* =========================================================
+   CHANGES REQUESTED
+========================================================= */
+
+.book-status-bookmark.changes-requested {
+  background: var(--status-changes);
+
+  color: #1C0D02;
+}
+
+
+.book-status-bookmark.changes-requested::after {
+  background: #994E0A;
+}
+
+
+/* =========================================================
+   REJECTED
+========================================================= */
+
+.book-status-bookmark.rejected {
+  background: var(--status-rejected);
+
+  color: #FFFFFF;
+}
+
+
+.book-status-bookmark.rejected::after {
+  background: #8F2025;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+.publication-modal-box::-webkit-scrollbar {
+  width: 7px;
+}
+
+
+.publication-modal-box::-webkit-scrollbar-track {
   background: transparent;
 }
 
-#delete-chapter-request:hover {
-  background: #F0908C;
-  color: #0B0B0F;
+
+.publication-modal-box::-webkit-scrollbar-thumb {
+  background: #514A3A;
+
+  border-radius: 20px;
 }
 
-.publication-summary > div {
-  background: #0B0B0F;
-  border: 1px solid #8C7625;
+
+.publication-modal-box::-webkit-scrollbar-thumb:hover {
+  background: #8C7625;
 }
 
-.publication-summary span {
-  color: #B9AE9A;
-}
 
-.publication-summary strong {
-  color: #F4D58D;
-}
+/* =========================================================
+   MOBILE
+========================================================= */
 
-.publication-agreements {
-  background: #0B0B0F;
-  border: 1px solid #8C7625;
-}
+@media (max-width: 600px) {
 
-.publication-check {
-  color: #FFF8E7 !important;
-}
+  .publication-modal {
+    align-items: flex-start;
 
-.publication-modal-box h3,
-.publication-modal-box h4 {
-  color: #F4D58D;
+    padding: 10px;
+  }
+
+
+  .publication-modal-box {
+    width: 100%;
+
+    max-height: 96vh;
+
+    padding: 27px 20px 25px;
+
+    border-radius: 23px;
+  }
+
+
+  .publication-close {
+    top: 12px;
+    right: 12px;
+
+    width: 38px;
+    height: 38px;
+  }
+
+
+  .publication-summary {
+    grid-template-columns: 1fr;
+  }
+
+
+  .publication-modal-box > h2 {
+    padding-right: 35px;
+
+    font-size: 28px;
+  }
+
+
+  #fiction-publication-fields {
+    padding: 17px;
+  }
+
+
+  .book-status-bookmark {
+    min-width: 68px;
+    height: 22px;
+
+    padding: 0 8px;
+
+    font-size: 7px;
+  }
 }
 </style>
