@@ -2260,7 +2260,7 @@ if (
 
       console.log(
   "PUBLICATION SUBMISSION CREATED:",
-  submission
+  submissionResult.data
 );
 
 window.location.href =
