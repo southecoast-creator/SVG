@@ -1,61 +1,93 @@
-async function openEditBook(book) {
+/* =========================
+   RESET COVER PREVIEW
+   THEN LOAD THIS BOOK'S COVER
+========================= */
 
-  /* =========================
-     RESET COVER INPUT STATE
-  ========================= */
+const fictionCoverInput =
+  document.getElementById("fiction-book-cover");
 
-  const fictionCoverInput =
-    document.getElementById("fiction-book-cover");
+const fictionCoverMessage =
+  document.getElementById("fiction-cover-message");
 
-  const fictionCoverMessage =
-    document.getElementById("fiction-cover-message");
+const fictionCoverPreview =
+  document.getElementById("fiction-cover-preview");
 
-  const fictionCoverPreview =
-    document.getElementById("fiction-cover-preview");
+const nonfictionCoverInput =
+  document.getElementById("book-cover");
 
-  const nonfictionCoverInput =
-    document.getElementById("book-cover");
+const nonfictionCoverMessage =
+  document.getElementById("cover-message");
 
-  const nonfictionCoverMessage =
-    document.getElementById("cover-message");
-
-  const nonfictionCoverPreview =
-    document.getElementById("cover-preview");
+const nonfictionCoverPreview =
+  document.getElementById("cover-preview");
 
 
-  if (fictionCoverInput) {
-    fictionCoverInput.value = "";
+/* Clear previous book's file selection */
+
+if (fictionCoverInput) {
+  fictionCoverInput.value = "";
+}
+
+if (nonfictionCoverInput) {
+  nonfictionCoverInput.value = "";
+}
+
+
+/* Clear previous preview */
+
+if (fictionCoverPreview) {
+  fictionCoverPreview.src = "";
+  fictionCoverPreview.style.display = "none";
+}
+
+if (nonfictionCoverPreview) {
+  nonfictionCoverPreview.src = "";
+  nonfictionCoverPreview.style.display = "none";
+}
+
+if (fictionCoverMessage) {
+  fictionCoverMessage.textContent = "";
+}
+
+if (nonfictionCoverMessage) {
+  nonfictionCoverMessage.textContent = "";
+}
+
+
+/* Load ONLY the cover belonging to this book */
+
+if (book.book_type === "fiction") {
+
+  if (book.cover_url && fictionCoverPreview) {
+
+    fictionCoverPreview.src =
+      book.cover_url;
+
+    fictionCoverPreview.style.display =
+      "block";
+
+    if (fictionCoverMessage) {
+      fictionCoverMessage.textContent =
+        "Current cover";
+    }
+
   }
 
-  if (fictionCoverMessage) {
-    fictionCoverMessage.textContent = "";
+} else {
+
+  if (book.cover_url && nonfictionCoverPreview) {
+
+    nonfictionCoverPreview.src =
+      book.cover_url;
+
+    nonfictionCoverPreview.style.display =
+      "block";
+
+    if (nonfictionCoverMessage) {
+      nonfictionCoverMessage.textContent =
+        "Current cover";
+    }
+
   }
 
-  if (fictionCoverPreview) {
-    fictionCoverPreview.src = "";
-    fictionCoverPreview.style.display = "none";
-  }
-
-
-  if (nonfictionCoverInput) {
-    nonfictionCoverInput.value = "";
-  }
-
-  if (nonfictionCoverMessage) {
-    nonfictionCoverMessage.textContent = "";
-  }
-
-  if (nonfictionCoverPreview) {
-    nonfictionCoverPreview.src = "";
-    nonfictionCoverPreview.style.display = "none";
-  }
-
-
-  /* =========================
-     YOUR EXISTING CODE
-  ========================= */
-
-  const editingId =
-    book.id;
-
-  // ...
+}
