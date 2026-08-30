@@ -1202,3 +1202,199 @@ body {
 }
 
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   LITDOM — BOOK COVER STATUS BOOKMARK
+========================================================= */
+
+/* The cover/header becomes the positioning area */
+.book-card-header {
+  position: relative;
+}
+
+
+/* The actual cover */
+.book-card-cover {
+  position: relative;
+  display: block;
+
+  overflow: visible;
+
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   STATUS BOOKMARK
+   The existing .book-status becomes the little label.
+========================================================= */
+
+.book-card-header .book-status {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: auto;
+  min-width: 58px;
+  height: 20px;
+
+  margin: 0;
+  padding: 0 8px;
+
+  border: none;
+  border-radius: 0 0 7px 0;
+
+  font-size: 7px;
+  font-weight: 900;
+
+  line-height: 1;
+  letter-spacing: .7px;
+
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  box-shadow:
+    2px 3px 7px rgba(0,0,0,.35);
+
+  box-sizing: border-box;
+}
+
+
+/* Tiny folded end */
+.book-card-header .book-status::after {
+  content: "";
+
+  position: absolute;
+
+  right: -5px;
+  bottom: -5px;
+
+  width: 6px;
+  height: 6px;
+
+  clip-path:
+    polygon(0 0, 100% 0, 100% 100%);
+
+  opacity: .8;
+}
+
+
+/* =========================================================
+   PUBLISHED
+========================================================= */
+
+.book-card-header .book-status.status-published {
+  background: #35C759;
+  color: #071108;
+}
+
+.book-card-header .book-status.status-published::after {
+  background: #187A32;
+}
+
+
+/* =========================================================
+   APPROVED
+========================================================= */
+
+.book-card-header .book-status.status-approved {
+  background: #35C759;
+  color: #071108;
+}
+
+.book-card-header .book-status.status-approved::after {
+  background: #187A32;
+}
+
+
+/* =========================================================
+   DRAFT
+========================================================= */
+
+.book-card-header .book-status.status-draft {
+  background: #3B82F6;
+  color: #FFFFFF;
+}
+
+.book-card-header .book-status.status-draft::after {
+  background: #174A94;
+}
+
+
+/* =========================================================
+   PENDING
+========================================================= */
+
+.book-card-header .book-status.status-pending {
+  background: #F2C94C;
+  color: #17120A;
+}
+
+.book-card-header .book-status.status-pending::after {
+  background: #A17B08;
+}
+
+
+/* =========================================================
+   CHANGES REQUESTED
+========================================================= */
+
+.book-card-header .book-status.status-changes_requested {
+  background: #F2994A;
+  color: #1C0D02;
+}
+
+.book-card-header .book-status.status-changes_requested::after {
+  background: #994E0A;
+}
+
+
+/* =========================================================
+   REJECTED
+========================================================= */
+
+.book-card-header .book-status.status-rejected {
+  background: #E5484D;
+  color: #FFFFFF;
+}
+
+.book-card-header .book-status.status-rejected::after {
+  background: #8F2025;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .book-card-header .book-status {
+    min-width: 52px;
+    height: 18px;
+
+    padding: 0 7px;
+
+    font-size: 6.5px;
+  }
+
+}
