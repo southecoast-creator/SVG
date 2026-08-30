@@ -3585,7 +3585,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     } = await supabaseClient
       .from("books")
       .select(
-  "id,title,description,genre,age_rating,cover_url,book_type,status,submission_status,type_details,created_at"
+  "id,title,description,genre,age_rating,cover_url,book_type,status,submission_status,type_details,created_at,total_word_count"
 )
       .eq("author_id", session.user.id)
       .order("created_at", {
