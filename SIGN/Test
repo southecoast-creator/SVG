@@ -34,3 +34,55 @@ if (
 
   return;
 }
+
+
+
+
+
+
+
+
+
+if (!books.length) {
+
+      booksList.innerHTML =
+        '<p class="empty-books">You haven\'t created any books yet.</p>';
+
+      return;
+
+    }
+
+
+    /* =========================
+       BATCH: PUBLICATION SUBMISSIONS
+       (one query for all books, replaces
+       N separate per-book queries)
+    ========================= */
+
+    const bookIds =
+      books.map(function (b) { return b.id; });
+
+    const {
+      data: existingSubmissions,
+      error: submissionsError
+    } = await supabaseClient
+      .from("book_submissions")
+      .select("book_id")
+      .in("book_id", bookIds);
+
+    if (submissionsError) {
+      console.error(
+        "PUBLICATION SUBMISSIONS BATCH ERROR:",
+        submissionsError
+      );
+    }
+
+    const submittedBookIds =
+      new Set(
+        (existingSubmissions || []).map(
+          function (s) { return s.book_id; }
+        )
+      );
+
+
+    booksList.innerHTML = "";
