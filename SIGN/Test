@@ -61,3 +61,59 @@
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   MODAL CLOSE BUTTON — CLEAN WHITE X
+========================================================= */
+
+.close-modal {
+  position: absolute;
+
+  top: 18px;
+  right: 20px;
+
+  width: auto;
+  height: auto;
+
+  padding: 0;
+
+  border: none !important;
+  border-radius: 0;
+
+  background: transparent !important;
+
+  color: #FFF8E7 !important;
+
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1;
+
+  cursor: pointer;
+
+  z-index: 20;
+
+  box-shadow: none !important;
+
+  transition:
+    color .18s ease,
+    transform .18s ease;
+}
+
+.close-modal:hover {
+  color: #F4D58D !important;
+
+  transform:
+    scale(1.12);
+}
