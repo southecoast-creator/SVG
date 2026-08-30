@@ -259,3 +259,134 @@
 
   font-weight: 900;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   LITDOM — TAG SELECTORS
+   Compact inline gold-outline pills
+========================================================= */
+
+#fiction-tag-chips,
+#nonfiction-tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+
+/* Individual tag */
+
+.fiction-tag,
+.nonfiction-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: auto;
+
+  padding: 5px 10px;
+
+  border: 1px solid rgba(212, 175, 55, .55);
+  border-radius: 999px;
+
+  background: #0B0B0F;
+
+  color: #FFF8E7;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease;
+}
+
+
+/* Hover */
+
+.fiction-tag:hover,
+.nonfiction-tag:hover {
+  border-color: var(--litdom-gold);
+
+  background: #111116;
+
+  color: var(--litdom-champagne);
+
+  transform: translateY(-1px);
+}
+
+
+/* SELECTED TAG */
+
+.fiction-tag.selected,
+.nonfiction-tag.selected {
+  background: var(--litdom-gold);
+
+  border-color: var(--litdom-champagne);
+
+  color: #0B0B0F;
+
+  font-weight: 900;
+
+  box-shadow:
+    0 0 10px rgba(212, 175, 55, .28),
+    0 0 22px rgba(212, 175, 55, .10);
+}
+
+
+/* Selected hover */
+
+.fiction-tag.selected:hover,
+.nonfiction-tag.selected:hover {
+  background: var(--litdom-champagne);
+
+  border-color: var(--litdom-champagne);
+
+  color: #0B0B0F;
+
+  box-shadow:
+    0 0 14px rgba(244, 213, 141, .38),
+    0 0 28px rgba(212, 175, 55, .14);
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+  #fiction-tag-chips,
+  #nonfiction-tag-chips {
+    gap: 6px;
+  }
+
+  .fiction-tag,
+  .nonfiction-tag {
+    padding: 5px 9px;
+
+    font-size: 10.5px;
+  }
+}
