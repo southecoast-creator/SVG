@@ -117,3 +117,107 @@
   transform:
     scale(1.12);
 }
+
+
+
+/* =========================================================
+   CREATE BOOK — FORM SPACING
+========================================================= */
+
+#create-book-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+
+/* Every form field gets breathing room */
+
+#create-book-form > label,
+#create-book-form > input,
+#create-book-form > textarea,
+#create-book-form > select,
+
+#create-book-form .type-field-group {
+  margin-bottom: 18px;
+}
+
+
+/* Labels have a little space before their input */
+
+#create-book-form label {
+  margin-top: 2px;
+  margin-bottom: 8px;
+}
+
+
+/* Groups keep their internal fields organized */
+
+#create-book-form .type-field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+#create-book-form .type-field-group > label {
+  margin-bottom: 8px;
+}
+
+
+/* =========================================================
+   DARK DROPDOWNS
+========================================================= */
+
+#create-book-form select,
+#book-genre,
+#age-rating,
+#fiction-subgenre,
+#nonfiction-subgenre,
+#intended-audience,
+#nonfiction-content-level {
+
+  background-color: #0E0E13 !important;
+
+  color: #FFF8E7 !important;
+
+  border: 1px solid #343129 !important;
+}
+
+
+/* Dropdown options */
+
+#create-book-form select option {
+  background: #17171C;
+  color: #FFF8E7;
+}
+
+
+/* Placeholder/default option */
+
+#create-book-form select:invalid,
+#create-book-form select option[value=""] {
+  color: #8F887B;
+}
+
+
+/* Give the select a little more visual weight */
+
+#create-book-form select {
+  min-height: 46px;
+
+  padding: 12px 14px;
+
+  border-radius: 12px;
+
+  outline: none;
+}
+
+
+/* Focus */
+
+#create-book-form select:focus {
+  border-color: var(--litdom-gold) !important;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(212,175,55,.10);
+}
