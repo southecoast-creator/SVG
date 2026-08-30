@@ -91,3 +91,64 @@ if (book.book_type === "fiction") {
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================
+   CHECK TOTAL WORD COUNT
+========================= */
+
+const {
+  data: bookData,
+  error: wordCountError
+} = await supabaseClient
+  .from("books")
+  .select("total_word_count")
+  .eq("id", book.id)
+  .single();
+
+
+if (wordCountError) {
+
+  console.error(
+    "PUBLICATION WORD COUNT ERROR:",
+    wordCountError
+  );
+
+  applyButton.style.display =
+    "none";
+
+  return;
+
+}
+
+
+const totalWords =
+  Number(
+    bookData.total_word_count
+  ) || 0;
+
+
+if (
+  totalWords >= 5000
+) {
+
+  applyButton.style.display =
+    "inline-flex";
+
+} else {
+
+  applyButton.style.display =
+    "none";
+
+}
