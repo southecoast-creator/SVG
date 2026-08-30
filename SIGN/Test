@@ -1,44 +1,136 @@
 /* =========================================================
-   LITDOM — PROPER CENTERED MODAL SYSTEM
+   CREATE / EDIT BOOK MODAL
 ========================================================= */
 
-.book-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-
-  display: none;
-
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  height: 100%;
-
-  padding: 20px;
-
-  box-sizing: border-box;
-
-  background: rgba(5, 5, 8, .82);
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  overflow-y: auto;
+#create-book-modal .book-modal-box {
+  width: min(620px, 94vw);
+  max-height: 90vh;
 }
 
-/* The modal itself */
-.book-modal-box {
-  position: relative;
+#create-book-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
 
-  width: min(560px, 94vw);
-  max-height: 90vh;
+#create-book-modal label {
+  margin-top: 10px;
+}
 
-  box-sizing: border-box;
+#create-book-modal textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+#create-book-modal select {
+  appearance: auto;
+}
+
+#save-book-button {
+  width: 100%;
+  min-height: 52px;
+
+  margin-top: 18px;
+  padding: 14px 20px;
+
+  font-size: 14px;
+  letter-spacing: .2px;
+
+  border-radius: 13px;
+}
+
+/* =========================================================
+   MANAGE CHAPTERS
+========================================================= */
+
+.manage-chapters-box {
+  width: min(680px, 94vw);
+}
+
+.manage-chapters-box .dashboard-label,
+.manage-chapters-box h2,
+.manage-chapters-box p,
+.manage-chapters-box span,
+.manage-chapters-box strong,
+.manage-chapters-box label {
+  color: inherit;
+}
+
+.manage-chapters-box h2 {
+  color: var(--litdom-ivory);
+  margin: 0 0 22px;
+}
+
+.chapter-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 0 0 20px;
+}
+
+.chapter-summary-item {
+  padding: 16px;
+
+  border:
+    1px solid
+    rgba(212,175,55,.16);
+
+  border-radius: 14px;
+
+  background: #0F0F14;
+
+  text-align: center;
+}
+
+.chapter-summary-item strong {
+  display: block;
+
+  color: var(--litdom-champagne);
+
+  font-size: 22px;
+}
+
+.chapter-summary-item span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #8F887B;
+
+  font-size: 11px;
+}
+
+#create-chapter-button {
+  width: 100%;
+
+  min-height: 46px;
+
+  margin-bottom: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #D4AF37,
+      #A98520
+    );
+
+  color: #0B0B0F;
+
+  border-color: var(--litdom-gold);
+
+  font-weight: 900;
+}
+
+/* =========================================================
+   CHAPTER EDITOR — POLISHED MODAL
+========================================================= */
+
+.chapter-editor-box {
+  width: min(900px, 94vw);
+
+  max-height: 92vh;
 
   padding: 30px;
-
-  overflow-y: auto;
 
   background:
     linear-gradient(
@@ -52,25 +144,118 @@
     rgba(212,175,55,.24);
 
   border-radius: 24px;
+}
+
+.chapter-editor-box label {
+  color: #D9CCB3;
+}
+
+#chapter-editor-book-title {
+  color: var(--litdom-ivory);
+}
+
+.chapter-editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 8px;
+
+  background: #0B0B0F;
+
+  border:
+    1px solid
+    #38342A;
+
+  border-radius: 12px 12px 0 0;
+}
+
+.chapter-format-button {
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border-radius: 8px;
+
+  background: #17171C;
+
+  border:
+    1px solid
+    #38342A;
+
+  color: #E8DDC8;
+
+  cursor: pointer;
+}
+
+.chapter-content-editor {
+  min-height: 420px;
+
+  padding: 18px;
+
+  box-sizing: border-box;
+
+  background: #0B0B0F;
+
+  border:
+    1px solid
+    #38342A;
+
+  border-top: none;
+
+  border-radius: 0 0 12px 12px;
 
   color: var(--litdom-ivory);
 
-  box-shadow:
-    0 30px 80px rgba(0,0,0,.60),
-    0 0 40px rgba(212,175,55,.07);
+  font-size: 16px;
+  line-height: 1.75;
 
-  animation:
-    litdomModalIn .22s ease-out;
+  outline: none;
 }
 
-@keyframes litdomModalIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(.98);
-  }
+.chapter-content-editor:empty::before {
+  content: attr(data-placeholder);
 
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  color: #625E55;
+
+  pointer-events: none;
+}
+
+.chapter-editor-footer {
+  margin-top: 18px;
+
+  padding-top: 16px;
+
+  border-top:
+    1px solid
+    rgba(255,255,255,.06);
+}
+
+#save-chapter-draft {
+  min-width: 150px;
+  min-height: 44px;
+
+  padding: 11px 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #D4AF37,
+      #A98520
+    );
+
+  color: #0B0B0F;
+
+  border:
+    1px solid
+    var(--litdom-gold);
+
+  border-radius: 12px;
+
+  font-weight: 900;
 }
