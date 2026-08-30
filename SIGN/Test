@@ -1,376 +1,50 @@
 /* =========================================================
-   CREATE / EDIT BOOK MODAL
+   BOOK CARD — KEEP TEXT CLEAR OF COVER
 ========================================================= */
 
-#create-book-modal .book-modal-box {
-  width: min(620px, 94vw);
-  max-height: 90vh;
-}
-
-#create-book-modal form {
+.book-card-header {
   display: flex;
-  flex-direction: column;
-  gap: 9px;
+  align-items: flex-start;
+  gap: 16px;
 }
 
-#create-book-modal label {
-  margin-top: 10px;
+.book-card-cover {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 88px;
 }
 
-#create-book-modal textarea {
-  min-height: 120px;
-  resize: vertical;
+.book-card-info {
+  position: relative;
+  z-index: 3;
+
+  min-width: 0;
+  flex: 1;
+
+  overflow: hidden;
 }
 
-#create-book-modal select {
-  appearance: auto;
+.book-card-info h3 {
+  position: relative;
+  z-index: 3;
+
+  margin: 1px 0 7px;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-#save-book-button {
-  width: 100%;
-  min-height: 52px;
-
-  margin-top: 18px;
-  padding: 14px 20px;
-
-  font-size: 14px;
-  letter-spacing: .2px;
-
-  border-radius: 13px;
-}
-
-/* =========================================================
-   MANAGE CHAPTERS
-========================================================= */
-
-.manage-chapters-box {
-  width: min(680px, 94vw);
-}
-
-.manage-chapters-box .dashboard-label,
-.manage-chapters-box h2,
-.manage-chapters-box p,
-.manage-chapters-box span,
-.manage-chapters-box strong,
-.manage-chapters-box label {
-  color: inherit;
-}
-
-.manage-chapters-box h2 {
-  color: var(--litdom-ivory);
-  margin: 0 0 22px;
-}
-
-.chapter-summary {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin: 0 0 20px;
-}
-
-.chapter-summary-item {
-  padding: 16px;
-
-  border:
-    1px solid
-    rgba(212,175,55,.16);
-
-  border-radius: 14px;
-
-  background: #0F0F14;
-
-  text-align: center;
-}
-
-.chapter-summary-item strong {
-  display: block;
-
-  color: var(--litdom-champagne);
-
-  font-size: 22px;
-}
-
-.chapter-summary-item span {
-  display: block;
-
-  margin-top: 4px;
-
-  color: #8F887B;
-
-  font-size: 11px;
-}
-
-#create-chapter-button {
-  width: 100%;
-
-  min-height: 46px;
-
-  margin-bottom: 18px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #D4AF37,
-      #A98520
-    );
-
-  color: #0B0B0F;
-
-  border-color: var(--litdom-gold);
-
-  font-weight: 900;
-}
-
-/* =========================================================
-   CHAPTER EDITOR — POLISHED MODAL
-========================================================= */
-
-.chapter-editor-box {
-  width: min(900px, 94vw);
-
-  max-height: 92vh;
-
-  padding: 30px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #1A1A20,
-      #111116
-    );
-
-  border:
-    1px solid
-    rgba(212,175,55,.24);
-
-  border-radius: 24px;
-}
-
-.chapter-editor-box label {
-  color: #D9CCB3;
-}
-
-#chapter-editor-book-title {
-  color: var(--litdom-ivory);
-}
-
-.chapter-editor-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-
-  padding: 8px;
-
-  background: #0B0B0F;
-
-  border:
-    1px solid
-    #38342A;
-
-  border-radius: 12px 12px 0 0;
-}
-
-.chapter-format-button {
-  width: 34px;
-  height: 34px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border-radius: 8px;
-
-  background: #17171C;
-
-  border:
-    1px solid
-    #38342A;
-
-  color: #E8DDC8;
-
-  cursor: pointer;
-}
-
-.chapter-content-editor {
-  min-height: 420px;
-
-  padding: 18px;
-
-  box-sizing: border-box;
-
-  background: #0B0B0F;
-
-  border:
-    1px solid
-    #38342A;
-
-  border-top: none;
-
-  border-radius: 0 0 12px 12px;
-
-  color: var(--litdom-ivory);
-
-  font-size: 16px;
-  line-height: 1.75;
-
-  outline: none;
-}
-
-.chapter-content-editor:empty::before {
-  content: attr(data-placeholder);
-
-  color: #625E55;
-
-  pointer-events: none;
-}
-
-.chapter-editor-footer {
-  margin-top: 18px;
-
-  padding-top: 16px;
-
-  border-top:
-    1px solid
-    rgba(255,255,255,.06);
-}
-
-#save-chapter-draft {
-  min-width: 150px;
-  min-height: 44px;
-
-  padding: 11px 18px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #D4AF37,
-      #A98520
-    );
-
-  color: #0B0B0F;
-
-  border:
-    1px solid
-    var(--litdom-gold);
-
-  border-radius: 12px;
-
-  font-weight: 900;
+.book-card-info .book-meta,
+.book-card-info .book-status {
+  position: relative;
+  z-index: 3;
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =========================================================
-   LITDOM — TAG SELECTORS
-   Compact inline gold-outline pills
-========================================================= */
-
-#fiction-tag-chips,
-#nonfiction-tag-chips {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 7px;
-  margin-top: 10px;
-}
-
-
-/* Individual tag */
-
-.fiction-tag,
-.nonfiction-tag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: auto;
-
-  padding: 5px 10px;
-
-  border: 1px solid rgba(212, 175, 55, .55);
-  border-radius: 999px;
-
-  background: #0B0B0F;
-
-  color: #FFF8E7;
-
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.2;
-
-  white-space: nowrap;
-
-  cursor: pointer;
-
-  transition:
-    background .18s ease,
-    border-color .18s ease,
-    color .18s ease,
-    box-shadow .18s ease,
-    transform .18s ease;
-}
-
-
-/* Hover */
-
-.fiction-tag:hover,
-.nonfiction-tag:hover {
-  border-color: var(--litdom-gold);
-
-  background: #111116;
-
-  color: var(--litdom-champagne);
-
-  transform: translateY(-1px);
-}
-
-
-/* SELECTED TAG */
-
-.fiction-tag.selected,
-.nonfiction-tag.selected {
-  background: var(--litdom-gold);
-
-  border-color: var(--litdom-champagne);
-
-  color: #0B0B0F;
-
-  font-weight: 900;
-
-  box-shadow:
-    0 0 10px rgba(212, 175, 55, .28),
-    0 0 22px rgba(212, 175, 55, .10);
-}
-
-
-/* Selected hover */
-
-.fiction-tag.selected:hover,
-.nonfiction-tag.selected:hover {
-  background: var(--litdom-champagne);
-
-  border-color: var(--litdom-champagne);
-
-  color: #0B0B0F;
-
-  box-shadow:
-    0 0 14px rgba(244, 213, 141, .38),
-    0 0 28px rgba(212, 175, 55, .14);
+/* When there is no actual cover,
+   keep the information in its own column */
+.book-card-header .book-card-info {
+  min-width: 0;
 }
 
 
@@ -378,15 +52,12 @@
 
 @media (max-width: 600px) {
 
-  #fiction-tag-chips,
-  #nonfiction-tag-chips {
-    gap: 6px;
+  .book-card-header {
+    gap: 12px;
   }
 
-  .fiction-tag,
-  .nonfiction-tag {
-    padding: 5px 9px;
-
-    font-size: 10.5px;
+  .book-card-cover {
+    flex: 0 0 76px;
   }
+
 }
