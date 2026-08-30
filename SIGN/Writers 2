@@ -2277,3 +2277,342 @@ window.location.href =
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+/* =========================================================
+   LITDOM BRAND THEME — OVERRIDE LAYER
+========================================================= */
+
+body {
+  background: #0B0B0F;
+}
+
+#author-dashboard {
+  background: #0B0B0F;
+  color: #FFF8E7;
+}
+
+.dashboard-label {
+  color: #8C7625;
+}
+
+.dashboard-header h1 {
+  color: #FFF8E7;
+}
+
+#author-name {
+  color: #B9AE9A;
+}
+
+#logout-button {
+  background: #17171C;
+  border: 1px solid #8C7625;
+  color: #FFF8E7;
+}
+
+#logout-button:hover {
+  background: #1f1f26;
+  border-color: #D4AF37;
+}
+
+.dashboard-actions button {
+  background: #17171C;
+  border: 1px solid #8C7625;
+  color: #FFF8E7;
+}
+
+.dashboard-actions button:hover {
+  border-color: #D4AF37;
+  background: #1c1c22;
+}
+
+.dashboard-actions span {
+  color: #D4AF37;
+}
+
+.section-heading h2 {
+  color: #FFF8E7;
+}
+
+#book-count {
+  color: #B9AE9A;
+}
+
+/* BOOK CARDS */
+
+.book-card {
+  background: #17171C;
+  border: 1px solid #2a2a30;
+}
+
+.book-card h3,
+.book-card-info h3 {
+  color: #FFF8E7;
+}
+
+.book-meta {
+  color: #B9AE9A;
+}
+
+.book-tag {
+  background: #1f1f26;
+  color: #F4D58D;
+  border: 1px solid #8C7625;
+}
+
+.book-action-button {
+  background: #0B0B0F;
+  border: 1px solid #8C7625;
+  color: #FFF8E7;
+}
+
+.book-action-button:hover {
+  background: #1c1c22;
+  border-color: #D4AF37;
+  color: #F4D58D;
+}
+
+.empty-books,
+.empty-chapters {
+  color: #B9AE9A;
+}
+
+/* STATUS BADGES — book cards */
+
+.book-status {
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.book-status.status-draft {
+  background: rgba(90, 140, 255, 0.15);
+  color: #7FA8FF;
+}
+
+.book-status.status-pending {
+  background: rgba(244, 213, 141, 0.15);
+  color: #F4D58D;
+}
+
+.book-status.status-changes_requested {
+  background: rgba(244, 213, 141, 0.15);
+  color: #F4D58D;
+}
+
+.book-status.status-approved {
+  background: rgba(90, 200, 130, 0.15);
+  color: #6FDB9B;
+}
+
+.book-status.status-published {
+  background: rgba(90, 200, 130, 0.15);
+  color: #6FDB9B;
+}
+
+.book-status.status-rejected {
+  background: rgba(220, 90, 90, 0.15);
+  color: #F0908C;
+}
+
+/* CHAPTER STATUS BADGES */
+
+.chapter-status.draft {
+  background: rgba(90, 140, 255, 0.15);
+  color: #7FA8FF;
+}
+
+.chapter-status.changes-requested {
+  background: rgba(244, 213, 141, 0.15);
+  color: #F4D58D;
+}
+
+.chapter-status.published {
+  background: rgba(90, 200, 130, 0.15);
+  color: #6FDB9B;
+}
+
+/* MODALS */
+
+.book-modal-box,
+.publication-modal-box,
+.chapter-editor-box {
+  background: #17171C;
+  color: #FFF8E7;
+  border: 1px solid #2a2a30;
+}
+
+.close-modal,
+.publication-close {
+  color: #B9AE9A;
+  background: #0B0B0F;
+}
+
+.close-modal:hover,
+.publication-close:hover {
+  color: #F4D58D;
+  background: #1c1c22;
+}
+
+.book-modal-box label,
+.publication-modal-box label,
+.type-field-group label {
+  color: #F4D58D;
+}
+
+.book-modal-box input,
+.book-modal-box textarea,
+.book-modal-box select,
+.publication-modal-box input,
+.publication-modal-box textarea,
+.publication-modal-box select,
+.type-field-group input,
+.type-field-group select,
+#create-book-form select {
+  background: #0B0B0F;
+  border: 1px solid #8C7625;
+  color: #FFF8E7;
+}
+
+.book-modal-box input:focus,
+.book-modal-box textarea:focus,
+.book-modal-box select:focus,
+.publication-modal-box input:focus,
+.publication-modal-box textarea:focus,
+.publication-modal-box select:focus {
+  border-color: #D4AF37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+#save-book-button,
+#submit-publication-application {
+  background: linear-gradient(135deg, #D4AF37, #B9962E);
+  color: #0B0B0F;
+  font-weight: 800;
+}
+
+#save-book-button:hover,
+#submit-publication-application:hover {
+  filter: brightness(1.08);
+}
+
+.fiction-tag,
+.nonfiction-tag {
+  background: #0B0B0F;
+  border: 1px solid #8C7625;
+  color: #FFF8E7;
+}
+
+.fiction-tag.selected,
+.nonfiction-tag.selected {
+  background: rgba(212, 175, 55, 0.18);
+  border-color: #D4AF37;
+  color: #F4D58D;
+}
+
+.cover-upload-box {
+  background: #0B0B0F;
+  border: 2px dashed #8C7625;
+}
+
+.cover-upload-box:hover {
+  border-color: #D4AF37;
+  background: #17171C;
+}
+
+.cover-upload-icon {
+  background: #2a2416;
+  color: #F4D58D;
+}
+
+/* CHAPTER EDITOR */
+
+.chapter-editor-toolbar {
+  background: #0B0B0F;
+  border-color: #8C7625;
+}
+
+.chapter-format-button {
+  background: #17171C;
+  border-color: #8C7625;
+  color: #FFF8E7;
+}
+
+.chapter-format-button:hover {
+  background: #1f1f26;
+  border-color: #D4AF37;
+}
+
+.chapter-content-editor,
+#chapter-content {
+  background: #0B0B0F;
+  border-color: #8C7625;
+  color: #FFF8E7;
+}
+
+.chapter-content-editor:focus,
+#chapter-content:focus,
+#chapter-number:focus,
+#chapter-title:focus {
+  border-color: #D4AF37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+#chapter-number,
+#chapter-title {
+  background: #0B0B0F;
+  border-color: #8C7625;
+  color: #FFF8E7;
+}
+
+#delete-chapter-request {
+  border-color: #F0908C;
+  color: #F0908C;
+  background: transparent;
+}
+
+#delete-chapter-request:hover {
+  background: #F0908C;
+  color: #0B0B0F;
+}
+
+.publication-summary > div {
+  background: #0B0B0F;
+  border: 1px solid #8C7625;
+}
+
+.publication-summary span {
+  color: #B9AE9A;
+}
+
+.publication-summary strong {
+  color: #F4D58D;
+}
+
+.publication-agreements {
+  background: #0B0B0F;
+  border: 1px solid #8C7625;
+}
+
+.publication-check {
+  color: #FFF8E7 !important;
+}
+
+.publication-modal-box h3,
+.publication-modal-box h4 {
+  color: #F4D58D;
+}
+</style>
+
+
+
