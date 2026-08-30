@@ -1,8 +1,6 @@
-<style>
 /* =========================================================
    LITDOM — PUBLICATION APPLICATION
-   Brand System
-   Scoped ONLY to the publication modal
+   LIGHT BRAND STYLE
 ========================================================= */
 
 .publication-modal {
@@ -16,10 +14,10 @@
 
   padding: 20px;
 
-  background: rgba(11, 11, 15, 0.86);
+  background: rgba(11, 11, 15, 0.62);
 
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
   overflow-y: auto;
 }
@@ -33,7 +31,6 @@
   position: relative;
 
   width: min(720px, 100%);
-
   max-height: 92vh;
   overflow-y: auto;
 
@@ -42,20 +39,20 @@
   background:
     linear-gradient(
       145deg,
-      #17171C 0%,
-      #111116 52%,
-      #0B0B0F 100%
+      #ffffff 0%,
+      #fffdf8 55%,
+      #fff8e7 100%
     );
 
-  border: 1px solid rgba(212, 175, 55, 0.22);
+  border: 1px solid rgba(212, 175, 55, 0.28);
 
   border-radius: 28px;
 
   box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.60),
-    0 10px 35px rgba(212, 175, 55, 0.08);
+    0 30px 80px rgba(11, 11, 15, 0.25),
+    0 10px 30px rgba(212, 175, 55, 0.10);
 
-  color: #FFF8E7;
+  color: #17171C;
 
   box-sizing: border-box;
 
@@ -66,6 +63,7 @@
 
 
 @keyframes publicationModalIn {
+
   from {
     opacity: 0;
     transform:
@@ -79,6 +77,7 @@
       translateY(0)
       scale(1);
   }
+
 }
 
 
@@ -95,12 +94,12 @@
   width: 42px;
   height: 42px;
 
-  border: 1px solid rgba(212, 175, 55, 0.18);
+  border: 1px solid #eadfbd;
   border-radius: 50%;
 
-  background: #17171C;
+  background: #fff8e7;
 
-  color: #F4D58D;
+  color: #6f5a1c;
 
   font-size: 25px;
   line-height: 1;
@@ -116,11 +115,12 @@
 
 
 .publication-close:hover {
-  background: #211F18;
 
-  color: #FFF8E7;
+  background: #f4d58d;
 
-  border-color: rgba(212, 175, 55, 0.50);
+  color: #17171C;
+
+  border-color: #d4af37;
 
   transform:
     rotate(8deg)
@@ -133,9 +133,10 @@
 ========================================================= */
 
 .publication-label {
+
   margin: 0 0 8px;
 
-  color: #F4D58D;
+  color: #8c7625;
 
   font-size: 11px;
   font-weight: 800;
@@ -147,9 +148,10 @@
 
 
 .publication-modal-box > h2 {
+
   margin: 0;
 
-  color: #FFF8E7;
+  color: #17171C;
 
   font-size: clamp(28px, 5vw, 38px);
 
@@ -160,9 +162,10 @@
 
 
 .publication-book-name {
+
   margin: 10px 0 25px;
 
-  color: #B8AA8B;
+  color: #827969;
 
   font-size: 15px;
 }
@@ -173,6 +176,7 @@
 ========================================================= */
 
 .publication-summary {
+
   display: grid;
 
   grid-template-columns:
@@ -185,6 +189,7 @@
 
 
 .publication-summary > div {
+
   padding: 17px 18px;
 
   border-radius: 18px;
@@ -192,20 +197,21 @@
   background:
     linear-gradient(
       135deg,
-      #17171C,
-      #1D1B18
+      #fffdf8,
+      #fff8e7
     );
 
-  border: 1px solid rgba(212, 175, 55, 0.16);
+  border: 1px solid #eadfbd;
 }
 
 
 .publication-summary span {
+
   display: block;
 
   margin-bottom: 5px;
 
-  color: #9F967F;
+  color: #9a8961;
 
   font-size: 11px;
   font-weight: 700;
@@ -217,7 +223,8 @@
 
 
 .publication-summary strong {
-  color: #FFF8E7;
+
+  color: #3f3517;
 
   font-size: 16px;
 }
@@ -228,19 +235,21 @@
 ========================================================= */
 
 .publication-modal-box h3 {
+
   position: relative;
 
   margin: 34px 0 8px;
 
   padding-left: 14px;
 
-  color: #F4D58D;
+  color: #4f4017;
 
   font-size: 20px;
 }
 
 
 .publication-modal-box h3::before {
+
   content: "";
 
   position: absolute;
@@ -256,16 +265,17 @@
   background:
     linear-gradient(
       180deg,
-      #F4D58D,
-      #8C7625
+      #d4af37,
+      #8c7625
     );
 }
 
 
 .publication-modal-box h4 {
+
   margin: 28px 0 15px;
 
-  color: #D4AF37;
+  color: #765f1d;
 
   font-size: 16px;
 }
@@ -276,9 +286,10 @@
 ========================================================= */
 
 .publication-section-note {
+
   margin: 0 0 20px;
 
-  color: #A9A092;
+  color: #8c8273;
 
   font-size: 13px;
 
@@ -292,12 +303,13 @@
 
 .publication-modal-box form > label,
 .publication-modal-box label[for] {
+
   display: block;
 
   margin:
     18px 0 7px;
 
-  color: #E8DDC8;
+  color: #493f32;
 
   font-size: 13px;
   font-weight: 700;
@@ -318,19 +330,21 @@ input[type="tel"],
 select,
 .publication-modal-box
 textarea {
+
   width: 100%;
 
   box-sizing: border-box;
 
-  border: 1px solid #302D25;
+  border: 1px solid #e6dcc6;
 
   border-radius: 15px;
 
-  background: #111116;
+  background: #ffffff;
 
-  color: #FFF8E7;
+  color: #29251f;
 
-  padding: 14px 16px;
+  padding:
+    14px 16px;
 
   font-family: inherit;
 
@@ -354,11 +368,13 @@ input[type="email"],
 input[type="tel"],
 .publication-modal-box
 select {
+
   min-height: 50px;
 }
 
 
 .publication-modal-box textarea {
+
   min-height: 120px;
 
   resize: vertical;
@@ -371,7 +387,8 @@ select {
 input::placeholder,
 .publication-modal-box
 textarea::placeholder {
-  color: #716B60;
+
+  color: #b1a798;
 }
 
 
@@ -389,13 +406,14 @@ input[type="tel"]:focus,
 select:focus,
 .publication-modal-box
 textarea:focus {
-  border-color: #D4AF37;
 
-  background: #15140F;
+  border-color: #d4af37;
+
+  background: #fffdf8;
 
   box-shadow:
     0 0 0 4px
-    rgba(212, 175, 55, 0.10);
+    rgba(212, 175, 55, 0.12);
 
   transform:
     translateY(-1px);
@@ -407,6 +425,7 @@ textarea:focus {
 ========================================================= */
 
 #fiction-publication-fields {
+
   margin-top: 30px;
 
   padding: 22px;
@@ -416,11 +435,11 @@ textarea:focus {
   background:
     linear-gradient(
       145deg,
-      #17171C,
-      #121216
+      #fffdf8,
+      #fff8e7
     );
 
-  border: 1px solid rgba(212, 175, 55, 0.15);
+  border: 1px solid #eadfbd;
 }
 
 
@@ -429,19 +448,21 @@ textarea:focus {
 ========================================================= */
 
 .publication-agreements {
+
   margin-top: 32px;
 
   padding: 20px;
 
   border-radius: 20px;
 
-  background: #121216;
+  background: #fffdf9;
 
-  border: 1px solid #2C2923;
+  border: 1px solid #e9dfca;
 }
 
 
 .publication-check {
+
   display: flex !important;
 
   align-items: flex-start;
@@ -450,7 +471,7 @@ textarea:focus {
 
   margin: 0 0 15px !important;
 
-  color: #BEB5A5 !important;
+  color: #675f52 !important;
 
   font-size: 13px !important;
 
@@ -461,11 +482,13 @@ textarea:focus {
 
 
 .publication-check:last-child {
+
   margin-bottom: 0 !important;
 }
 
 
 .publication-check input[type="checkbox"] {
+
   flex: 0 0 auto;
 
   width: 18px;
@@ -473,13 +496,14 @@ textarea:focus {
 
   margin-top: 2px;
 
-  accent-color: #D4AF37;
+  accent-color: #d4af37;
 
   cursor: pointer;
 }
 
 
 .publication-check span {
+
   cursor: pointer;
 }
 
@@ -489,6 +513,7 @@ textarea:focus {
 ========================================================= */
 
 #submit-publication-application {
+
   width: 100%;
 
   min-height: 56px;
@@ -497,31 +522,31 @@ textarea:focus {
 
   padding: 15px 22px;
 
-  border: 1px solid #D4AF37;
+  border: 1px solid #d4af37;
 
   border-radius: 17px;
 
   background:
     linear-gradient(
       135deg,
-      #D4AF37,
-      #A98520
+      #d4af37,
+      #b89125
     );
 
-  color: #0B0B0F;
+  color: #17171C;
 
   font-family: inherit;
 
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 800;
 
   letter-spacing: 0.2px;
 
   cursor: pointer;
 
   box-shadow:
-    0 12px 28px
-    rgba(212, 175, 55, 0.18);
+    0 12px 24px
+    rgba(140, 118, 37, 0.18);
 
   transition:
     transform 0.2s ease,
@@ -531,18 +556,20 @@ textarea:focus {
 
 
 #submit-publication-application:hover {
+
   transform:
     translateY(-2px);
 
   box-shadow:
-    0 16px 35px
-    rgba(212, 175, 55, 0.25);
+    0 16px 30px
+    rgba(140, 118, 37, 0.25);
 
-  filter: brightness(1.06);
+  filter: brightness(1.04);
 }
 
 
 #submit-publication-application:active {
+
   transform:
     translateY(0)
     scale(0.99);
@@ -554,13 +581,14 @@ textarea:focus {
 ========================================================= */
 
 #publication-application-message {
+
   margin: 15px 0 0;
 
   padding: 0;
 
   text-align: center;
 
-  color: #CDBF9D;
+  color: #806b35;
 
   font-size: 13px;
 
@@ -571,209 +599,32 @@ textarea:focus {
 
 
 /* =========================================================
-   STATUS COLORS
-   Semantic colors intentionally remain distinct
-   from Litdom's brand gold.
-========================================================= */
-
-:root {
-  --status-published: #35C759;
-  --status-approved: #35C759;
-
-  --status-draft: #3B82F6;
-
-  --status-pending: #F2C94C;
-
-  --status-changes: #F2994A;
-
-  --status-rejected: #E5484D;
-}
-
-
-/* =========================================================
-   CORNER BOOKMARK
-   Small status marker for book covers
-========================================================= */
-
-.book-status-bookmark {
-  position: absolute;
-
-  top: 0;
-  left: 0;
-
-  z-index: 5;
-
-  display: inline-flex;
-
-  align-items: center;
-  justify-content: center;
-
-  min-width: 76px;
-  height: 24px;
-
-  padding: 0 10px;
-
-  border-radius:
-    0 0 8px 0;
-
-  font-size: 8px;
-  font-weight: 900;
-
-  line-height: 1;
-
-  letter-spacing: 0.8px;
-
-  text-transform: uppercase;
-
-  white-space: nowrap;
-
-  box-sizing: border-box;
-
-  box-shadow:
-    2px 3px 8px rgba(0, 0, 0, 0.25);
-
-  transform-origin: top left;
-}
-
-
-/* Small folded corner behind the bookmark */
-
-.book-status-bookmark::after {
-  content: "";
-
-  position: absolute;
-
-  right: -7px;
-  bottom: -7px;
-
-  width: 8px;
-  height: 8px;
-
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
-
-  opacity: 0.65;
-}
-
-
-/* =========================================================
-   APPROVED
-========================================================= */
-
-.book-status-bookmark.approved {
-  background: var(--status-approved);
-
-  color: #071108;
-}
-
-
-.book-status-bookmark.approved::after {
-  background: #187A32;
-}
-
-
-/* =========================================================
-   PUBLISHED
-========================================================= */
-
-.book-status-bookmark.published {
-  background: var(--status-published);
-
-  color: #071108;
-}
-
-
-.book-status-bookmark.published::after {
-  background: #187A32;
-}
-
-
-/* =========================================================
-   DRAFT
-========================================================= */
-
-.book-status-bookmark.draft {
-  background: var(--status-draft);
-
-  color: #FFFFFF;
-}
-
-
-.book-status-bookmark.draft::after {
-  background: #174A94;
-}
-
-
-/* =========================================================
-   PENDING
-========================================================= */
-
-.book-status-bookmark.pending {
-  background: var(--status-pending);
-
-  color: #1C1603;
-}
-
-
-.book-status-bookmark.pending::after {
-  background: #A17B08;
-}
-
-
-/* =========================================================
-   CHANGES REQUESTED
-========================================================= */
-
-.book-status-bookmark.changes-requested {
-  background: var(--status-changes);
-
-  color: #1C0D02;
-}
-
-
-.book-status-bookmark.changes-requested::after {
-  background: #994E0A;
-}
-
-
-/* =========================================================
-   REJECTED
-========================================================= */
-
-.book-status-bookmark.rejected {
-  background: var(--status-rejected);
-
-  color: #FFFFFF;
-}
-
-
-.book-status-bookmark.rejected::after {
-  background: #8F2025;
-}
-
-
-/* =========================================================
    SCROLLBAR
 ========================================================= */
 
 .publication-modal-box::-webkit-scrollbar {
+
   width: 7px;
 }
 
 
 .publication-modal-box::-webkit-scrollbar-track {
+
   background: transparent;
 }
 
 
 .publication-modal-box::-webkit-scrollbar-thumb {
-  background: #514A3A;
+
+  background: #d8c99f;
 
   border-radius: 20px;
 }
 
 
 .publication-modal-box::-webkit-scrollbar-thumb:hover {
-  background: #8C7625;
+
+  background: #b99b43;
 }
 
 
@@ -784,6 +635,7 @@ textarea:focus {
 @media (max-width: 600px) {
 
   .publication-modal {
+
     align-items: flex-start;
 
     padding: 10px;
@@ -791,6 +643,7 @@ textarea:focus {
 
 
   .publication-modal-box {
+
     width: 100%;
 
     max-height: 96vh;
@@ -802,6 +655,7 @@ textarea:focus {
 
 
   .publication-close {
+
     top: 12px;
     right: 12px;
 
@@ -811,11 +665,13 @@ textarea:focus {
 
 
   .publication-summary {
+
     grid-template-columns: 1fr;
   }
 
 
   .publication-modal-box > h2 {
+
     padding-right: 35px;
 
     font-size: 28px;
@@ -823,17 +679,7 @@ textarea:focus {
 
 
   #fiction-publication-fields {
+
     padding: 17px;
   }
-
-
-  .book-status-bookmark {
-    min-width: 68px;
-    height: 22px;
-
-    padding: 0 8px;
-
-    font-size: 7px;
-  }
 }
-</style>
