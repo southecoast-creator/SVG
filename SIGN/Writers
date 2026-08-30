@@ -3954,65 +3954,53 @@ card.appendChild(actions);
     
     
       /* =========================
-     CHECK WORD COUNT
-  ========================== */
+   CHECK TOTAL WORD COUNT
+========================= */
 
-  const {
-    data: chapters,
-    error
-  } = await supabaseClient
-    .from("chapters")
-    .select("word_count")
-    .eq(
-      "book_id",
-      book.id
-    );
+const {
+  data: bookData,
+  error: wordCountError
+} = await supabaseClient
+  .from("books")
+  .select("total_word_count")
+  .eq("id", book.id)
+  .single();
 
 
-  if (error) {
+if (wordCountError) {
 
-    console.error(
-      "PUBLICATION WORD COUNT ERROR:",
-      error
-    );
+  console.error(
+    "PUBLICATION WORD COUNT ERROR:",
+    wordCountError
+  );
 
-    applyButton.style.display =
-      "none";
+  applyButton.style.display =
+    "none";
 
-    return;
+  return;
 
-  }
-    
-    
-      const totalWords =
-    (chapters || []).reduce(
-      function (total, chapter) {
-
-        return total +
-          (
-            Number(
-              chapter.word_count
-            ) || 0
-          );
-
-      },
-      0
-    );
+}
 
 
-  if (
-    totalWords >= 5000
-  ) {
+const totalWords =
+  Number(
+    bookData.total_word_count
+  ) || 0;
 
-    applyButton.style.display =
-      "inline-flex";
 
-  } else {
+if (
+  totalWords >= 5000
+) {
 
-    applyButton.style.display =
-      "none";
+  applyButton.style.display =
+    "inline-flex";
 
-  }
+} else {
+
+  applyButton.style.display =
+    "none";
+
+}
 
 }
   
