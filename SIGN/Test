@@ -1,154 +1,36 @@
-/* =========================
-   RESET COVER PREVIEW
-   THEN LOAD THIS BOOK'S COVER
-========================= */
-
-const fictionCoverInput =
-  document.getElementById("fiction-book-cover");
-
-const fictionCoverMessage =
-  document.getElementById("fiction-cover-message");
-
-const fictionCoverPreview =
-  document.getElementById("fiction-cover-preview");
-
-const nonfictionCoverInput =
-  document.getElementById("book-cover");
-
-const nonfictionCoverMessage =
-  document.getElementById("cover-message");
-
-const nonfictionCoverPreview =
-  document.getElementById("cover-preview");
-
-
-/* Clear previous book's file selection */
-
-if (fictionCoverInput) {
-  fictionCoverInput.value = "";
-}
-
-if (nonfictionCoverInput) {
-  nonfictionCoverInput.value = "";
-}
-
-
-/* Clear previous preview */
-
-if (fictionCoverPreview) {
-  fictionCoverPreview.src = "";
-  fictionCoverPreview.style.display = "none";
-}
-
-if (nonfictionCoverPreview) {
-  nonfictionCoverPreview.src = "";
-  nonfictionCoverPreview.style.display = "none";
-}
-
-if (fictionCoverMessage) {
-  fictionCoverMessage.textContent = "";
-}
-
-if (nonfictionCoverMessage) {
-  nonfictionCoverMessage.textContent = "";
-}
-
-
-/* Load ONLY the cover belonging to this book */
-
-if (book.book_type === "fiction") {
-
-  if (book.cover_url && fictionCoverPreview) {
-
-    fictionCoverPreview.src =
-      book.cover_url;
-
-    fictionCoverPreview.style.display =
-      "block";
-
-    if (fictionCoverMessage) {
-      fictionCoverMessage.textContent =
-        "Current cover";
-    }
-
-  }
-
-} else {
-
-  if (book.cover_url && nonfictionCoverPreview) {
-
-    nonfictionCoverPreview.src =
-      book.cover_url;
-
-    nonfictionCoverPreview.style.display =
-      "block";
-
-    if (nonfictionCoverMessage) {
-      nonfictionCoverMessage.textContent =
-        "Current cover";
-    }
-
-  }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =========================
-   CHECK TOTAL WORD COUNT
-========================= */
-
 const {
-  data: bookData,
-  error: wordCountError
-} = await supabaseClient
-  .from("books")
-  .select("total_word_count")
-  .eq("id", book.id)
-  .single();
+  error: bookStatusError
+} =
+  await supabaseClient
+    .from("books")
+    .update({
 
+      status:
+        "pending",
 
-if (wordCountError) {
+      submission_status:
+        "pending"
 
-  console.error(
-    "PUBLICATION WORD COUNT ERROR:",
-    wordCountError
-  );
-
-  applyButton.style.display =
-    "none";
-
-  return;
-
-}
-
-
-const totalWords =
-  Number(
-    bookData.total_word_count
-  ) || 0;
+    })
+    .eq(
+      "id",
+      submissionResult.data.id
+        ? bookId
+        : bookId
+    );
 
 
 if (
-  totalWords >= 5000
+  bookStatusError
 ) {
 
-  applyButton.style.display =
-    "inline-flex";
+  console.error(
+    "SUBMISSION STATUS UPDATE ERROR:",
+    bookStatusError
+  );
 
-} else {
+  message.textContent =
+    "Your application was submitted, but its review status could not be updated.";
 
-  applyButton.style.display =
-    "none";
-
+  return;
 }
