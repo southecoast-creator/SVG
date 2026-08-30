@@ -86,3 +86,38 @@ if (!books.length) {
 
 
     booksList.innerHTML = "";
+
+
+
+
+
+
+
+
+
+
+function setPublicationButtonVisibility(
+    book,
+    applyButton,
+    submittedBookIds
+  ) {
+
+    if (submittedBookIds.has(book.id)) {
+      applyButton.style.display = "none";
+      return;
+    }
+
+    if (book.status === "published") {
+      applyButton.style.display = "none";
+      return;
+    }
+
+    const totalWords =
+      Number(book.total_word_count) || 0;
+
+    applyButton.style.display =
+      totalWords >= 5000
+        ? "inline-flex"
+        : "none";
+
+  }
