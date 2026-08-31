@@ -1,131 +1,183 @@
-loadFollowerCount();
+/* =====================================================
+       LOAD WITHDRAWAL REQUESTS
+    ===================================================== */
 
-    loadInsightsForBook(insightsBookSelect.value);
+    const withdrawalsContainer =
+      document.getElementById("led-withdrawals");
 
-  }
+    const withdrawalCount =
+      document.getElementById("led-withdrawal-count");
 
-  async function handleWithdrawClick() {
-
-    const bookId = insightsBookSelect.value;
-
-    if (!bookId) {
-      alert("Please select a book first.");
-      return;
-    }
-
-    if (!currentBookEarnings || currentBookEarnings <= 0) {
-      alert("This book has no available earnings to withdraw.");
-      return;
-    }
-
-    withdrawButton.disabled = true;
-
-    const {
-      data: existingAccounts,
-      error: accountsError
-    } = await supabaseClient
-      .from("payout_accounts")
-      .select("id")
-      .eq("author_id", session.user.id)
-      .eq("is_primary", true)
-      .maybeSingle();
-
-    if (accountsError) {
-
-      console.error("PAYOUT ACCOUNT LOOKUP ERROR:", accountsError);
-
-      alert("Could not check your payout account. Please try again.");
-
-      withdrawButton.disabled = false;
-
-      return;
-
-    }
-
-    let payoutAccountId =
-      existingAccounts ? existingAccounts.id : null;
-
-    if (!payoutAccountId) {
-
-      const bankName =
-        prompt("Enter your bank name:");
-
-      if (!bankName) {
-        withdrawButton.disabled = false;
-        return;
-      }
-
-      const accountName =
-        prompt("Enter the account name:");
-
-      if (!accountName) {
-        withdrawButton.disabled = false;
-        return;
-      }
-
-      const accountNumber =
-        prompt("Enter the account number:");
-
-      if (!accountNumber) {
-        withdrawButton.disabled = false;
-        return;
-      }
+    async function loadWithdrawalRequests() {
 
       const {
-        data: newAccount,
-        error: createAccountError
+        data: withdrawals,
+        error: withdrawalsError
       } = await supabaseClient
-        .from("payout_accounts")
-        .insert({
-          author_id: session.user.id,
-          bank_name: bankName.trim(),
-          account_name: accountName.trim(),
-          account_number: accountNumber.trim(),
-          is_primary: true
-        })
-        .select("id")
-        .single();
+        .from("withdrawal_requests")
+        .select(
+          "id,author_id,payout_account_id,amount,currency,status,admin_note,requested_at,processed_at"
+        )
+        .order("requested_at", { ascending: false });
 
-      if (createAccountError) {
+      if (withdrawalsError) {
 
-        console.error("PAYOUT ACCOUNT CREATE ERROR:", createAccountError);
+        console.error("WITHDRAWALS LOAD ERROR:", withdrawalsError);
 
-        alert("Could not save your payout account. Please try again.");
-
-        withdrawButton.disabled = false;
+        withdrawalsContainer.innerHTML =
+          "<div class='led-message'>Could not load withdrawal requests.</div>";
 
         return;
 
       }
 
-      payoutAccountId = newAccount.id;
+      const rows = withdrawals || [];
 
-    }
+      withdrawalCount.textContent = rows.length;
 
-    const {
-      error: withdrawalError
-    } = await supabaseClient
-      .from("withdrawal_requests")
-      .insert({
-        author_id: session.user.id,
-        payout_account_id: payoutAccountId,
-        amount: currentBookEarnings,
-        currency: "NGN",
-        status: "pending"
+      if (rows.length === 0) {
+
+        withdrawalsContainer.innerHTML =
+          "<div class='led-message'>No withdrawal requests yet.</div>";
+
+        return;
+
+      }
+
+      const payoutAccountIds =
+        rows.map(function (r) { return r.payout_account_id; });
+
+      const {
+        data: accounts,
+        error: accountsError
+      } = await supabaseClient
+        .from("payout_accounts")
+        .select("id,bank_name,account_name,account_number")
+        .in("id", payoutAccountIds);
+
+      if (accountsError) {
+        console.error("PAYOUT ACCOUNTS LOAD ERROR:", accountsError);
+      }
+
+      const accountsById = {};
+
+      (accounts || []).forEach(function (acc) {
+        accountsById[acc.id] = acc;
       });
 
-    withdrawButton.disabled = false;
+      withdrawalsContainer.innerHTML = "";
 
-    if (withdrawalError) {
+      rows.forEach(function (request) {
 
-      console.error("WITHDRAWAL REQUEST ERROR:", withdrawalError);
+        const card =
+          document.createElement("div");
 
-      alert("Your withdrawal request could not be submitted. Please try again.");
+        card.className = "led-book-card";
+        card.style.display = "block";
 
-      return;
+        const account =
+          accountsById[request.payout_account_id] || {};
+
+        const title =
+          document.createElement("h3");
+
+        title.textContent =
+          (request.currency || "NGN") + " " +
+          Number(request.amount).toLocaleString();
+
+        const bankInfo =
+          document.createElement("p");
+
+        bankInfo.textContent =
+          (account.bank_name || "Unknown bank") + " \u2014 " +
+          (account.account_name || "Unknown name") + " \u2014 " +
+          (account.account_number || "Unknown number");
+
+        const requestedInfo =
+          document.createElement("p");
+
+        requestedInfo.textContent =
+          "Requested: " +
+          new Date(request.requested_at).toLocaleString();
+
+        const status =
+          document.createElement("span");
+
+        status.className = "led-status";
+
+        status.textContent = request.status || "pending";
+
+        card.appendChild(title);
+        card.appendChild(bankInfo);
+        card.appendChild(requestedInfo);
+        card.appendChild(status);
+
+        if (request.status === "pending") {
+
+          const markPaidButton =
+            document.createElement("button");
+
+          markPaidButton.type = "button";
+
+          markPaidButton.className = "led-action-button";
+
+          markPaidButton.textContent = "Mark as Paid";
+
+          markPaidButton.style.marginTop = "10px";
+
+          markPaidButton.style.display = "block";
+
+          markPaidButton.addEventListener("click", async function () {
+
+            const confirmed =
+              confirm("Confirm this withdrawal has been paid?");
+
+            if (!confirmed) {
+              return;
+            }
+
+            markPaidButton.disabled = true;
+
+            const {
+              error: updateError
+            } = await supabaseClient
+              .from("withdrawal_requests")
+              .update({
+                status: "paid",
+                processed_at: new Date().toISOString(),
+                processed_by: session.user.id
+              })
+              .eq("id", request.id);
+
+            if (updateError) {
+
+              console.error("WITHDRAWAL UPDATE ERROR:", updateError);
+
+              alert("Could not update this withdrawal request.");
+
+              markPaidButton.disabled = false;
+
+              return;
+
+            }
+
+            loadWithdrawalRequests();
+
+          });
+
+          card.appendChild(markPaidButton);
+
+        }
+
+        withdrawalsContainer.appendChild(card);
+
+      });
 
     }
 
-    alert("Withdrawal requested. You will receive your funds within the next 24 hours.");
+    loadWithdrawalRequests();
 
-  }
+
+    /* =====================================================
+       HELPER: BOOK DETAIL
+    ===================================================== */
