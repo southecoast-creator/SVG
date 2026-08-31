@@ -1,398 +1,424 @@
-/* =====================================================
-   DISPLAY BOOK
-===================================================== */
+<style>
 
-const titleElement =
-  document.getElementById(
-    "litdom-book-title"
-  );
+/* =========================================================
+   LITDOM PREMIUM BUTTON SYSTEM
+   Obsidian • Royal Gold • Champagne Gold
+========================================================= */
 
-const descriptionElement =
-  document.getElementById(
-    "litdom-book-description"
-  );
 
-const readMoreButton =
-  document.getElementById(
-    "litdom-read-more"
-  );
-
-const tagsContainer =
-  document.getElementById(
-    "litdom-book-tags"
-  );
-
-
-/* =====================================================
-   BOOK TITLE
-===================================================== */
-
-if (titleElement) {
-
-  titleElement.textContent =
-    book.title ||
-    "Untitled Book";
-
-}
-
-
-/* =====================================================
-   BOOK DESCRIPTION
-   Read More appears ONLY when the blurb
-   contains more than 100 words.
-===================================================== */
-
-const fullDescription =
-  String(
-    book.description ||
-    "No description available."
-  ).trim();
-
-
-const descriptionWords =
-  fullDescription
-    .split(/\s+/)
-    .filter(Boolean);
-
-
-const DESCRIPTION_LIMIT =
-  100;
-
-
-let descriptionExpanded =
-  false;
-
-
-function renderDescription() {
-
-  if (!descriptionElement) {
-    return;
-  }
-
-
-  /*
-     100 words or fewer:
-     show everything and hide Read More.
-  */
-
-  if (
-    descriptionWords.length <=
-    DESCRIPTION_LIMIT
-  ) {
-
-    descriptionElement.textContent =
-      fullDescription;
-
-    if (readMoreButton) {
-
-      readMoreButton.style.display =
-        "none";
-
-    }
-
-    return;
-  }
-
-
-  /*
-     More than 100 words:
-     show shortened version.
-  */
-
-  if (!descriptionExpanded) {
-
-    descriptionElement.textContent =
-      descriptionWords
-        .slice(
-          0,
-          DESCRIPTION_LIMIT
-        )
-        .join(" ") +
-      "...";
-
-    if (readMoreButton) {
-
-      readMoreButton.style.display =
-        "inline-flex";
-
-      readMoreButton.textContent =
-        "Read more";
-
-    }
-
-  } else {
-
-    /*
-       Expanded:
-       show the complete blurb.
-    */
-
-    descriptionElement.textContent =
-      fullDescription;
-
-    if (readMoreButton) {
-
-      readMoreButton.style.display =
-        "inline-flex";
-
-      readMoreButton.textContent =
-        "Show less";
-
-    }
-
-  }
-
-}
-
-
-/* Initial description */
-
-renderDescription();
-
-
-/* =====================================================
-   READ MORE / SHOW LESS
-===================================================== */
-
-if (readMoreButton) {
-
-  readMoreButton.addEventListener(
-    "click",
-    function () {
-
-      descriptionExpanded =
-        !descriptionExpanded;
-
-      renderDescription();
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   BOOK TAGS
-   Tags remain separate from the blurb
-   and are displayed as individual pills.
-===================================================== */
-
-if (tagsContainer) {
-
-  tagsContainer.replaceChildren();
-
-  const tags = [];
-
-
-  /* GENRE */
-
-  if (book.genre) {
-
-    tags.push(
-      String(book.genre).trim()
-    );
-
-  }
-
-
-  /* PROTAGONIST TAGS */
-
-  if (
-    Array.isArray(
-      book.protagonist_tags
-    )
-  ) {
-
-    book.protagonist_tags
-      .forEach(
-        function (tag) {
-
-          const cleanTag =
-            String(
-              tag || ""
-            ).trim();
-
-          if (
-            cleanTag &&
-            !tags.includes(cleanTag)
-          ) {
-
-            tags.push(
-              cleanTag
-            );
-
-          }
-
-        }
-      );
-
-  }
-
-
-  /* ANTAGONIST TAGS */
-
-  if (
-    Array.isArray(
-      book.antagonist_tags
-    )
-  ) {
-
-    book.antagonist_tags
-      .forEach(
-        function (tag) {
-
-          const cleanTag =
-            String(
-              tag || ""
-            ).trim();
-
-          if (
-            cleanTag &&
-            !tags.includes(cleanTag)
-          ) {
-
-            tags.push(
-              cleanTag
-            );
-
-          }
-
-        }
-      );
-
-  }
-
-
-  /*
-     Maximum of 8 pills.
-     This keeps the Book Page clean,
-     especially on mobile.
-  */
-
-  tags
-    .slice(0, 8)
-    .forEach(
-      function (tag) {
-
-        const pill =
-          document.createElement(
-            "span"
-          );
-
-        pill.className =
-          "litdom-book-tag";
-
-        pill.textContent =
-          tag;
-
-        tagsContainer.appendChild(
-          pill
-        );
-
-      }
-    );
-
-}
-
-
-/* =====================================================
-   LITDOM BOOK DESCRIPTION
-===================================================== */
-
-.litdom-book-description {
-  position: relative;
-}
-
-#litdom-book-description {
-  margin: 0;
-  color: #FFF8E7;
-  line-height: 1.75;
-}
-
-
-/* =====================================================
-   READ MORE
-===================================================== */
+/* =========================================================
+   READ MORE — PREMIUM SECONDARY BUTTON
+========================================================= */
 
 #litdom-read-more {
+  position: relative;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  margin-top: 12px;
-  padding: 8px 15px;
+  margin-top: 16px;
+  padding: 9px 18px;
 
-  border: 1px solid #8C7625;
-  border-radius: 999px;
+  min-height: 38px;
 
-  background: #17171C;
-  color: #F4D58D;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-#litdom-read-more:hover {
-  background: #0B0B0F;
-  border-color: #D4AF37;
-
-  box-shadow:
-    0 0 12px
-    rgba(212, 175, 55, 0.22);
-
-  transform: translateY(-1px);
-}
-
-#litdom-read-more:active {
-  transform: scale(0.97);
-}
-
-
-/* =====================================================
-   BOOK TAG PILLS
-===================================================== */
-
-#litdom-book-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  margin-top: 14px;
-}
-
-.litdom-book-tag {
-  display: inline-flex;
-  align-items: center;
-
-  min-height: 30px;
-  padding: 5px 11px;
-
-  border: 1px solid #8C7625;
+  border: 1px solid rgba(212, 175, 55, 0.55);
   border-radius: 999px;
 
   background:
     linear-gradient(
-      135deg,
-      #17171C,
-      #0B0B0F
+      145deg,
+      rgba(244, 213, 141, 0.10),
+      rgba(23, 23, 28, 0.96) 45%,
+      rgba(11, 11, 15, 0.98)
     );
 
   color: #F4D58D;
 
+  font-family: inherit;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
 
-  letter-spacing: 0.2px;
+  letter-spacing: 0.35px;
+
+  cursor: pointer;
+
+  overflow: hidden;
 
   box-shadow:
     inset 0 1px 0
-    rgba(244, 213, 141, 0.08);
+      rgba(255, 248, 231, 0.10),
+
+    inset 0 -1px 0
+      rgba(0, 0, 0, 0.45),
+
+    0 4px 14px
+      rgba(0, 0, 0, 0.20);
+
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease;
 }
+
+
+/* Subtle glossy highlight */
+
+#litdom-read-more::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -80%;
+
+  width: 55%;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      100deg,
+      transparent,
+      rgba(255, 248, 231, 0.16),
+      transparent
+    );
+
+  transform: skewX(-20deg);
+
+  transition:
+    left 0.55s ease;
+
+  pointer-events: none;
+}
+
+
+/* Hover */
+
+#litdom-read-more:hover {
+
+  transform:
+    translateY(-2px);
+
+  border-color:
+    #D4AF37;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(244, 213, 141, 0.16),
+      rgba(23, 23, 28, 0.98) 48%,
+      #0B0B0F
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 248, 231, 0.12),
+
+    0 7px 20px
+      rgba(0, 0, 0, 0.28),
+
+    0 0 16px
+      rgba(212, 175, 55, 0.16);
+}
+
+
+/* Gloss sweep */
+
+#litdom-read-more:hover::before {
+  left: 135%;
+}
+
+
+/* Press */
+
+#litdom-read-more:active {
+
+  transform:
+    translateY(0)
+    scale(0.96);
+
+  box-shadow:
+    inset 0 2px 5px
+      rgba(0, 0, 0, 0.35);
+}
+
+
+/* Keyboard accessibility */
+
+#litdom-read-more:focus-visible {
+
+  outline: none;
+
+  border-color:
+    #F4D58D;
+
+  box-shadow:
+    0 0 0 3px
+      rgba(212, 175, 55, 0.16),
+
+    0 0 18px
+      rgba(212, 175, 55, 0.20);
+}
+
+
+/* =========================================================
+   CONTINUE READING — PREMIUM PRIMARY BUTTON
+========================================================= */
+
+#litdom-continue-reading {
+
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  min-height: 52px;
+
+  margin-top: 22px;
+
+  padding: 13px 22px;
+
+  border: 1px solid
+    rgba(244, 213, 141, 0.75);
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #D4AF37 0%,
+      #F4D58D 42%,
+      #D4AF37 72%,
+      #8C7625 100%
+    );
+
+  color: #0B0B0F;
+
+  font-family: inherit;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  letter-spacing: 0.3px;
+
+  cursor: pointer;
+
+  overflow: hidden;
+
+  box-shadow:
+
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.55),
+
+    inset 0 -2px 0
+      rgba(91, 70, 10, 0.28),
+
+    0 7px 18px
+      rgba(0, 0, 0, 0.28),
+
+    0 0 22px
+      rgba(212, 175, 55, 0.18);
+
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    filter 0.22s ease;
+}
+
+
+/* =========================================================
+   CINEMATIC GLOSS
+========================================================= */
+
+#litdom-continue-reading::before {
+
+  content: "";
+
+  position: absolute;
+
+  top: -40%;
+  left: -65%;
+
+  width: 45%;
+  height: 180%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.38),
+      transparent
+    );
+
+  transform:
+    skewX(-22deg);
+
+  pointer-events: none;
+}
+
+
+/* Soft upper film highlight */
+
+#litdom-continue-reading::after {
+
+  content: "";
+
+  position: absolute;
+
+  top: 1px;
+  left: 8%;
+
+  width: 84%;
+  height: 45%;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0)
+    );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   CONTINUE READING HOVER
+========================================================= */
+
+#litdom-continue-reading:hover {
+
+  transform:
+    translateY(-2px);
+
+  filter:
+    brightness(1.05);
+
+  box-shadow:
+
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.65),
+
+    inset 0 -2px 0
+      rgba(91, 70, 10, 0.22),
+
+    0 10px 25px
+      rgba(0, 0, 0, 0.32),
+
+    0 0 30px
+      rgba(212, 175, 55, 0.28);
+}
+
+
+/* Gloss sweep */
+
+#litdom-continue-reading:hover::before {
+
+  left: 125%;
+
+  transition:
+    left 0.65s ease;
+}
+
+
+/* =========================================================
+   PRESS EFFECT
+========================================================= */
+
+#litdom-continue-reading:active {
+
+  transform:
+    translateY(1px)
+    scale(0.985);
+
+  filter:
+    brightness(0.98);
+
+  box-shadow:
+
+    inset 0 3px 7px
+      rgba(74, 55, 5, 0.30),
+
+    0 3px 9px
+      rgba(0, 0, 0, 0.20);
+}
+
+
+/* =========================================================
+   KEYBOARD ACCESSIBILITY
+========================================================= */
+
+#litdom-continue-reading:focus-visible {
+
+  outline: none;
+
+  box-shadow:
+
+    0 0 0 3px
+      rgba(11, 11, 15, 0.95),
+
+    0 0 0 5px
+      rgba(244, 213, 141, 0.75),
+
+    0 0 25px
+      rgba(212, 175, 55, 0.30);
+}
+
+
+/* =========================================================
+   MOBILE POLISH
+========================================================= */
+
+@media (max-width: 480px) {
+
+  #litdom-read-more {
+
+    min-height: 37px;
+
+    padding:
+      8px 16px;
+
+    font-size: 12px;
+
+  }
+
+
+  #litdom-continue-reading {
+
+    min-height: 54px;
+
+    margin-top: 20px;
+
+    border-radius: 13px;
+
+    font-size: 14px;
+
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  #litdom-read-more,
+  #litdom-continue-reading,
+  #litdom-read-more::before,
+  #litdom-continue-reading::before {
+
+    transition: none !important;
+
+  }
+
+}
+
+</style>
