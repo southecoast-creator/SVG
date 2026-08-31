@@ -1,73 +1,61 @@
-async function countBookRead() {
+downloadButton.addEventListener(
+    "click",
+    async function () {
 
-  const {
-    data: {
-      session
-    }
-  } = await client.auth.getSession();
+      downloadButton.disabled =
+        true;
 
-  /*
-     Only signed-in readers count as
-     a unique reader.
-  */
-  if (!session) {
-    return;
-  }
+      downloadButton.textContent =
+        "Preparing download…";
 
-  try {
+      try {
 
-    const {
-      error
-    } = await client
-      .from("book_reads")
-      .upsert(
-        {
-          book_id: book.id,
-          reader_id: session.user.id,
-          last_read_at: new Date().toISOString()
-        },
-        {
-          onConflict: "book_id,reader_id"
+        const {
+          data: freeChapters,
+          error: freeChaptersError
+        } = await client
+          .from("chapters")
+          .select("id,chapter_number,title,content,is_locked")
+          .eq("book_id", book.id)
+          .eq("status", "published")
+          .eq("is_locked", false);
+
+        if (freeChaptersError) {
+          throw freeChaptersError;
         }
-      );
 
-    if (error) {
+        await litdomSaveBookOffline(
+          book.id,
+          book.title,
+          freeChapters || []
+        );
 
-      console.error(
-        "READ COUNT ERROR:",
-        error
-      );
+        downloadButton.textContent =
+          "✓ Downloaded";
 
-      return;
+        setTimeout(function () {
+
+          overlay.remove();
+
+        }, 1000);
+
+      } catch (downloadError) {
+
+        console.error(
+          "OFFLINE DOWNLOAD ERROR:",
+          downloadError
+        );
+
+        downloadButton.disabled = false;
+
+        downloadButton.textContent =
+          "↓ Download for Offline";
+
+        alert(
+          "Could not download this book for offline reading."
+        );
+
+      }
+
     }
-
-    const {
-      count
-    } = await client
-      .from("book_reads")
-      .select("id", { count: "exact", head: true })
-      .eq("book_id", book.id);
-
-    const viewsElement =
-      document.getElementById(
-        "litdom-book-views"
-      );
-
-    if (viewsElement) {
-
-      viewsElement.textContent =
-        Number(count || 0).toLocaleString();
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Unexpected read count error:",
-      error
-    );
-
-  }
-}
-
-countBookRead();
+  );
