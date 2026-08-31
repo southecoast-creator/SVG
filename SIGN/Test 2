@@ -1,136 +1,187 @@
 /* =====================================================
-   LITDOM — PREMIUM SECTION SEPARATION
-   ===================================================== */
+   LITDOM — SHARE BOOK
+   Shares the current book's direct URL
+===================================================== */
 
-.litdom-book-description,
-.litdom-book-stats,
-.litdom-book-actions,
-.litdom-book-reading {
-  position: relative;
+const shareButton =
+  document.getElementById(
+    "litdom-share-button"
+  );
+
+if (shareButton) {
+
+  shareButton.addEventListener(
+    "click",
+    async function () {
+
+      /*
+         Build the exact URL of this book.
+         The current book ID is already loaded,
+         so no database request is needed.
+      */
+
+      const bookUrl =
+        window.location.origin +
+        window.location.pathname +
+        "?book=" +
+        encodeURIComponent(
+          book.id
+        );
+
+
+      const shareTitle =
+        book.title ||
+        "Read this book on Litdom";
+
+
+      const shareText =
+        `Read "${shareTitle}" on Litdom 📖`;
+
+
+      /* =================================================
+         NATIVE SHARE
+         Works especially well on phones.
+      ================================================= */
+
+      if (
+        navigator.share
+      ) {
+
+        try {
+
+          await navigator.share({
+
+            title:
+              shareTitle,
+
+            text:
+              shareText,
+
+            url:
+              bookUrl
+
+          });
+
+        } catch (error) {
+
+          /*
+             User cancelling the share sheet
+             is normal — don't show an error.
+          */
+
+          if (
+            error?.name !==
+            "AbortError"
+          ) {
+
+            console.error(
+              "SHARE ERROR:",
+              error
+            );
+
+          }
+
+        }
+
+        return;
+      }
+
+
+      /* =================================================
+         FALLBACK — COPY LINK
+         For browsers without navigator.share.
+      ================================================= */
+
+      try {
+
+        await navigator.clipboard.writeText(
+          bookUrl
+        );
+
+
+        const originalText =
+          shareButton.textContent;
+
+
+        shareButton.textContent =
+          "✓ Link Copied";
+
+
+        shareButton.classList.add(
+          "share-copied"
+        );
+
+
+        setTimeout(
+          function () {
+
+            shareButton.textContent =
+              originalText;
+
+            shareButton.classList.remove(
+              "share-copied"
+            );
+
+          },
+          1800
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "COPY LINK ERROR:",
+          error
+        );
+
+
+        /*
+           Last-resort fallback.
+        */
+
+        window.prompt(
+          "Copy this book link:",
+          bookUrl
+        );
+
+      }
+
+    }
+  );
+
 }
 
 
-/* Subtle atmospheric divider between sections */
-.litdom-book-description::after,
-.litdom-book-stats::after,
-.litdom-book-actions::after {
-  content: "";
-  display: block;
 
-  width: 100%;
-  height: 1px;
 
-  margin-top: 22px;
 
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(140, 118, 37, 0.28),
-      rgba(244, 213, 141, 0.18),
-      rgba(140, 118, 37, 0.28),
-      transparent
-    );
-}
+
+
+
+
+
+
 
 
 /* =====================================================
-   LITDOM — CALLIGRAPHIC AUTHOR NAME
-   ===================================================== */
+   LITDOM — PREMIUM SHARE BUTTON
+===================================================== */
 
-.litdom-author-link {
-  display: inline-block;
-
-  color: #F4D58D;
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
-  font-size: 15px;
-  font-style: italic;
-  font-weight: 600;
-
-  letter-spacing: 0.2px;
-
-  text-decoration: none;
-
-  position: relative;
-
-  transition:
-    color 0.25s ease,
-    text-shadow 0.25s ease,
-    transform 0.25s ease;
-}
-
-
-/* Tiny underline hint that suggests clickability */
-.litdom-author-link::after {
-  content: "";
-
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  bottom: -3px;
-
-  height: 1px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      #D4AF37,
-      transparent
-    );
-
-  opacity: 0.45;
-
-  transform: scaleX(0.65);
-
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
-}
-
-
-.litdom-author-link:hover {
-  color: #FFF8E7;
-
-  text-shadow:
-    0 0 10px
-    rgba(244, 213, 141, 0.25);
-
-  transform: translateY(-1px);
-}
-
-
-.litdom-author-link:hover::after {
-  opacity: 0.9;
-  transform: scaleX(1);
-}
-
-
-/* =====================================================
-   LITDOM — PREMIUM ADD TO LIBRARY
-   ===================================================== */
-
-#litdom-library-button {
+#litdom-share-button {
   position: relative;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  gap: 8px;
+  gap: 7px;
 
   min-height: 44px;
 
-  padding: 11px 19px;
+  padding: 11px 18px;
 
   border: 1px solid
-    rgba(212, 175, 55, 0.55);
+    rgba(140, 118, 37, 0.65);
 
   border-radius: 13px;
 
@@ -155,21 +206,21 @@
 
   box-shadow:
     inset 0 1px 0
-      rgba(255, 248, 231, 0.08),
+      rgba(255, 248, 231, 0.07),
     0 5px 18px
-      rgba(0, 0, 0, 0.22);
+      rgba(0, 0, 0, 0.2);
 
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
     box-shadow 0.25s ease,
-    color 0.2s ease,
-    background 0.25s ease;
+    color 0.2s ease;
 }
 
 
-/* Soft glossy sweep */
-#litdom-library-button::before {
+/* Glossy sweep */
+
+#litdom-share-button::before {
   content: "";
 
   position: absolute;
@@ -184,7 +235,7 @@
     linear-gradient(
       110deg,
       transparent,
-      rgba(255, 248, 231, 0.12),
+      rgba(255, 248, 231, 0.11),
       transparent
     );
 
@@ -195,119 +246,65 @@
 }
 
 
-#litdom-library-button:hover {
+#litdom-share-button:hover {
   transform: translateY(-2px);
 
-  border-color: #D4AF37;
+  border-color:
+    #D4AF37;
 
-  color: #FFF8E7;
-
-  background:
-    linear-gradient(
-      145deg,
-      #25252C,
-      #17171C
-    );
+  color:
+    #FFF8E7;
 
   box-shadow:
     inset 0 1px 0
-      rgba(255, 248, 231, 0.1),
+      rgba(255, 248, 231, 0.09),
     0 7px 24px
-      rgba(0, 0, 0, 0.3),
+      rgba(0, 0, 0, 0.28),
     0 0 16px
       rgba(212, 175, 55, 0.12);
 }
 
 
-#litdom-library-button:hover::before {
+#litdom-share-button:hover::before {
   left: 140%;
 }
 
 
-#litdom-library-button:active {
+#litdom-share-button:active {
   transform: scale(0.97);
 }
 
 
 /* =====================================================
-   LIBRARY — ADDED STATE
-   ===================================================== */
+   LINK COPIED STATE
+===================================================== */
 
-#litdom-library-button.library-added {
+#litdom-share-button.share-copied {
   border-color:
-    rgba(244, 213, 141, 0.7);
+    #D4AF37;
 
-  background:
-    linear-gradient(
-      145deg,
-      #24231F,
-      #17171C
-    );
-
-  color: #FFF8E7;
-
-  cursor: default;
+  color:
+    #FFF8E7;
 
   box-shadow:
-    inset 0 1px 0
-      rgba(255, 248, 231, 0.09),
-    0 5px 18px
-      rgba(0, 0, 0, 0.2);
-}
-
-
-#litdom-library-button.library-added:hover {
-  transform: none;
-
-  border-color:
-    rgba(244, 213, 141, 0.7);
-
-  box-shadow:
-    inset 0 1px 0
-      rgba(255, 248, 231, 0.09),
-    0 5px 18px
-      rgba(0, 0, 0, 0.2);
+    0 0 15px
+      rgba(212, 175, 55, 0.16);
 }
 
 
 /* =====================================================
-   OPTIONAL — SMALL LIBRARY ICON
-   ===================================================== */
-
-#litdom-library-button .litdom-library-icon {
-  width: 17px;
-  height: 17px;
-
-  flex-shrink: 0;
-
-  fill: none;
-
-  stroke: currentColor;
-
-  stroke-width: 1.7;
-
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-
-/* =====================================================
-   MOBILE REFINEMENT
-   ===================================================== */
+   MOBILE
+===================================================== */
 
 @media (max-width: 600px) {
 
-  #litdom-library-button {
+  #litdom-share-button {
     min-height: 43px;
 
     padding:
       10px 15px;
 
     font-size: 12.5px;
-  }
-
-  .litdom-author-link {
-    font-size: 14px;
   }
 
 }
