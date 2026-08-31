@@ -1,30 +1,73 @@
-/* RESET COVER PREVIEW FOR NEW BOOK */
+</section>
 
-const fictionCoverInput =
-  document.getElementById("fiction-book-cover");
+    </div>
 
-const fictionCoverPreview =
-  document.getElementById("fiction-cover-preview");
+    <div id="tab-insights" class="dashboard-tab-panel">
 
-const fictionCoverMessage =
-  document.getElementById("fiction-cover-message");
+      <div class="section-heading">
+        <h2>Insights &amp; Earnings</h2>
+      </div>
 
-const nonfictionCoverInput =
-  document.getElementById("book-cover");
+      <div class="insights-controls">
+        <label for="insights-book-select">Select a book</label>
+        <select id="insights-book-select">
+          <option value="">Loading books...</option>
+        </select>
+      </div>
 
-const nonfictionCoverPreview =
-  document.getElementById("cover-preview");
+      <div class="insights-summary">
+        <div class="insights-card">
+          <span>Likes</span>
+          <strong id="insights-likes">—</strong>
+        </div>
+        <div class="insights-card">
+          <span>Reads</span>
+          <strong id="insights-reads">—</strong>
+        </div>
+        <div class="insights-card">
+          <span>Followers</span>
+          <strong id="insights-followers">—</strong>
+        </div>
+        <div class="insights-card">
+          <span>Earnings</span>
+          <strong id="insights-earnings">—</strong>
+        </div>
+      </div>
 
-const nonfictionCoverMessage =
-  document.getElementById("cover-message");
+      <div class="withdraw-section">
+        <button id="withdraw-funds-button" type="button" class="book-action-button" disabled>
+          Withdraw Funds
+        </button>
+        <p class="withdraw-note">Withdrawals are coming soon.</p>
+      </div>
+
+      <p id="insights-message"></p>
+
+    </div>
+
+    <div id="tab-calendar" class="dashboard-tab-panel">
+
+      <div class="section-heading">
+        <h2>Update Calendar</h2>
+      </div>
+
+      <div class="calendar-header">
+        <button id="calendar-prev" type="button" class="book-action-button">&lsaquo;</button>
+        <strong id="calendar-month-label">—</strong>
+        <button id="calendar-next" type="button" class="book-action-button">&rsaquo;</button>
+      </div>
+
+      <div id="calendar-grid" class="calendar-grid"></div>
+
+      <p class="calendar-legend">
+        <span class="calendar-dot updated"></span> Updated
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
 
 
-fictionCoverInput.value = "";
-fictionCoverPreview.src = "";
-fictionCoverPreview.style.display = "none";
-fictionCoverMessage.textContent = "";
-
-nonfictionCoverInput.value = "";
-nonfictionCoverPreview.src = "";
-nonfictionCoverPreview.style.display = "none";
-nonfictionCoverMessage.textContent = "";
+<!-- CREATE BOOK MODAL -->
