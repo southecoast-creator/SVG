@@ -1,73 +1,169 @@
-</section>
+<style>
+.dashboard-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #2a2a30;
+}
 
-    </div>
+.dashboard-tab {
+  background: none;
+  border: none;
+  padding: 12px 18px;
+  color: #B9AE9A;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
 
-    <div id="tab-insights" class="dashboard-tab-panel">
+.dashboard-tab:hover {
+  color: #F4D58D;
+}
 
-      <div class="section-heading">
-        <h2>Insights &amp; Earnings</h2>
-      </div>
+.dashboard-tab.active {
+  color: #D4AF37;
+  border-bottom: 2px solid #D4AF37;
+}
 
-      <div class="insights-controls">
-        <label for="insights-book-select">Select a book</label>
-        <select id="insights-book-select">
-          <option value="">Loading books...</option>
-        </select>
-      </div>
+.dashboard-tab-panel {
+  display: none;
+}
 
-      <div class="insights-summary">
-        <div class="insights-card">
-          <span>Likes</span>
-          <strong id="insights-likes">—</strong>
-        </div>
-        <div class="insights-card">
-          <span>Reads</span>
-          <strong id="insights-reads">—</strong>
-        </div>
-        <div class="insights-card">
-          <span>Followers</span>
-          <strong id="insights-followers">—</strong>
-        </div>
-        <div class="insights-card">
-          <span>Earnings</span>
-          <strong id="insights-earnings">—</strong>
-        </div>
-      </div>
+.dashboard-tab-panel.active {
+  display: block;
+}
 
-      <div class="withdraw-section">
-        <button id="withdraw-funds-button" type="button" class="book-action-button" disabled>
-          Withdraw Funds
-        </button>
-        <p class="withdraw-note">Withdrawals are coming soon.</p>
-      </div>
+.insights-controls {
+  margin-bottom: 25px;
+}
 
-      <p id="insights-message"></p>
+.insights-controls label {
+  display: block;
+  margin-bottom: 8px;
+  color: #F4D58D;
+  font-size: 13px;
+  font-weight: 700;
+}
 
-    </div>
+#insights-book-select {
+  width: 100%;
+  max-width: 340px;
+  padding: 13px;
+  background: #17171C;
+  border: 1px solid #8C7625;
+  border-radius: 8px;
+  color: #FFF8E7;
+  font-size: 15px;
+}
 
-    <div id="tab-calendar" class="dashboard-tab-panel">
+.insights-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 25px;
+}
 
-      <div class="section-heading">
-        <h2>Update Calendar</h2>
-      </div>
+.insights-card {
+  background: #17171C;
+  border: 1px solid #2a2a30;
+  border-radius: 14px;
+  padding: 18px;
+}
 
-      <div class="calendar-header">
-        <button id="calendar-prev" type="button" class="book-action-button">&lsaquo;</button>
-        <strong id="calendar-month-label">—</strong>
-        <button id="calendar-next" type="button" class="book-action-button">&rsaquo;</button>
-      </div>
+.insights-card span {
+  display: block;
+  color: #B9AE9A;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
 
-      <div id="calendar-grid" class="calendar-grid"></div>
+.insights-card strong {
+  color: #D4AF37;
+  font-size: 22px;
+}
 
-      <p class="calendar-legend">
-        <span class="calendar-dot updated"></span> Updated
-      </p>
+.withdraw-section {
+  background: #17171C;
+  border: 1px solid #2a2a30;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 15px;
+}
 
-    </div>
+#withdraw-funds-button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
 
-  </div>
+.withdraw-note {
+  margin-top: 10px;
+  color: #B9AE9A;
+  font-size: 13px;
+}
 
-</div>
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
 
+.calendar-header strong {
+  color: #F4D58D;
+  font-size: 16px;
+}
 
-<!-- CREATE BOOK MODAL -->
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.calendar-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #17171C;
+  border: 1px solid #2a2a30;
+  border-radius: 8px;
+  color: #B9AE9A;
+  font-size: 13px;
+}
+
+.calendar-cell.empty {
+  background: transparent;
+  border: none;
+}
+
+.calendar-cell.updated {
+  background: rgba(90, 200, 130, 0.15);
+  border-color: #6FDB9B;
+  color: #6FDB9B;
+  font-weight: 700;
+}
+
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #B9AE9A;
+  font-size: 13px;
+}
+
+.calendar-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.calendar-dot.updated {
+  background: #6FDB9B;
+}
+</style>
