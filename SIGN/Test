@@ -1,169 +1,398 @@
-<style>
-.dashboard-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 30px;
-  border-bottom: 1px solid #2a2a30;
-}
+await loadBooks();
 
-.dashboard-tab {
-  background: none;
-  border: none;
-  padding: 12px 18px;
-  color: #B9AE9A;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-}
 
-.dashboard-tab:hover {
-  color: #F4D58D;
-}
+  /* =========================
+     DASHBOARD TABS
+  ========================= */
 
-.dashboard-tab.active {
-  color: #D4AF37;
-  border-bottom: 2px solid #D4AF37;
-}
+  const dashboardTabs =
+    document.querySelectorAll(".dashboard-tab");
 
-.dashboard-tab-panel {
-  display: none;
-}
+  const tabPanels = {
+    mybooks: document.getElementById("tab-mybooks"),
+    insights: document.getElementById("tab-insights"),
+    calendar: document.getElementById("tab-calendar")
+  };
 
-.dashboard-tab-panel.active {
-  display: block;
-}
+  let insightsInitialized = false;
+  let calendarInitialized = false;
 
-.insights-controls {
-  margin-bottom: 25px;
-}
+  dashboardTabs.forEach(function (tabButton) {
 
-.insights-controls label {
-  display: block;
-  margin-bottom: 8px;
-  color: #F4D58D;
-  font-size: 13px;
-  font-weight: 700;
-}
+    tabButton.addEventListener("click", function () {
 
-#insights-book-select {
-  width: 100%;
-  max-width: 340px;
-  padding: 13px;
-  background: #17171C;
-  border: 1px solid #8C7625;
-  border-radius: 8px;
-  color: #FFF8E7;
-  font-size: 15px;
-}
+      dashboardTabs.forEach(function (btn) {
+        btn.classList.remove("active");
+      });
 
-.insights-summary {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-bottom: 25px;
-}
+      tabButton.classList.add("active");
 
-.insights-card {
-  background: #17171C;
-  border: 1px solid #2a2a30;
-  border-radius: 14px;
-  padding: 18px;
-}
+      Object.keys(tabPanels).forEach(function (key) {
+        tabPanels[key].classList.remove("active");
+      });
 
-.insights-card span {
-  display: block;
-  color: #B9AE9A;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
+      const target = tabButton.dataset.tab;
 
-.insights-card strong {
-  color: #D4AF37;
-  font-size: 22px;
-}
+      tabPanels[target].classList.add("active");
 
-.withdraw-section {
-  background: #17171C;
-  border: 1px solid #2a2a30;
-  border-radius: 14px;
-  padding: 18px;
-  margin-bottom: 15px;
-}
+      if (target === "insights" && !insightsInitialized) {
+        insightsInitialized = true;
+        initInsightsTab();
+      }
 
-#withdraw-funds-button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
+      if (target === "calendar" && !calendarInitialized) {
+        calendarInitialized = true;
+        initCalendarTab();
+      }
 
-.withdraw-note {
-  margin-top: 10px;
-  color: #B9AE9A;
-  font-size: 13px;
-}
+    });
 
-.calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
+  });
 
-.calendar-header strong {
-  color: #F4D58D;
-  font-size: 16px;
-}
 
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-bottom: 15px;
-}
+  /* =========================
+     INSIGHTS & EARNINGS TAB
+  ========================= */
 
-.calendar-cell {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #17171C;
-  border: 1px solid #2a2a30;
-  border-radius: 8px;
-  color: #B9AE9A;
-  font-size: 13px;
-}
+  const insightsBookSelect =
+    document.getElementById("insights-book-select");
 
-.calendar-cell.empty {
-  background: transparent;
-  border: none;
-}
+  const insightsLikes =
+    document.getElementById("insights-likes");
 
-.calendar-cell.updated {
-  background: rgba(90, 200, 130, 0.15);
-  border-color: #6FDB9B;
-  color: #6FDB9B;
-  font-weight: 700;
-}
+  const insightsReads =
+    document.getElementById("insights-reads");
 
-.calendar-legend {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #B9AE9A;
-  font-size: 13px;
-}
+  const insightsFollowers =
+    document.getElementById("insights-followers");
 
-.calendar-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
-}
+  const insightsEarnings =
+    document.getElementById("insights-earnings");
 
-.calendar-dot.updated {
-  background: #6FDB9B;
-}
-</style>
+  const insightsMessage =
+    document.getElementById("insights-message");
+
+  function initInsightsTab() {
+
+    insightsBookSelect.innerHTML = "";
+
+    if (!authorBooksCache.length) {
+
+      insightsBookSelect.innerHTML =
+        '<option value="">No books yet</option>';
+
+      return;
+
+    }
+
+    authorBooksCache.forEach(function (book) {
+
+      const option =
+        document.createElement("option");
+
+      option.value = book.id;
+      option.textContent = book.title;
+
+      insightsBookSelect.appendChild(option);
+
+    });
+
+    insightsBookSelect.addEventListener(
+      "change",
+      function () {
+
+        loadInsightsForBook(insightsBookSelect.value);
+
+      }
+    );
+
+    loadFollowerCount();
+
+    loadInsightsForBook(insightsBookSelect.value);
+
+  }
+
+  async function loadFollowerCount() {
+
+    const {
+      count,
+      error
+    } = await supabaseClient
+      .from("follows")
+      .select("id", { count: "exact", head: true })
+      .eq("following_id", session.user.id);
+
+    if (error) {
+
+      console.error("FOLLOWER COUNT ERROR:", error);
+
+      insightsFollowers.textContent = "—";
+
+      return;
+
+    }
+
+    insightsFollowers.textContent =
+      (count || 0).toLocaleString();
+
+  }
+
+  async function loadInsightsForBook(bookId) {
+
+    if (!bookId) {
+      return;
+    }
+
+    insightsMessage.textContent =
+      "Loading insights...";
+
+    insightsLikes.textContent = "—";
+    insightsReads.textContent = "—";
+    insightsEarnings.textContent = "—";
+
+
+    const {
+      count: readCount,
+      error: readError
+    } = await supabaseClient
+      .from("book_reads")
+      .select("id", { count: "exact", head: true })
+      .eq("book_id", bookId);
+
+    if (readError) {
+      console.error("READ COUNT ERROR:", readError);
+    }
+
+    insightsReads.textContent =
+      (readCount || 0).toLocaleString();
+
+
+    const {
+      data: bookChapters,
+      error: chaptersError
+    } = await supabaseClient
+      .from("chapters")
+      .select("id")
+      .eq("book_id", bookId);
+
+    if (chaptersError) {
+
+      console.error("CHAPTERS FOR LIKES ERROR:", chaptersError);
+
+      insightsLikes.textContent = "0";
+
+    } else {
+
+      const chapterIds =
+        bookChapters.map(function (c) { return c.id; });
+
+      if (!chapterIds.length) {
+
+        insightsLikes.textContent = "0";
+
+      } else {
+
+        const {
+          count: likeCount,
+          error: likeError
+        } = await supabaseClient
+          .from("chapter_likes")
+          .select("id", { count: "exact", head: true })
+          .in("chapter_id", chapterIds);
+
+        if (likeError) {
+          console.error("LIKE COUNT ERROR:", likeError);
+        }
+
+        insightsLikes.textContent =
+          (likeCount || 0).toLocaleString();
+
+      }
+
+    }
+
+
+    const {
+      data: bookUnlocks,
+      error: bookUnlocksError
+    } = await supabaseClient
+      .from("book_unlocks")
+      .select("monetary_value")
+      .eq("book_id", bookId);
+
+    const {
+      data: chapterUnlocks,
+      error: chapterUnlocksError
+    } = await supabaseClient
+      .from("chapter_unlocks")
+      .select("monetary_value")
+      .eq("book_id", bookId);
+
+    if (bookUnlocksError) {
+      console.error("BOOK UNLOCKS ERROR:", bookUnlocksError);
+    }
+
+    if (chapterUnlocksError) {
+      console.error("CHAPTER UNLOCKS ERROR:", chapterUnlocksError);
+    }
+
+    const totalEarnings =
+      (bookUnlocks || []).reduce(function (sum, row) {
+        return sum + (Number(row.monetary_value) || 0);
+      }, 0) +
+      (chapterUnlocks || []).reduce(function (sum, row) {
+        return sum + (Number(row.monetary_value) || 0);
+      }, 0);
+
+    insightsEarnings.textContent =
+      "\u20A6" + totalEarnings.toLocaleString();
+
+    insightsMessage.textContent = "";
+
+  }
+
+
+  /* =========================
+     CALENDAR TAB
+  ========================= */
+
+  const calendarGrid =
+    document.getElementById("calendar-grid");
+
+  const calendarMonthLabel =
+    document.getElementById("calendar-month-label");
+
+  const calendarPrev =
+    document.getElementById("calendar-prev");
+
+  const calendarNext =
+    document.getElementById("calendar-next");
+
+  let calendarViewDate = new Date();
+
+  function initCalendarTab() {
+
+    calendarPrev.addEventListener("click", function () {
+
+      calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+
+      renderCalendar();
+
+    });
+
+    calendarNext.addEventListener("click", function () {
+
+      calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+
+      renderCalendar();
+
+    });
+
+    renderCalendar();
+
+  }
+
+  async function renderCalendar() {
+
+    const year = calendarViewDate.getFullYear();
+
+    const month = calendarViewDate.getMonth();
+
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    calendarMonthLabel.textContent =
+      monthNames[month] + " " + year;
+
+    calendarGrid.innerHTML =
+      "<p>Loading...</p>";
+
+    const bookIds =
+      authorBooksCache.map(function (b) { return b.id; });
+
+    let updatedDates = new Set();
+
+    if (bookIds.length) {
+
+      const monthStart =
+        new Date(year, month, 1).toISOString();
+
+      const monthEnd =
+        new Date(year, month + 1, 1).toISOString();
+
+      const {
+        data: monthChapters,
+        error: monthChaptersError
+      } = await supabaseClient
+        .from("chapters")
+        .select("published_at")
+        .in("book_id", bookIds)
+        .not("published_at", "is", null)
+        .gte("published_at", monthStart)
+        .lt("published_at", monthEnd);
+
+      if (monthChaptersError) {
+
+        console.error("CALENDAR CHAPTERS ERROR:", monthChaptersError);
+
+      } else {
+
+        (monthChapters || []).forEach(function (chapter) {
+
+          const day =
+            new Date(chapter.published_at).getDate();
+
+          updatedDates.add(day);
+
+        });
+
+      }
+
+    }
+
+    calendarGrid.innerHTML = "";
+
+    const daysInMonth =
+      new Date(year, month + 1, 0).getDate();
+
+    const firstWeekday =
+      new Date(year, month, 1).getDay();
+
+    for (let i = 0; i < firstWeekday; i++) {
+
+      const blank =
+        document.createElement("div");
+
+      blank.className = "calendar-cell empty";
+
+      calendarGrid.appendChild(blank);
+
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+
+      const cell =
+        document.createElement("div");
+
+      cell.className = "calendar-cell";
+
+      if (updatedDates.has(day)) {
+
+        cell.classList.add("updated");
+
+      }
+
+      cell.textContent = day;
+
+      calendarGrid.appendChild(cell);
+
+    }
+
+  }
+
+
+  /* =========================
+     CREATE BOOK MODAL
+  ========================= */
