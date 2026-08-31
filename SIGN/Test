@@ -1,68 +1,95 @@
-/* =====================================================
-       SET MONTHLY EARNINGS
-    ===================================================== */
+setPublicationButtonVisibility(
+  book,
+  applyPublicationButton,
+  submittedBookIds
+);
 
-    const setEarningsButton =
-      document.getElementById("led-set-earnings");
+     applyPublicationButton.addEventListener(
+  "click",
+  function () {
 
-    const earningsInput =
-      document.getElementById("led-earnings-amount");
 
-    if (setEarningsButton) {
+    openPublicationApplication(
+      book
+    );
 
-      setEarningsButton.addEventListener("click", async function () {
+  }
+);
 
-        if (!currentReviewBook) {
-          alert("No book is currently selected.");
-          return;
-        }
 
-        const amount =
-          Number(earningsInput.value);
+/* =========================
+   DELETE BOOK BUTTON
+========================= */
 
-        if (!Number.isFinite(amount) || amount < 0) {
-          alert("Please enter a valid amount.");
-          return;
-        }
+const submissionStatus =
+  submissionStatusByBookId[book.id];
 
-        setEarningsButton.disabled = true;
+const canDelete =
+  !submittedBookIds.has(book.id) ||
+  submissionStatus === "rejected";
 
-        const {
-          error
-        } = await supabaseClient
-          .from("author_earnings")
-          .insert({
-            author_id: currentReviewBook.author_id,
-            book_id: currentReviewBook.book_id,
-            source_type: "editor_manual",
-            currency: "NGN",
-            gross_amount: amount,
-            platform_share: 0,
-            author_share: amount,
-            status: "settled"
-          });
+if (canDelete && book.status !== "published") {
 
-        setEarningsButton.disabled = false;
+  const deleteBookButton =
+    document.createElement("button");
 
-        if (error) {
+  deleteBookButton.type = "button";
 
-          console.error("SET EARNINGS ERROR:", error);
+  deleteBookButton.className =
+    "book-action-button";
 
-          alert("Could not set earnings for this book.");
+  deleteBookButton.textContent =
+    "Delete Book";
 
-          return;
+  deleteBookButton.style.color = "#F0908C";
 
-        }
+  deleteBookButton.addEventListener(
+    "click",
+    async function () {
 
-        alert("Earnings set: \u20A6" + amount.toLocaleString() + " for this book.");
+      const confirmed =
+        confirm(
+          "Delete \"" + book.title + "\"? This cannot be undone."
+        );
 
-        earningsInput.value = "";
+      if (!confirmed) {
+        return;
+      }
 
-      });
+      deleteBookButton.disabled = true;
+
+      const {
+        error: deleteError
+      } = await supabaseClient
+        .from("books")
+        .delete()
+        .eq("id", book.id);
+
+      if (deleteError) {
+
+        console.error("BOOK DELETE ERROR:", deleteError);
+
+        alert(
+          "Could not delete this book.\n\nError: " +
+          (deleteError.message || "Unknown") +
+          "\n\nCode: " +
+          (deleteError.code || "Unknown")
+        );
+
+        deleteBookButton.disabled = false;
+
+        return;
+
+      }
+
+      await loadBooks();
 
     }
+  );
+
+  actions.appendChild(deleteBookButton);
+
+}
 
 
-    /* =====================================================
-       HELPER: BOOK DETAIL
-    ===================================================== */
+card.appendChild(actions);
