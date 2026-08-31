@@ -1,147 +1,299 @@
 /* =====================================================
-   LITDOM — SHARE BOOK
-   Shares the current book's direct URL
+   LITDOM — ADD TO LIBRARY
 ===================================================== */
 
-const shareButton =
+const libraryButton =
   document.getElementById(
-    "litdom-share-button"
+    "litdom-library-button"
   );
 
-if (shareButton) {
+if (libraryButton) {
 
-  shareButton.addEventListener(
+  /*
+     Check whether this reader already
+     has the book in their Library.
+  */
+
+  async function checkLibraryStatus() {
+
+    const {
+      data: {
+        session
+      }
+    } =
+      await client.auth.getSession();
+
+    /*
+       Visitor is not signed in.
+       Keep the normal button.
+    */
+
+    if (!session) {
+      return;
+    }
+
+    const userId =
+      session.user.id;
+
+    const {
+      data: libraryEntry,
+      error: libraryError
+    } =
+      await client
+        .from("library")
+        .select("id")
+        .eq(
+          "user_id",
+          userId
+        )
+        .eq(
+          "book_id",
+          book.id
+        )
+        .maybeSingle();
+
+    if (libraryError) {
+
+      console.error(
+        "LIBRARY STATUS ERROR:",
+        libraryError
+      );
+
+      return;
+    }
+
+    /*
+       Already added.
+    */
+
+    if (libraryEntry) {
+
+      libraryButton.textContent =
+        "✓ Added to Library";
+
+      libraryButton.classList.add(
+        "litdom-library-added"
+      );
+
+      libraryButton.disabled =
+        true;
+
+      libraryButton.setAttribute(
+        "aria-label",
+        "Book added to Library"
+      );
+
+    }
+
+  }
+
+
+  /*
+     Add book to Library.
+  */
+
+  libraryButton.addEventListener(
     "click",
     async function () {
 
       /*
-         Build the exact URL of this book.
-         The current book ID is already loaded,
-         so no database request is needed.
+         Prevent accidental double clicks.
       */
 
-      const bookUrl =
-        window.location.origin +
-        window.location.pathname +
-        "?book=" +
-        encodeURIComponent(
-          book.id
+      if (
+        libraryButton.disabled
+      ) {
+        return;
+      }
+
+      const {
+        data: {
+          session
+        }
+      } =
+        await client.auth.getSession();
+
+
+      /*
+         Reader must be signed in.
+      */
+
+      if (!session) {
+
+        const popup =
+          document.createElement(
+            "div"
+          );
+
+        popup.className =
+          "litdom-auth-popup";
+
+        popup.innerHTML = `
+          <div class="litdom-auth-box">
+
+            <button
+              type="button"
+              class="litdom-auth-close"
+              aria-label="Close"
+            >
+              ×
+            </button>
+
+            <h3>
+              Add to Library
+            </h3>
+
+            <p>
+              Sign in or create a free Litdom
+              account to save this book to
+              your Library.
+            </p>
+
+            <a
+              href="/p/sign-up-for-litdom.html"
+              class="litdom-auth-button"
+            >
+              Sign In / Create Account
+            </a>
+
+          </div>
+        `;
+
+        document.body.appendChild(
+          popup
         );
 
 
-      const shareTitle =
-        book.title ||
-        "Read this book on Litdom";
+        popup
+          .querySelector(
+            ".litdom-auth-close"
+          )
+          .addEventListener(
+            "click",
+            function () {
+
+              popup.remove();
+
+            }
+          );
 
 
-      const shareText =
-        `Read "${shareTitle}" on Litdom 📖`;
+        popup.addEventListener(
+          "click",
+          function (event) {
 
+            if (
+              event.target === popup
+            ) {
 
-      /* =================================================
-         NATIVE SHARE
-         Works especially well on phones.
-      ================================================= */
+              popup.remove();
 
-      if (
-        navigator.share
-      ) {
-
-        try {
-
-          await navigator.share({
-
-            title:
-              shareTitle,
-
-            text:
-              shareText,
-
-            url:
-              bookUrl
-
-          });
-
-        } catch (error) {
-
-          /*
-             User cancelling the share sheet
-             is normal — don't show an error.
-          */
-
-          if (
-            error?.name !==
-            "AbortError"
-          ) {
-
-            console.error(
-              "SHARE ERROR:",
-              error
-            );
+            }
 
           }
-
-        }
+        );
 
         return;
       }
 
 
-      /* =================================================
-         FALLBACK — COPY LINK
-         For browsers without navigator.share.
-      ================================================= */
+      /*
+         Temporarily disable the button
+         while Supabase saves it.
+      */
+
+      libraryButton.disabled =
+        true;
+
+      libraryButton.textContent =
+        "Adding…";
+
 
       try {
 
-        await navigator.clipboard.writeText(
-          bookUrl
-        );
+        const userId =
+          session.user.id;
 
 
-        const originalText =
-          shareButton.textContent;
+        const {
+          error: insertError
+        } =
+          await client
+            .from("library")
+            .insert({
+              user_id:
+                userId,
+
+              book_id:
+                book.id
+            });
 
 
-        shareButton.textContent =
-          "✓ Link Copied";
+        /*
+           If Supabase rejects the insert,
+           restore the button.
+        */
 
+        if (insertError) {
 
-        shareButton.classList.add(
-          "share-copied"
-        );
+          /*
+             The unique constraint means that
+             even a double request cannot create
+             a duplicate.
+          */
 
+          if (
+            insertError.code ===
+            "23505"
+          ) {
 
-        setTimeout(
-          function () {
+            libraryButton.textContent =
+              "✓ Added to Library";
 
-            shareButton.textContent =
-              originalText;
-
-            shareButton.classList.remove(
-              "share-copied"
+            libraryButton.classList.add(
+              "litdom-library-added"
             );
 
-          },
-          1800
+            return;
+          }
+
+
+          throw insertError;
+        }
+
+
+        /*
+           SUCCESS
+        */
+
+        libraryButton.textContent =
+          "✓ Added to Library";
+
+        libraryButton.classList.add(
+          "litdom-library-added"
+        );
+
+        libraryButton.setAttribute(
+          "aria-label",
+          "Book added to Library"
         );
 
 
       } catch (error) {
 
         console.error(
-          "COPY LINK ERROR:",
+          "ADD TO LIBRARY ERROR:",
           error
         );
 
+        libraryButton.disabled =
+          false;
 
-        /*
-           Last-resort fallback.
-        */
+        libraryButton.textContent =
+          "＋ Add to Library";
 
-        window.prompt(
-          "Copy this book link:",
-          bookUrl
+        alert(
+          "We couldn't add this book to your Library right now."
         );
 
       }
@@ -149,162 +301,60 @@ if (shareButton) {
     }
   );
 
+
+  /*
+     Check status when the book page loads.
+  */
+
+  checkLibraryStatus();
+
+}
+
+/* =====================================================
+   LITDOM — LIBRARY BUTTON
+===================================================== */
+
+#litdom-library-button {
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
 
+/* Added state */
 
-
-
-
-
-
-
-
-
-
-
-/* =====================================================
-   LITDOM — PREMIUM SHARE BUTTON
-===================================================== */
-
-#litdom-share-button {
-  position: relative;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 7px;
-
-  min-height: 44px;
-
-  padding: 11px 18px;
-
-  border: 1px solid
-    rgba(140, 118, 37, 0.65);
-
-  border-radius: 13px;
-
+#litdom-library-button.litdom-library-added {
   background:
     linear-gradient(
-      145deg,
-      #202026 0%,
-      #17171C 48%,
-      #0F0F13 100%
+      135deg,
+      #1d1b15,
+      #17171c
     );
+
+  border-color: #D4AF37;
 
   color: #F4D58D;
 
-  font-size: 13px;
-  font-weight: 700;
-
-  letter-spacing: 0.15px;
-
-  cursor: pointer;
-
-  overflow: hidden;
-
   box-shadow:
-    inset 0 1px 0
-      rgba(255, 248, 231, 0.07),
-    0 5px 18px
-      rgba(0, 0, 0, 0.2);
+    0 0 10px
+    rgba(212, 175, 55, 0.14);
 
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.25s ease,
-    color 0.2s ease;
+  cursor: default;
 }
 
 
-/* Glossy sweep */
+/* While saving */
 
-#litdom-share-button::before {
-  content: "";
-
-  position: absolute;
-
-  top: 0;
-  left: -120%;
-
-  width: 80%;
-  height: 100%;
-
-  background:
-    linear-gradient(
-      110deg,
-      transparent,
-      rgba(255, 248, 231, 0.11),
-      transparent
-    );
-
-  transform: skewX(-18deg);
-
-  transition:
-    left 0.55s ease;
+#litdom-library-button:disabled {
+  opacity: 0.85;
 }
 
 
-#litdom-share-button:hover {
-  transform: translateY(-2px);
+/* Don't make the completed button jump */
 
-  border-color:
-    #D4AF37;
-
-  color:
-    #FFF8E7;
-
-  box-shadow:
-    inset 0 1px 0
-      rgba(255, 248, 231, 0.09),
-    0 7px 24px
-      rgba(0, 0, 0, 0.28),
-    0 0 16px
-      rgba(212, 175, 55, 0.12);
-}
-
-
-#litdom-share-button:hover::before {
-  left: 140%;
-}
-
-
-#litdom-share-button:active {
-  transform: scale(0.97);
-}
-
-
-/* =====================================================
-   LINK COPIED STATE
-===================================================== */
-
-#litdom-share-button.share-copied {
-  border-color:
-    #D4AF37;
-
-  color:
-    #FFF8E7;
-
-  box-shadow:
-    0 0 15px
-      rgba(212, 175, 55, 0.16);
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media (max-width: 600px) {
-
-  #litdom-share-button {
-    min-height: 43px;
-
-    padding:
-      10px 15px;
-
-    font-size: 12.5px;
-  }
-
+#litdom-library-button.litdom-library-added:hover {
+  transform: none;
 }
