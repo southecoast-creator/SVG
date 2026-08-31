@@ -1,45 +1,153 @@
-<style>
+/* =====================================================
+   LITDOM — PREMIUM SECTION SEPARATION
+   ===================================================== */
 
-/* =========================================================
-   LITDOM PREMIUM BUTTON SYSTEM
-   Obsidian • Royal Gold • Champagne Gold
-========================================================= */
+.litdom-book-description,
+.litdom-book-stats,
+.litdom-book-actions,
+.litdom-book-reading {
+  position: relative;
+}
 
 
-/* =========================================================
-   READ MORE — PREMIUM SECONDARY BUTTON
-========================================================= */
+/* Subtle atmospheric divider between sections */
+.litdom-book-description::after,
+.litdom-book-stats::after,
+.litdom-book-actions::after {
+  content: "";
+  display: block;
 
-#litdom-read-more {
+  width: 100%;
+  height: 1px;
+
+  margin-top: 22px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(140, 118, 37, 0.28),
+      rgba(244, 213, 141, 0.18),
+      rgba(140, 118, 37, 0.28),
+      transparent
+    );
+}
+
+
+/* =====================================================
+   LITDOM — CALLIGRAPHIC AUTHOR NAME
+   ===================================================== */
+
+.litdom-author-link {
+  display: inline-block;
+
+  color: #F4D58D;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 600;
+
+  letter-spacing: 0.2px;
+
+  text-decoration: none;
+
+  position: relative;
+
+  transition:
+    color 0.25s ease,
+    text-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+/* Tiny underline hint that suggests clickability */
+.litdom-author-link::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: -3px;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #D4AF37,
+      transparent
+    );
+
+  opacity: 0.45;
+
+  transform: scaleX(0.65);
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+.litdom-author-link:hover {
+  color: #FFF8E7;
+
+  text-shadow:
+    0 0 10px
+    rgba(244, 213, 141, 0.25);
+
+  transform: translateY(-1px);
+}
+
+
+.litdom-author-link:hover::after {
+  opacity: 0.9;
+  transform: scaleX(1);
+}
+
+
+/* =====================================================
+   LITDOM — PREMIUM ADD TO LIBRARY
+   ===================================================== */
+
+#litdom-library-button {
   position: relative;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  margin-top: 16px;
-  padding: 9px 18px;
+  gap: 8px;
 
-  min-height: 38px;
+  min-height: 44px;
 
-  border: 1px solid rgba(212, 175, 55, 0.55);
-  border-radius: 999px;
+  padding: 11px 19px;
+
+  border: 1px solid
+    rgba(212, 175, 55, 0.55);
+
+  border-radius: 13px;
 
   background:
     linear-gradient(
       145deg,
-      rgba(244, 213, 141, 0.10),
-      rgba(23, 23, 28, 0.96) 45%,
-      rgba(11, 11, 15, 0.98)
+      #202026 0%,
+      #17171C 48%,
+      #0F0F13 100%
     );
 
   color: #F4D58D;
 
-  font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 
-  letter-spacing: 0.35px;
+  letter-spacing: 0.15px;
 
   cursor: pointer;
 
@@ -47,378 +155,159 @@
 
   box-shadow:
     inset 0 1px 0
-      rgba(255, 248, 231, 0.10),
-
-    inset 0 -1px 0
-      rgba(0, 0, 0, 0.45),
-
-    0 4px 14px
-      rgba(0, 0, 0, 0.20);
+      rgba(255, 248, 231, 0.08),
+    0 5px 18px
+      rgba(0, 0, 0, 0.22);
 
   transition:
-    transform 0.22s ease,
-    border-color 0.22s ease,
-    box-shadow 0.22s ease,
-    background 0.22s ease;
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.25s ease,
+    color 0.2s ease,
+    background 0.25s ease;
 }
 
 
-/* Subtle glossy highlight */
-
-#litdom-read-more::before {
+/* Soft glossy sweep */
+#litdom-library-button::before {
   content: "";
 
   position: absolute;
 
   top: 0;
-  left: -80%;
+  left: -120%;
 
-  width: 55%;
+  width: 80%;
   height: 100%;
 
   background:
     linear-gradient(
-      100deg,
+      110deg,
       transparent,
-      rgba(255, 248, 231, 0.16),
+      rgba(255, 248, 231, 0.12),
       transparent
     );
 
-  transform: skewX(-20deg);
+  transform: skewX(-18deg);
 
   transition:
     left 0.55s ease;
-
-  pointer-events: none;
 }
 
 
-/* Hover */
+#litdom-library-button:hover {
+  transform: translateY(-2px);
 
-#litdom-read-more:hover {
+  border-color: #D4AF37;
 
-  transform:
-    translateY(-2px);
-
-  border-color:
-    #D4AF37;
+  color: #FFF8E7;
 
   background:
     linear-gradient(
       145deg,
-      rgba(244, 213, 141, 0.16),
-      rgba(23, 23, 28, 0.98) 48%,
-      #0B0B0F
+      #25252C,
+      #17171C
     );
 
   box-shadow:
     inset 0 1px 0
-      rgba(255, 248, 231, 0.12),
-
-    0 7px 20px
-      rgba(0, 0, 0, 0.28),
-
+      rgba(255, 248, 231, 0.1),
+    0 7px 24px
+      rgba(0, 0, 0, 0.3),
     0 0 16px
-      rgba(212, 175, 55, 0.16);
+      rgba(212, 175, 55, 0.12);
 }
 
 
-/* Gloss sweep */
-
-#litdom-read-more:hover::before {
-  left: 135%;
+#litdom-library-button:hover::before {
+  left: 140%;
 }
 
 
-/* Press */
+#litdom-library-button:active {
+  transform: scale(0.97);
+}
 
-#litdom-read-more:active {
 
-  transform:
-    translateY(0)
-    scale(0.96);
+/* =====================================================
+   LIBRARY — ADDED STATE
+   ===================================================== */
+
+#litdom-library-button.library-added {
+  border-color:
+    rgba(244, 213, 141, 0.7);
+
+  background:
+    linear-gradient(
+      145deg,
+      #24231F,
+      #17171C
+    );
+
+  color: #FFF8E7;
+
+  cursor: default;
 
   box-shadow:
-    inset 0 2px 5px
-      rgba(0, 0, 0, 0.35);
+    inset 0 1px 0
+      rgba(255, 248, 231, 0.09),
+    0 5px 18px
+      rgba(0, 0, 0, 0.2);
 }
 
 
-/* Keyboard accessibility */
-
-#litdom-read-more:focus-visible {
-
-  outline: none;
+#litdom-library-button.library-added:hover {
+  transform: none;
 
   border-color:
-    #F4D58D;
+    rgba(244, 213, 141, 0.7);
 
   box-shadow:
-    0 0 0 3px
-      rgba(212, 175, 55, 0.16),
-
-    0 0 18px
-      rgba(212, 175, 55, 0.20);
-}
-
-
-/* =========================================================
-   CONTINUE READING — PREMIUM PRIMARY BUTTON
-========================================================= */
-
-#litdom-continue-reading {
-
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-
-  min-height: 52px;
-
-  margin-top: 22px;
-
-  padding: 13px 22px;
-
-  border: 1px solid
-    rgba(244, 213, 141, 0.75);
-
-  border-radius: 14px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #D4AF37 0%,
-      #F4D58D 42%,
-      #D4AF37 72%,
-      #8C7625 100%
-    );
-
-  color: #0B0B0F;
-
-  font-family: inherit;
-
-  font-size: 14px;
-  font-weight: 800;
-
-  letter-spacing: 0.3px;
-
-  cursor: pointer;
-
-  overflow: hidden;
-
-  box-shadow:
-
     inset 0 1px 0
-      rgba(255, 255, 255, 0.55),
-
-    inset 0 -2px 0
-      rgba(91, 70, 10, 0.28),
-
-    0 7px 18px
-      rgba(0, 0, 0, 0.28),
-
-    0 0 22px
-      rgba(212, 175, 55, 0.18);
-
-  transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease,
-    filter 0.22s ease;
+      rgba(255, 248, 231, 0.09),
+    0 5px 18px
+      rgba(0, 0, 0, 0.2);
 }
 
 
-/* =========================================================
-   CINEMATIC GLOSS
-========================================================= */
+/* =====================================================
+   OPTIONAL — SMALL LIBRARY ICON
+   ===================================================== */
 
-#litdom-continue-reading::before {
+#litdom-library-button .litdom-library-icon {
+  width: 17px;
+  height: 17px;
 
-  content: "";
+  flex-shrink: 0;
 
-  position: absolute;
+  fill: none;
 
-  top: -40%;
-  left: -65%;
+  stroke: currentColor;
 
-  width: 45%;
-  height: 180%;
+  stroke-width: 1.7;
 
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.38),
-      transparent
-    );
-
-  transform:
-    skewX(-22deg);
-
-  pointer-events: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 
-/* Soft upper film highlight */
+/* =====================================================
+   MOBILE REFINEMENT
+   ===================================================== */
 
-#litdom-continue-reading::after {
+@media (max-width: 600px) {
 
-  content: "";
-
-  position: absolute;
-
-  top: 1px;
-  left: 8%;
-
-  width: 84%;
-  height: 45%;
-
-  border-radius: 999px;
-
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.18),
-      rgba(255, 255, 255, 0)
-    );
-
-  pointer-events: none;
-}
-
-
-/* =========================================================
-   CONTINUE READING HOVER
-========================================================= */
-
-#litdom-continue-reading:hover {
-
-  transform:
-    translateY(-2px);
-
-  filter:
-    brightness(1.05);
-
-  box-shadow:
-
-    inset 0 1px 0
-      rgba(255, 255, 255, 0.65),
-
-    inset 0 -2px 0
-      rgba(91, 70, 10, 0.22),
-
-    0 10px 25px
-      rgba(0, 0, 0, 0.32),
-
-    0 0 30px
-      rgba(212, 175, 55, 0.28);
-}
-
-
-/* Gloss sweep */
-
-#litdom-continue-reading:hover::before {
-
-  left: 125%;
-
-  transition:
-    left 0.65s ease;
-}
-
-
-/* =========================================================
-   PRESS EFFECT
-========================================================= */
-
-#litdom-continue-reading:active {
-
-  transform:
-    translateY(1px)
-    scale(0.985);
-
-  filter:
-    brightness(0.98);
-
-  box-shadow:
-
-    inset 0 3px 7px
-      rgba(74, 55, 5, 0.30),
-
-    0 3px 9px
-      rgba(0, 0, 0, 0.20);
-}
-
-
-/* =========================================================
-   KEYBOARD ACCESSIBILITY
-========================================================= */
-
-#litdom-continue-reading:focus-visible {
-
-  outline: none;
-
-  box-shadow:
-
-    0 0 0 3px
-      rgba(11, 11, 15, 0.95),
-
-    0 0 0 5px
-      rgba(244, 213, 141, 0.75),
-
-    0 0 25px
-      rgba(212, 175, 55, 0.30);
-}
-
-
-/* =========================================================
-   MOBILE POLISH
-========================================================= */
-
-@media (max-width: 480px) {
-
-  #litdom-read-more {
-
-    min-height: 37px;
+  #litdom-library-button {
+    min-height: 43px;
 
     padding:
-      8px 16px;
+      10px 15px;
 
-    font-size: 12px;
-
+    font-size: 12.5px;
   }
 
-
-  #litdom-continue-reading {
-
-    min-height: 54px;
-
-    margin-top: 20px;
-
-    border-radius: 13px;
-
+  .litdom-author-link {
     font-size: 14px;
-
   }
 
 }
-
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  #litdom-read-more,
-  #litdom-continue-reading,
-  #litdom-read-more::before,
-  #litdom-continue-reading::before {
-
-    transition: none !important;
-
-  }
-
-}
-
-</style>
