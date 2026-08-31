@@ -1,336 +1,73 @@
-/* =====================================================
-   LITDOM — OFFLINE DOWNLOAD POPUP
-===================================================== */
-
-.litdom-offline-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 20px;
-
-  background: rgba(0, 0, 0, 0.62);
-
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-}
-
-.litdom-offline-popup {
-  width: 100%;
-  max-width: 390px;
-
-  padding: 28px 22px 22px;
-
-  box-sizing: border-box;
-
-  border: 1px solid rgba(212, 175, 55, 0.42);
-  border-radius: 18px;
-
-  background: #17171c;
-  color: #fff8e7;
-
-  text-align: center;
-
-  box-shadow:
-    0 18px 55px rgba(0, 0, 0, 0.42);
-}
-
-.litdom-offline-popup-icon {
-  font-size: 34px;
-  margin-bottom: 10px;
-}
-
-.litdom-offline-popup h3 {
-  margin: 0 0 8px;
-
-  font-size: 20px;
-}
-
-.litdom-offline-popup p {
-  margin: 0 auto 20px;
-
-  max-width: 310px;
-
-  font-size: 13px;
-  line-height: 1.6;
-
-  opacity: 0.68;
-}
-
-.litdom-offline-download-button {
-  width: 100%;
-
-  padding: 13px 18px;
-
-  border: 0;
-  border-radius: 11px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #d4af37,
-      #f4d58d
-    );
-
-  color: #0b0b0f;
-
-  font-size: 14px;
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-.litdom-offline-later-button {
-  width: 100%;
-
-  margin-top: 9px;
-
-  padding: 11px 18px;
-
-  border: 1px solid rgba(244, 213, 141, 0.18);
-  border-radius: 11px;
-
-  background: transparent;
-
-  color: #fff8e7;
-
-  font-size: 13px;
-
-  cursor: pointer;
-
-  opacity: 0.72;
-}
-
-.litdom-offline-later-button:hover {
-  opacity: 1;
-}
-
-.litdom-offline-download-button:disabled {
-  opacity: 0.7;
-  cursor: wait;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =====================================================
-   SUCCESS
-===================================================== */
-
-libraryButton.textContent =
-  "✓ Added to Library";
-
-libraryButton.classList.add(
-  "litdom-library-added"
-);
-
-libraryButton.setAttribute(
-  "aria-label",
-  "Book added to Library"
-);
-
-
-/* =====================================================
-   OFFER OFFLINE DOWNLOAD
-===================================================== */
-
-showOfflineDownloadPopup();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =====================================================
-   LITDOM — OFFLINE DOWNLOAD OFFER
-===================================================== */
-
-function showOfflineDownloadPopup() {
+async function countBookRead() {
+
+  const {
+    data: {
+      session
+    }
+  } = await client.auth.getSession();
 
   /*
-     Prevent duplicate popups.
+     Only signed-in readers count as
+     a unique reader.
   */
-
-  if (
-    document.querySelector(
-      ".litdom-offline-overlay"
-    )
-  ) {
+  if (!session) {
     return;
   }
 
+  try {
 
-  /*
-     Create overlay.
-  */
-
-  const overlay =
-    document.createElement("div");
-
-  overlay.className =
-    "litdom-offline-overlay";
-
-
-  /*
-     Create popup.
-  */
-
-  const popup =
-    document.createElement("div");
-
-  popup.className =
-    "litdom-offline-popup";
-
-
-  popup.innerHTML = `
-
-    <div class="litdom-offline-popup-icon">
-      📚
-    </div>
-
-    <h3>
-      Added to your Library
-    </h3>
-
-    <p>
-      Would you like to save this book
-      for offline reading?
-    </p>
-
-    <button
-      type="button"
-      class="litdom-offline-download-button"
-    >
-      ↓ Download for Offline
-    </button>
-
-    <button
-      type="button"
-      class="litdom-offline-later-button"
-    >
-      Maybe Later
-    </button>
-
-  `;
-
-
-  overlay.appendChild(
-    popup
-  );
-
-  document.body.appendChild(
-    overlay
-  );
-
-
-  /*
-     Buttons.
-  */
-
-  const downloadButton =
-    popup.querySelector(
-      ".litdom-offline-download-button"
-    );
-
-  const laterButton =
-    popup.querySelector(
-      ".litdom-offline-later-button"
-    );
-
-
-  /*
-     Maybe Later.
-  */
-
-  laterButton.addEventListener(
-    "click",
-    function () {
-
-      overlay.remove();
-
-    }
-  );
-
-
-  /*
-     Clicking outside closes it too.
-  */
-
-  overlay.addEventListener(
-    "click",
-    function (event) {
-
-      if (
-        event.target === overlay
-      ) {
-
-        overlay.remove();
-
-      }
-
-    }
-  );
-
-
-  /*
-     Download button.
-     
-     For now we only prepare the UI.
-     The actual offline storage will be
-     added in the next stage.
-  */
-
-  downloadButton.addEventListener(
-    "click",
-    function () {
-
-      downloadButton.disabled =
-        true;
-
-      downloadButton.textContent =
-        "Preparing download…";
-
-      /*
-         Actual chapter downloading
-         will be connected here next.
-      */
-
-      setTimeout(
-        function () {
-
-          downloadButton.disabled =
-            false;
-
-          downloadButton.textContent =
-            "↓ Download for Offline";
-
+    const {
+      error
+    } = await client
+      .from("book_reads")
+      .upsert(
+        {
+          book_id: book.id,
+          reader_id: session.user.id,
+          last_read_at: new Date().toISOString()
         },
-        800
+        {
+          onConflict: "book_id,reader_id"
+        }
       );
 
-    }
-  );
+    if (error) {
 
+      console.error(
+        "READ COUNT ERROR:",
+        error
+      );
+
+      return;
+    }
+
+    const {
+      count
+    } = await client
+      .from("book_reads")
+      .select("id", { count: "exact", head: true })
+      .eq("book_id", book.id);
+
+    const viewsElement =
+      document.getElementById(
+        "litdom-book-views"
+      );
+
+    if (viewsElement) {
+
+      viewsElement.textContent =
+        Number(count || 0).toLocaleString();
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Unexpected read count error:",
+      error
+    );
+
+  }
 }
+
+countBookRead();
