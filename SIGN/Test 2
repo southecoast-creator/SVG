@@ -1,83 +1,74 @@
-/* =====================================================
-     OFFLINE STORAGE (IndexedDB)
-  ===================================================== */
+card.addEventListener("click", async function () {
 
-  function litdomOpenOfflineDb() {
+      const isOnline = navigator.onLine;
 
-    return new Promise(function (resolve, reject) {
+      if (!isOnline && !isDownloaded) {
 
-      const request =
-        indexedDB.open("litdom_offline", 1);
+        alert(
+          "You're offline and this book hasn't been downloaded yet. Connect to the internet to download and read it."
+        );
 
-      request.onupgradeneeded = function (event) {
+        return;
 
-        const db = event.target.result;
+      }
 
-        if (!db.objectStoreNames.contains("chapters")) {
+      if (isOnline && !isDownloaded) {
 
-          const store =
-            db.createObjectStore("chapters", { keyPath: "id" });
+        const wantsDownload =
+          confirm(
+            "\"" + book.title + "\" is not downloaded yet. Download it now for offline reading?"
+          );
 
-          store.createIndex("book_id", "book_id", { unique: false });
+        if (wantsDownload) {
+
+          badge.textContent = "Downloading...";
+
+          try {
+
+            const {
+              data: freeChapters,
+              error: freeChaptersError
+            } = await client
+              .from("chapters")
+              .select("id,chapter_number,title,content,is_locked")
+              .eq("book_id", book.id)
+              .eq("status", "published")
+              .eq("is_locked", false);
+
+            if (freeChaptersError) {
+              throw freeChaptersError;
+            }
+
+            await litdomSaveBookOffline(
+              book.id,
+              book.title,
+              freeChapters || []
+            );
+
+            badge.textContent = "Downloaded";
+
+            badge.className =
+              "library-download-badge downloaded";
+
+          } catch (downloadError) {
+
+            console.error("LIBRARY DOWNLOAD ERROR:", downloadError);
+
+            badge.textContent = "Not Downloaded";
+
+            alert("Could not download this book right now.");
+
+            return;
+
+          }
 
         }
 
-        if (!db.objectStoreNames.contains("books")) {
+      }
 
-          db.createObjectStore("books", { keyPath: "book_id" });
+      localStorage.setItem(seenKey, String(currentCount));
 
-        }
-
-      };
-
-      request.onsuccess = function () {
-        resolve(request.result);
-      };
-
-      request.onerror = function () {
-        reject(request.error);
-      };
+      window.location.href =
+        "/p/book.html?book=" + encodeURIComponent(book.id);
 
     });
-
-  }
-
-  async function litdomSaveBookOffline(bookId, bookTitle, chapters) {
-
-    const db = await litdomOpenOfflineDb();
-
-    return new Promise(function (resolve, reject) {
-
-      const tx =
-        db.transaction(["chapters", "books"], "readwrite");
-
-      tx.objectStore("books").put({
-        book_id: bookId,
-        title: bookTitle,
-        downloaded_at: new Date().toISOString(),
-        chapter_count: chapters.length
-      });
-
-      chapters.forEach(function (chapter) {
-
-        tx.objectStore("chapters").put({
-          id: chapter.id,
-          book_id: bookId,
-          chapter_number: chapter.chapter_number,
-          title: chapter.title,
-          content: chapter.content
-        });
-
-      });
-
-      tx.oncomplete = function () {
-        resolve();
-      };
-
-      tx.onerror = function () {
-        reject(tx.error);
-      };
-
-    });
-
-  }
