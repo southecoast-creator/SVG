@@ -148,3 +148,189 @@ libraryButton.setAttribute(
 ===================================================== */
 
 showOfflineDownloadPopup();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   LITDOM — OFFLINE DOWNLOAD OFFER
+===================================================== */
+
+function showOfflineDownloadPopup() {
+
+  /*
+     Prevent duplicate popups.
+  */
+
+  if (
+    document.querySelector(
+      ".litdom-offline-overlay"
+    )
+  ) {
+    return;
+  }
+
+
+  /*
+     Create overlay.
+  */
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.className =
+    "litdom-offline-overlay";
+
+
+  /*
+     Create popup.
+  */
+
+  const popup =
+    document.createElement("div");
+
+  popup.className =
+    "litdom-offline-popup";
+
+
+  popup.innerHTML = `
+
+    <div class="litdom-offline-popup-icon">
+      📚
+    </div>
+
+    <h3>
+      Added to your Library
+    </h3>
+
+    <p>
+      Would you like to save this book
+      for offline reading?
+    </p>
+
+    <button
+      type="button"
+      class="litdom-offline-download-button"
+    >
+      ↓ Download for Offline
+    </button>
+
+    <button
+      type="button"
+      class="litdom-offline-later-button"
+    >
+      Maybe Later
+    </button>
+
+  `;
+
+
+  overlay.appendChild(
+    popup
+  );
+
+  document.body.appendChild(
+    overlay
+  );
+
+
+  /*
+     Buttons.
+  */
+
+  const downloadButton =
+    popup.querySelector(
+      ".litdom-offline-download-button"
+    );
+
+  const laterButton =
+    popup.querySelector(
+      ".litdom-offline-later-button"
+    );
+
+
+  /*
+     Maybe Later.
+  */
+
+  laterButton.addEventListener(
+    "click",
+    function () {
+
+      overlay.remove();
+
+    }
+  );
+
+
+  /*
+     Clicking outside closes it too.
+  */
+
+  overlay.addEventListener(
+    "click",
+    function (event) {
+
+      if (
+        event.target === overlay
+      ) {
+
+        overlay.remove();
+
+      }
+
+    }
+  );
+
+
+  /*
+     Download button.
+     
+     For now we only prepare the UI.
+     The actual offline storage will be
+     added in the next stage.
+  */
+
+  downloadButton.addEventListener(
+    "click",
+    function () {
+
+      downloadButton.disabled =
+        true;
+
+      downloadButton.textContent =
+        "Preparing download…";
+
+      /*
+         Actual chapter downloading
+         will be connected here next.
+      */
+
+      setTimeout(
+        function () {
+
+          downloadButton.disabled =
+            false;
+
+          downloadButton.textContent =
+            "↓ Download for Offline";
+
+        },
+        800
+      );
+
+    }
+  );
+
+}
