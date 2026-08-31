@@ -1,360 +1,150 @@
 /* =====================================================
-   LITDOM — ADD TO LIBRARY
+   LITDOM — OFFLINE DOWNLOAD POPUP
 ===================================================== */
 
-const libraryButton =
-  document.getElementById(
-    "litdom-library-button"
-  );
+.litdom-offline-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
 
-if (libraryButton) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  /*
-     Check whether this reader already
-     has the book in their Library.
-  */
+  padding: 20px;
 
-  async function checkLibraryStatus() {
+  background: rgba(0, 0, 0, 0.62);
 
-    const {
-      data: {
-        session
-      }
-    } =
-      await client.auth.getSession();
-
-    /*
-       Visitor is not signed in.
-       Keep the normal button.
-    */
-
-    if (!session) {
-      return;
-    }
-
-    const userId =
-      session.user.id;
-
-    const {
-      data: libraryEntry,
-      error: libraryError
-    } =
-      await client
-        .from("library")
-        .select("id")
-        .eq(
-          "user_id",
-          userId
-        )
-        .eq(
-          "book_id",
-          book.id
-        )
-        .maybeSingle();
-
-    if (libraryError) {
-
-      console.error(
-        "LIBRARY STATUS ERROR:",
-        libraryError
-      );
-
-      return;
-    }
-
-    /*
-       Already added.
-    */
-
-    if (libraryEntry) {
-
-      libraryButton.textContent =
-        "✓ Added to Library";
-
-      libraryButton.classList.add(
-        "litdom-library-added"
-      );
-
-      libraryButton.disabled =
-        true;
-
-      libraryButton.setAttribute(
-        "aria-label",
-        "Book added to Library"
-      );
-
-    }
-
-  }
-
-
-  /*
-     Add book to Library.
-  */
-
-  libraryButton.addEventListener(
-    "click",
-    async function () {
-
-      /*
-         Prevent accidental double clicks.
-      */
-
-      if (
-        libraryButton.disabled
-      ) {
-        return;
-      }
-
-      const {
-        data: {
-          session
-        }
-      } =
-        await client.auth.getSession();
-
-
-      /*
-         Reader must be signed in.
-      */
-
-      if (!session) {
-
-        const popup =
-          document.createElement(
-            "div"
-          );
-
-        popup.className =
-          "litdom-auth-popup";
-
-        popup.innerHTML = `
-          <div class="litdom-auth-box">
-
-            <button
-              type="button"
-              class="litdom-auth-close"
-              aria-label="Close"
-            >
-              ×
-            </button>
-
-            <h3>
-              Add to Library
-            </h3>
-
-            <p>
-              Sign in or create a free Litdom
-              account to save this book to
-              your Library.
-            </p>
-
-            <a
-              href="/p/sign-up-for-litdom.html"
-              class="litdom-auth-button"
-            >
-              Sign In / Create Account
-            </a>
-
-          </div>
-        `;
-
-        document.body.appendChild(
-          popup
-        );
-
-
-        popup
-          .querySelector(
-            ".litdom-auth-close"
-          )
-          .addEventListener(
-            "click",
-            function () {
-
-              popup.remove();
-
-            }
-          );
-
-
-        popup.addEventListener(
-          "click",
-          function (event) {
-
-            if (
-              event.target === popup
-            ) {
-
-              popup.remove();
-
-            }
-
-          }
-        );
-
-        return;
-      }
-
-
-      /*
-         Temporarily disable the button
-         while Supabase saves it.
-      */
-
-      libraryButton.disabled =
-        true;
-
-      libraryButton.textContent =
-        "Adding…";
-
-
-      try {
-
-        const userId =
-          session.user.id;
-
-
-        const {
-          error: insertError
-        } =
-          await client
-            .from("library")
-            .insert({
-              user_id:
-                userId,
-
-              book_id:
-                book.id
-            });
-
-
-        /*
-           If Supabase rejects the insert,
-           restore the button.
-        */
-
-        if (insertError) {
-
-          /*
-             The unique constraint means that
-             even a double request cannot create
-             a duplicate.
-          */
-
-          if (
-            insertError.code ===
-            "23505"
-          ) {
-
-            libraryButton.textContent =
-              "✓ Added to Library";
-
-            libraryButton.classList.add(
-              "litdom-library-added"
-            );
-
-            return;
-          }
-
-
-          throw insertError;
-        }
-
-
-        /*
-           SUCCESS
-        */
-
-        libraryButton.textContent =
-          "✓ Added to Library";
-
-        libraryButton.classList.add(
-          "litdom-library-added"
-        );
-
-        libraryButton.setAttribute(
-          "aria-label",
-          "Book added to Library"
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "ADD TO LIBRARY ERROR:",
-          error
-        );
-
-        libraryButton.disabled =
-          false;
-
-        libraryButton.textContent =
-          "＋ Add to Library";
-
-        alert(
-          "We couldn't add this book to your Library right now."
-        );
-
-      }
-
-    }
-  );
-
-
-  /*
-     Check status when the book page loads.
-  */
-
-  checkLibraryStatus();
-
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
-/* =====================================================
-   LITDOM — LIBRARY BUTTON
-===================================================== */
+.litdom-offline-popup {
+  width: 100%;
+  max-width: 390px;
 
-#litdom-library-button {
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.15s ease;
+  padding: 28px 22px 22px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(212, 175, 55, 0.42);
+  border-radius: 18px;
+
+  background: #17171c;
+  color: #fff8e7;
+
+  text-align: center;
+
+  box-shadow:
+    0 18px 55px rgba(0, 0, 0, 0.42);
 }
 
+.litdom-offline-popup-icon {
+  font-size: 34px;
+  margin-bottom: 10px;
+}
 
-/* Added state */
+.litdom-offline-popup h3 {
+  margin: 0 0 8px;
 
-#litdom-library-button.litdom-library-added {
+  font-size: 20px;
+}
+
+.litdom-offline-popup p {
+  margin: 0 auto 20px;
+
+  max-width: 310px;
+
+  font-size: 13px;
+  line-height: 1.6;
+
+  opacity: 0.68;
+}
+
+.litdom-offline-download-button {
+  width: 100%;
+
+  padding: 13px 18px;
+
+  border: 0;
+  border-radius: 11px;
+
   background:
     linear-gradient(
       135deg,
-      #1d1b15,
-      #17171c
+      #d4af37,
+      #f4d58d
     );
 
-  border-color: #D4AF37;
+  color: #0b0b0f;
 
-  color: #F4D58D;
+  font-size: 14px;
+  font-weight: 700;
 
-  box-shadow:
-    0 0 10px
-    rgba(212, 175, 55, 0.14);
+  cursor: pointer;
+}
 
-  cursor: default;
+.litdom-offline-later-button {
+  width: 100%;
+
+  margin-top: 9px;
+
+  padding: 11px 18px;
+
+  border: 1px solid rgba(244, 213, 141, 0.18);
+  border-radius: 11px;
+
+  background: transparent;
+
+  color: #fff8e7;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  opacity: 0.72;
+}
+
+.litdom-offline-later-button:hover {
+  opacity: 1;
+}
+
+.litdom-offline-download-button:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 
-/* While saving */
-
-#litdom-library-button:disabled {
-  opacity: 0.85;
-}
 
 
-/* Don't make the completed button jump */
 
-#litdom-library-button.litdom-library-added:hover {
-  transform: none;
-}
+
+
+
+
+
+
+
+
+/* =====================================================
+   SUCCESS
+===================================================== */
+
+libraryButton.textContent =
+  "✓ Added to Library";
+
+libraryButton.classList.add(
+  "litdom-library-added"
+);
+
+libraryButton.setAttribute(
+  "aria-label",
+  "Book added to Library"
+);
+
+
+/* =====================================================
+   OFFER OFFLINE DOWNLOAD
+===================================================== */
+
+showOfflineDownloadPopup();
