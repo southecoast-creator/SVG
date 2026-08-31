@@ -1,181 +1,66 @@
 /* =====================================================
-       LOAD WITHDRAWAL REQUESTS
+       SET MONTHLY EARNINGS
     ===================================================== */
 
-    const withdrawalsContainer =
-      document.getElementById("led-withdrawals");
+    const setEarningsButton =
+      document.getElementById("led-set-earnings");
 
-    const withdrawalCount =
-      document.getElementById("led-withdrawal-count");
+    const earningsInput =
+      document.getElementById("led-earnings-amount");
 
-    async function loadWithdrawalRequests() {
+    if (setEarningsButton) {
 
-      const {
-        data: withdrawals,
-        error: withdrawalsError
-      } = await supabaseClient
-        .from("withdrawal_requests")
-        .select(
-          "id,author_id,payout_account_id,amount,currency,status,admin_note,requested_at,processed_at"
-        )
-        .order("requested_at", { ascending: false });
+      setEarningsButton.addEventListener("click", async function () {
 
-      if (withdrawalsError) {
+        if (!currentReviewBook) {
+          alert("No book is currently selected.");
+          return;
+        }
 
-        console.error("WITHDRAWALS LOAD ERROR:", withdrawalsError);
+        const amount =
+          Number(earningsInput.value);
 
-        withdrawalsContainer.innerHTML =
-          "<div class='led-message'>Could not load withdrawal requests.</div>";
+        if (!Number.isFinite(amount) || amount < 0) {
+          alert("Please enter a valid amount.");
+          return;
+        }
 
-        return;
+        setEarningsButton.disabled = true;
 
-      }
-
-      const rows = withdrawals || [];
-
-      withdrawalCount.textContent = rows.length;
-
-      if (rows.length === 0) {
-
-        withdrawalsContainer.innerHTML =
-          "<div class='led-message'>No withdrawal requests yet.</div>";
-
-        return;
-
-      }
-
-      const payoutAccountIds =
-        rows.map(function (r) { return r.payout_account_id; });
-
-      const {
-        data: accounts,
-        error: accountsError
-      } = await supabaseClient
-        .from("payout_accounts")
-        .select("id,bank_name,account_name,account_number")
-        .in("id", payoutAccountIds);
-
-      if (accountsError) {
-        console.error("PAYOUT ACCOUNTS LOAD ERROR:", accountsError);
-      }
-
-      const accountsById = {};
-
-      (accounts || []).forEach(function (acc) {
-        accountsById[acc.id] = acc;
-      });
-
-      withdrawalsContainer.innerHTML = "";
-
-      rows.forEach(function (request) {
-
-        const card =
-          document.createElement("div");
-
-        card.className = "led-book-card";
-        card.style.display = "block";
-
-        const account =
-          accountsById[request.payout_account_id] || {};
-
-        const title =
-          document.createElement("h3");
-
-        title.textContent =
-          (request.currency || "NGN") + " " +
-          Number(request.amount).toLocaleString();
-
-        const bankInfo =
-          document.createElement("p");
-
-        bankInfo.textContent =
-          (account.bank_name || "Unknown bank") + " \u2014 " +
-          (account.account_name || "Unknown name") + " \u2014 " +
-          (account.account_number || "Unknown number");
-
-        const requestedInfo =
-          document.createElement("p");
-
-        requestedInfo.textContent =
-          "Requested: " +
-          new Date(request.requested_at).toLocaleString();
-
-        const status =
-          document.createElement("span");
-
-        status.className = "led-status";
-
-        status.textContent = request.status || "pending";
-
-        card.appendChild(title);
-        card.appendChild(bankInfo);
-        card.appendChild(requestedInfo);
-        card.appendChild(status);
-
-        if (request.status === "pending") {
-
-          const markPaidButton =
-            document.createElement("button");
-
-          markPaidButton.type = "button";
-
-          markPaidButton.className = "led-action-button";
-
-          markPaidButton.textContent = "Mark as Paid";
-
-          markPaidButton.style.marginTop = "10px";
-
-          markPaidButton.style.display = "block";
-
-          markPaidButton.addEventListener("click", async function () {
-
-            const confirmed =
-              confirm("Confirm this withdrawal has been paid?");
-
-            if (!confirmed) {
-              return;
-            }
-
-            markPaidButton.disabled = true;
-
-            const {
-              error: updateError
-            } = await supabaseClient
-              .from("withdrawal_requests")
-              .update({
-                status: "paid",
-                processed_at: new Date().toISOString(),
-                processed_by: session.user.id
-              })
-              .eq("id", request.id);
-
-            if (updateError) {
-
-              console.error("WITHDRAWAL UPDATE ERROR:", updateError);
-
-              alert("Could not update this withdrawal request.");
-
-              markPaidButton.disabled = false;
-
-              return;
-
-            }
-
-            loadWithdrawalRequests();
-
+        const {
+          error
+        } = await supabaseClient
+          .from("author_earnings")
+          .insert({
+            author_id: currentReviewBook.author_id,
+            book_id: currentReviewBook.book_id,
+            source_type: "editor_manual",
+            currency: "NGN",
+            gross_amount: amount,
+            platform_share: 0,
+            author_share: amount,
+            status: "settled"
           });
 
-          card.appendChild(markPaidButton);
+        setEarningsButton.disabled = false;
+
+        if (error) {
+
+          console.error("SET EARNINGS ERROR:", error);
+
+          alert("Could not set earnings for this book.");
+
+          return;
 
         }
 
-        withdrawalsContainer.appendChild(card);
+        alert("Earnings set: \u20A6" + amount.toLocaleString() + " for this book.");
+
+        earningsInput.value = "";
 
       });
 
     }
-
-    loadWithdrawalRequests();
 
 
     /* =====================================================
