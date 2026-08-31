@@ -1,95 +1,282 @@
-setPublicationButtonVisibility(
-  book,
-  applyPublicationButton,
-  submittedBookIds
-);
+<script>
 
-     applyPublicationButton.addEventListener(
-  "click",
-  function () {
+  const SUPABASE_URL = "https://uniecvgkxhcbedppadgx.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_UhqP7y8Cjyiv8RebOSMUDA_lBj0QuTE";
+  const litdomSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
+  const RUBY_PACKAGES = [
+    { id: "ruby_150", amount: 150, ngnPrice: 100, tier: "Basic Package" },
+    { id: "ruby_300", amount: 300, ngnPrice: 250, tier: "Basic Package" },
+    { id: "ruby_750", amount: 750, ngnPrice: 500, tier: "Basic Package" },
+    { id: "ruby_1000", amount: 1000, ngnPrice: 750, tier: "Basic Package" },
+    { id: "ruby_1500", amount: 1500, ngnPrice: 1000, tier: "Medium Package" },
+    { id: "ruby_3100", amount: 3100, ngnPrice: 2500, tier: "Medium Package" },
+    { id: "ruby_8000", amount: 8000, ngnPrice: 5000, tier: "Medium Package" },
+    { id: "ruby_16500", amount: 16500, ngnPrice: 10000, tier: "Medium Package" },
+    { id: "ruby_32000", amount: 32000, ngnPrice: 20000, tier: "Pro Package" },
+    { id: "ruby_81000", amount: 81000, ngnPrice: 50000, tier: "Pro Package" },
+    { id: "ruby_113500", amount: 113500, ngnPrice: 75000, tier: "Pro Package" },
+    { id: "ruby_200000", amount: 200000, ngnPrice: 100000, tier: "Pro Package" }
+  ];
 
-    openPublicationApplication(
-      book
-    );
+  const DIAMOND_PACKAGES = [
+    { id: "diamond_5", amount: 5, ngnPrice: 500, tier: "Basic Package" },
+    { id: "diamond_12", amount: 12, ngnPrice: 1000, tier: "Basic Package" },
+    { id: "diamond_23", amount: 23, ngnPrice: 2000, tier: "Basic Package" },
+    { id: "diamond_55", amount: 55, ngnPrice: 5000, tier: "Basic Package" },
+    { id: "diamond_75", amount: 75, ngnPrice: 7000, tier: "Medium Package" },
+    { id: "diamond_110", amount: 110, ngnPrice: 10000, tier: "Medium Package" },
+    { id: "diamond_163", amount: 163, ngnPrice: 15000, tier: "Medium Package" },
+    { id: "diamond_215", amount: 215, ngnPrice: 20000, tier: "Medium Package" },
+    { id: "diamond_320", amount: 320, ngnPrice: 30000, tier: "Pro Package" },
+    { id: "diamond_530", amount: 530, ngnPrice: 50000, tier: "Pro Package" },
+    { id: "diamond_760", amount: 760, ngnPrice: 75000, tier: "Pro Package" },
+    { id: "diamond_1000", amount: 1000, ngnPrice: 100000, tier: "Pro Package" }
+  ];
+  
+    const CURRENCY_INFO = {
+    NGN: { locale: "en-NG", symbol: "\u20A6", decimals: 0 },
+    USD: { locale: "en-US", symbol: "$", decimals: 2 },
+    EUR: { locale: "en-IE", symbol: "\u20AC", decimals: 2 },
+    GBP: { locale: "en-GB", symbol: "\u00A3", decimals: 2 },
+    ZAR: { locale: "en-ZA", symbol: "R", decimals: 2 },
+    GHS: { locale: "en-GH", symbol: "GH\u20B5", decimals: 2 },
+    KES: { locale: "en-KE", symbol: "KSh", decimals: 2 },
+    UGX: { locale: "en-UG", symbol: "UGX", decimals: 0 },
+    RWF: { locale: "rw-RW", symbol: "FRw", decimals: 0 },
+    TZS: { locale: "sw-TZ", symbol: "TSh", decimals: 0 },
+    MWK: { locale: "en-MW", symbol: "MK", decimals: 2 },
+    XAF: { locale: "fr-CM", symbol: "FCFA", decimals: 0 },
+    XOF: { locale: "fr-SN", symbol: "CFA", decimals: 0 },
+    EGP: { locale: "ar-EG", symbol: "E\u00A3", decimals: 2 }
+  };
 
-  }
-);
+  document.addEventListener("DOMContentLoaded", async function () {
 
+    const rubyBalanceValue = document.getElementById("rubyBalanceValue");
+    const diamondBalanceValue = document.getElementById("diamondBalanceValue");
+    const openTopupModalButton = document.getElementById("openTopupModalButton");
+    const closeTopupModalButton = document.getElementById("closeTopupModalButton");
+    const topupModalOverlay = document.getElementById("topupModalOverlay");
+    const rubyTabButton = document.getElementById("rubyTabButton");
+    const diamondTabButton = document.getElementById("diamondTabButton");
+    const rubyPackageGroup = document.getElementById("rubyPackageGroup");
+    const diamondPackageGroup = document.getElementById("diamondPackageGroup");
+    
+        const { data: { user } } = await litdomSupabase.auth.getUser();
 
-/* =========================
-   DELETE BOOK BUTTON
-========================= */
-
-const submissionStatus =
-  submissionStatusByBookId[book.id];
-
-const canDelete =
-  !submittedBookIds.has(book.id) ||
-  submissionStatus === "rejected";
-
-if (canDelete && book.status !== "published") {
-
-  const deleteBookButton =
-    document.createElement("button");
-
-  deleteBookButton.type = "button";
-
-  deleteBookButton.className =
-    "book-action-button";
-
-  deleteBookButton.textContent =
-    "Delete Book";
-
-  deleteBookButton.style.color = "#F0908C";
-
-  deleteBookButton.addEventListener(
-    "click",
-    async function () {
-
-      const confirmed =
-        confirm(
-          "Delete \"" + book.title + "\"? This cannot be undone."
-        );
-
-      if (!confirmed) {
-        return;
-      }
-
-      deleteBookButton.disabled = true;
-
-      const {
-        error: deleteError
-      } = await supabaseClient
-        .from("books")
-        .delete()
-        .eq("id", book.id);
-
-      if (deleteError) {
-
-        console.error("BOOK DELETE ERROR:", deleteError);
-
-        alert(
-          "Could not delete this book.\n\nError: " +
-          (deleteError.message || "Unknown") +
-          "\n\nCode: " +
-          (deleteError.code || "Unknown")
-        );
-
-        deleteBookButton.disabled = false;
-
-        return;
-
-      }
-
-      await loadBooks();
-
+    if (!user) {
+      document.getElementById("walletPage").innerHTML =
+        "<div class='wallet-modal-message'>Please log in to view your wallet.</div>";
+      return;
     }
-  );
 
-  actions.appendChild(deleteBookButton);
+    async function loadWalletBalance() {
+      const { data: wallet, error } = await litdomSupabase
+        .from("wallets")
+        .select("ruby_balance, diamond_balance")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-}
+      if (error) {
+        console.error("Wallet load error:", error);
+        return;
+      }
 
+      rubyBalanceValue.textContent = String(wallet?.ruby_balance ?? 0);
+      diamondBalanceValue.textContent = String(wallet?.diamond_balance ?? 0);
+    }
 
-card.appendChild(actions);
+    await loadWalletBalance();
+
+    let detectedCurrency = "NGN";
+    let displayRate = 1;
+
+    try {
+      const locationResponse = await fetch("https://ipapi.co/json/");
+
+      if (locationResponse.ok) {
+        const locationData = await locationResponse.json();
+        const countryCode = String(locationData?.country_code || "NG").toUpperCase().trim();
+
+        const countryCurrencyMap = {
+          NG: "NGN",
+          US: "USD", CA: "USD",
+          GB: "GBP",
+          IE: "EUR", FR: "EUR", DE: "EUR", ES: "EUR", IT: "EUR", PT: "EUR", NL: "EUR", BE: "EUR", AT: "EUR", FI: "EUR", GR: "EUR",
+          ZA: "ZAR",
+          GH: "GHS",
+          KE: "KES",
+          UG: "UGX",
+          RW: "RWF",
+          TZ: "TZS",
+          MW: "MWK",
+          CM: "XAF",
+          SN: "XOF",
+          EG: "EGP"
+        };
+
+        detectedCurrency = countryCurrencyMap[countryCode] || "USD";
+      }
+    } catch (locationError) {
+      console.warn("Unable to detect currency. Using NGN:", locationError);
+      detectedCurrency = "NGN";
+    }
+    
+    
+        const displayCurrency = CURRENCY_INFO[detectedCurrency] || CURRENCY_INFO.NGN;
+
+    if (detectedCurrency !== "NGN") {
+      try {
+        const rateResponse = await fetch("https://open.er-api.com/v6/latest/NGN");
+
+        if (rateResponse.ok) {
+          const rateData = await rateResponse.json();
+          const rate = Number(rateData?.rates?.[detectedCurrency]);
+
+          if (Number.isFinite(rate) && rate > 0) {
+            displayRate = rate;
+          }
+        }
+      } catch (rateError) {
+        console.warn("Unable to obtain exchange rate. Showing NGN prices.", rateError);
+        detectedCurrency = "NGN";
+      }
+    }
+
+    function formatDisplayPrice(ngnPrice) {
+      const localAmount = ngnPrice * displayRate;
+
+      const safeAmount = displayCurrency.decimals === 0
+        ? Math.ceil(localAmount)
+        : Math.ceil(localAmount * 100) / 100;
+
+      return `${displayCurrency.symbol} ${safeAmount.toLocaleString(displayCurrency.locale, {
+        minimumFractionDigits: displayCurrency.decimals,
+        maximumFractionDigits: displayCurrency.decimals
+      })}`;
+    }
+
+    function buildPackageGrid(container, packages, iconUrlPlaceholder) {
+      container.innerHTML = "";
+
+      let currentTier = "";
+
+      packages.forEach(function (pkg) {
+        if (pkg.tier !== currentTier) {
+          currentTier = pkg.tier;
+
+          const tierLabel = document.createElement("div");
+          tierLabel.className = "wallet-package-tier-label";
+          tierLabel.textContent = currentTier;
+          container.appendChild(tierLabel);
+
+          const grid = document.createElement("div");
+          grid.className = "wallet-package-grid";
+          grid.dataset.tierGrid = currentTier;
+          container.appendChild(grid);
+        }
+        
+                const grid = container.querySelector(`[data-tier-grid="${currentTier}"]`);
+
+        const card = document.createElement("div");
+        card.className = "wallet-package-card";
+
+        card.innerHTML = `
+          <div class="wallet-package-image-slot">
+            <img src="${iconUrlPlaceholder}" alt="" />
+          </div>
+          <div class="wallet-package-amount">${pkg.amount.toLocaleString()}</div>
+          <div class="wallet-package-price">${formatDisplayPrice(pkg.ngnPrice)}</div>
+        `;
+
+        card.addEventListener("click", function () {
+          startTopup(pkg);
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    buildPackageGrid(rubyPackageGroup, RUBY_PACKAGES, "PASTE_RUBY_ICON_URL_HERE");
+    buildPackageGrid(diamondPackageGroup, DIAMOND_PACKAGES, "PASTE_DIAMOND_ICON_URL_HERE");
+
+    openTopupModalButton.addEventListener("click", function () {
+      topupModalOverlay.classList.add("visible");
+    });
+
+    closeTopupModalButton.addEventListener("click", function () {
+      topupModalOverlay.classList.remove("visible");
+    });
+
+    topupModalOverlay.addEventListener("click", function (event) {
+      if (event.target === topupModalOverlay) {
+        topupModalOverlay.classList.remove("visible");
+      }
+    });
+
+    rubyTabButton.addEventListener("click", function () {
+      rubyTabButton.classList.add("active");
+      diamondTabButton.classList.remove("active");
+      rubyPackageGroup.classList.add("active");
+      diamondPackageGroup.classList.remove("active");
+    });
+
+    diamondTabButton.addEventListener("click", function () {
+      diamondTabButton.classList.add("active");
+      rubyTabButton.classList.remove("active");
+      diamondPackageGroup.classList.add("active");
+      rubyPackageGroup.classList.remove("active");
+    });
+
+    async function startTopup(pkg) {
+      if (!user.email) {
+        alert("Your account does not have an email address.");
+        return;
+      }
+
+      const { data, error } = await litdomSupabase.functions.invoke("create-wallet-topup", {
+        body: {
+          package_id: pkg.id,
+          email: user.email,
+          currency: detectedCurrency
+        }
+      });
+      
+            if (error) {
+        console.error("Topup creation error:", error);
+        alert("We couldn't start this top-up. Please try again.");
+        return;
+      }
+
+      if (!data || !data.success || !data.payment_link) {
+        console.error("Topup response:", data);
+        alert(data?.error || "Unable to create the top-up payment.");
+        return;
+      }
+
+      window.location.href = data.payment_link;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const txRef = urlParams.get("tx_ref");
+
+    if (txRef) {
+      const { data, error } = await litdomSupabase.functions.invoke("verify-wallet-topup", {
+        body: { tx_ref: txRef }
+      });
+
+      if (error) {
+        console.error("Topup verification error:", error);
+        alert("We couldn't confirm your top-up. Please contact support if you were charged.");
+      } else if (data && data.success && data.verified) {
+        alert(`Success! ${data.currency_amount} ${data.currency_type === "ruby" ? "Rubies" : "Diamonds"} added to your wallet.`);
+        await loadWalletBalance();
+      } else {
+        alert(data?.message || "Payment could not be confirmed yet.");
+      }
+    }
+
+  });
+
+</script>
