@@ -66,3 +66,118 @@
     ></textarea>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================
+CHAPTER WRITING SECTIONS
+========================== */
+
+.chapter-section {
+margin-top: 45px;
+padding: 30px;
+background: #17121f;
+border: 1px solid rgba(212,175,55,.22);
+border-radius: 20px;
+box-shadow: 0 0 25px rgba(212,175,55,.05);
+}
+
+.chapter-title {
+color: #D4AF37;
+font-family: "Cinzel", serif;
+font-size: 1.5rem;
+margin-bottom: 8px;
+}
+
+.chapter-description {
+color: #c8bca4;
+line-height: 1.7;
+margin-bottom: 22px;
+font-size: .95rem;
+}
+
+.chapter-group {
+display: flex;
+flex-direction: column;
+margin-bottom: 30px;
+}
+
+.chapter-group label {
+color: #D4AF37;
+font-weight: 600;
+margin-bottom: 10px;
+}
+
+.chapter-group textarea {
+width: 100%;
+min-height: 320px;
+padding: 22px;
+
+background: #0b0812;
+color: #FFF8E7;
+
+border: 1px solid rgba(212,175,55,.35);
+border-radius: 18px;
+
+font-family: Arial, sans-serif;
+font-size: 1rem;
+line-height: 1.8;
+
+resize: vertical;
+
+transition: .35s;
+
+}
+
+.chapter-group textarea::placeholder {
+color: #786f60;
+}
+
+.chapter-group textarea:focus {
+outline: none;
+border-color: #D4AF37;
+
+box-shadow:
+    0 0 18px rgba(212,175,55,.18),
+    0 0 35px rgba(212,175,55,.06);
+
+}
+
+.chapter-note {
+margin-top: 8px;
+color: #9f947f;
+font-size: .85rem;
+line-height: 1.5;
+}
+
+/* ==========================
+MOBILE CHAPTER BOXES
+========================== */
+
+@media(max-width:768px) {
+
+.chapter-section {
+    padding: 22px 16px;
+    border-radius: 16px;
+}
+
+.chapter-title {
+    font-size: 1.3rem;
+}
+
+.chapter-group textarea {
+    min-height: 260px;
+    padding: 18px;
+    font-size: .95rem;
+}
+
+}
