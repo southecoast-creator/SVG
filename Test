@@ -944,3 +944,84 @@ How long do you intend to write on Litdom?
 </div>
 
 </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ==========================================
+// REQUIRED TAG VALIDATION
+// ==========================================
+
+const authorForm = document.getElementById("authorForm");
+
+authorForm.addEventListener("submit", function(e){
+
+    const storyTagsValue =
+        document.getElementById("storyTags").value.trim();
+
+    const protagonistTraitsValue =
+        document.getElementById("protagonistTraits").value.trim();
+
+    const antagonistTraitsValue =
+        document.getElementById("antagonistTraits").value.trim();
+
+
+    if (!storyTagsValue) {
+
+        e.preventDefault();
+
+        alert("Please select at least one Story Tag or Trope.");
+
+        document.getElementById("storyTags").scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+        return;
+
+    }
+
+
+    if (!protagonistTraitsValue) {
+
+        e.preventDefault();
+
+        alert("Please select at least one protagonist trait.");
+
+        document.getElementById("protagonistTraits").scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+        return;
+
+    }
+
+
+    if (!antagonistTraitsValue) {
+
+        e.preventDefault();
+
+        alert("Please select at least one antagonist trait.");
+
+        document.getElementById("antagonistTraits").scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+        return;
+
+    }
+
+});
