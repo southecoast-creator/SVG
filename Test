@@ -1,1027 +1,243 @@
-/* ==========================
-WRITER INFORMATION SECTIONS
-========================== */
-
-.option-group{
-display:flex;
-flex-wrap:wrap;
-gap:12px;
-margin-top:10px;
+<!-- LITDOM WRITER WELCOME POPUP -->
+<style>
+#litdomWelcome {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(5,5,8,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
-.option-label{
-display:inline-flex;
-align-items:center;
-gap:8px;
-padding:12px 18px;
-background:#1b1624;
-border:1px solid rgba(212,175,55,.35);
-border-radius:999px;
-color:#f5e6c8;
-cursor:pointer;
-transition:.3s;
+.litdom-popup {
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 32px 25px 25px;
+    text-align: center;
+    border: 1px solid #D4AF37;
+    border-radius: 25px;
+    background:
+        radial-gradient(circle at top, rgba(212,175,55,.16), transparent 45%),
+        #17171C;
+    color: #FFF8E7;
+    box-shadow: 0 20px 70px rgba(0,0,0,.8),
+                0 0 40px rgba(212,175,55,.15);
+    animation: litdomPop .45s ease;
 }
 
-.option-label:hover{
-background:#2b2238;
-border-color:#D4AF37;
+@keyframes litdomPop {
+    from {
+        opacity: 0;
+        transform: scale(.88) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
-.option-label input{
-accent-color:#D4AF37;
+.litdom-star {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #D4AF37;
+    border-radius: 50%;
+    color: #F4D58D;
+    font-size: 29px;
+    background: rgba(212,175,55,.08);
+    box-shadow: 0 0 25px rgba(212,175,55,.2);
 }
 
-.ai-note{
-padding:22px;
-margin-top:20px;
-background:#1b1624;
-border-left:3px solid #D4AF37;
-border-radius:12px;
-color:#d9ccb1;
-line-height:1.8;
+.litdom-popup h2 {
+    margin: 0 0 12px;
+    color: #F4D58D;
+    font-size: 28px;
 }
 
-.required-note{
-color:#cbb98f;
-font-size:.9rem;
-margin-top:8px;
-font-style:italic;
+.litdom-popup p {
+    margin: 0 0 18px;
+    font-size: 14px;
+    line-height: 1.7;
 }
 
-.declaration-box{
-margin-top:25px;
-padding:25px;
-background:#17121f;
-border:1px solid rgba(212,175,55,.25);
-border-radius:18px;
-line-height:1.8;
+.litdom-intro {
+    color: #FFF8E7;
 }
 
-@media(max-width:768px){
-
-.option-label{
-width:100%;
+.litdom-note {
+    padding: 15px;
+    margin-bottom: 18px;
+    border-left: 3px solid #D4AF37;
+    border-radius: 10px;
+    background: rgba(212,175,55,.06);
+    color: #F4D58D;
+    text-align: left;
 }
 
+.litdom-benefits {
+    display: grid;
+    gap: 9px;
+    margin-bottom: 23px;
+    text-align: left;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-<!-- =====================================
-WRITING EXPERIENCE
-===================================== -->
-
-<section class="form-section">
-
-<h2 class="section-title">
-✍️ Writing Experience
-</h2>
-
-<p class="section-description">
-Tell us about your experience as a writer. There are no wrong answers — we simply want to understand your writing background.
-</p>
-
-<div class="input-group">
-
-<label for="writingExperience">
-How long have you been writing?
-</label>
-
-<select id="writingExperience" name="Writing Experience" required>
-
-<option value="">Select an option</option>
-<option>Less than 6 months</option>
-<option>6 months – 1 year</option>
-<option>1 – 3 years</option>
-<option>3 – 5 years</option>
-<option>5+ years</option>
-
-</select>
-
-</div>
-
-<div class="input-group">
-
-<label>
-Have you published your writing before?
-</label>
-
-<div class="option-group">
-
-<label class="option-label">
-<input type="radio" name="Published Before" value="Yes" required>
-Yes
-</label>
-
-<label class="option-label">
-<input type="radio" name="Published Before" value="No">
-No
-</label>
-
-</div>
-
-</div>
-
-<div class="input-group">
-
-<label for="previousPlatforms">
-If yes, where have you published your writing?
-</label>
-
-<input
-type="text"
-id="previousPlatforms"
-name="Previous Publishing Platforms"
-placeholder="e.g. Wattpad, GoodNovel, Webnovel, personal website...">
-
-</div>
-
-<div class="input-group">
-
-<label for="completedStories">
-How many stories or books have you completed?
-</label>
-
-<select id="completedStories" name="Completed Stories" required>
-
-<option value="">Select an option</option>
-<option>None</option>
-<option>1</option>
-<option>2 – 5</option>
-<option>6 – 10</option>
-<option>More than 10</option>
-
-</select>
-
-</div>
-
-<div class="input-group">
-
-<label for="previousGenres">
-What genres have you previously written?
-</label>
-
-<input
-type="text"
-id="previousGenres"
-name="Previous Genres"
-placeholder="Tell us the genres you have experience writing.">
-
-</div>
-
-<div class="input-group">
-
-<label>
-What type of writing are you most experienced in?
-</label>
-
-<div class="option-group">
-
-<label class="option-label">
-<input type="checkbox" name="Writing Type" value="Serialized Fiction">
-Serialized Fiction
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Writing Type" value="Full-Length Novels">
-Full-Length Novels
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Writing Type" value="Short Stories">
-Short Stories
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Writing Type" value="Non-Fiction">
-Non-Fiction
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Writing Type" value="Poetry">
-Poetry
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Writing Type" value="Other">
-Other
-</label>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =====================================
-WRITING PROCESS
-===================================== -->
-
-<section class="form-section">
-
-<h2 class="section-title">
-🧠 Your Writing Process
-</h2>
-
-<p class="section-description">
-We want to understand how you approach storytelling and develop your ideas.
-</p>
-
-<div class="input-group">
-
-<label for="storyBeginning">
-How do you usually begin a new story?
-</label>
-
-<textarea
-id="storyBeginning"
-name="How I Begin Stories"
-rows="6"
-placeholder="Tell us how you normally develop the beginning of a new story..."
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="storyPlanning">
-How do you normally plan your stories?
-</label>
-
-<textarea
-id="storyPlanning"
-name="Story Planning Process"
-rows="6"
-placeholder="Do you outline, plan chapters, develop characters first, write freely, or use another method?"
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="strongOpening">
-What do you believe makes a strong opening chapter?
-</label>
-
-<textarea
-id="strongOpening"
-name="Strong Opening Chapter"
-rows="6"
-placeholder="Tell us what you think makes readers want to continue..."
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="readerInterest">
-How do you keep readers interested from one chapter to the next?
-</label>
-
-<textarea
-id="readerInterest"
-name="Keeping Readers Interested"
-rows="6"
-placeholder="Explain your approach to maintaining reader interest..."
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="compellingCharacter">
-What do you believe makes a character compelling?
-</label>
-
-<textarea
-id="compellingCharacter"
-name="Compelling Character"
-rows="6"
-placeholder="What makes readers care about or become interested in a character?"
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="writersBlock">
-How do you handle writer's block or moments when you don't know what happens next?
-</label>
-
-<textarea
-id="writersBlock"
-name="Handling Writers Block"
-rows="6"
-placeholder="Tell us what you normally do when you get stuck..."
-required></textarea>
-
-</div>
-
-</section>
-
-
-<!-- =====================================
-WRITING SKILLS
-===================================== -->
-
-<section class="form-section">
-
-<h2 class="section-title">
-🛠️ Your Writing Skills
-</h2>
-
-<p class="section-description">
-Understanding your strengths and weaknesses helps us know where you may need support.
-</p>
-
-<div class="input-group">
-
-<label>
-What are your strongest writing skills?
-</label>
-
-<div class="option-group">
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Character Development">
-Character Development
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Dialogue">
-Dialogue
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Romance">
-Romance
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Emotional Scenes">
-Emotional Scenes
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Action">
-Action
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Description">
-Description
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Plotting">
-Plotting
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="World-Building">
-World-Building
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Pacing">
-Pacing
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Suspense">
-Suspense
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Strongest Writing Skills" value="Humor">
-Humor
-</label>
-
-</div>
-
-</div>
-
-<div class="input-group">
-
-<label for="writingStruggle">
-What area of writing do you struggle with most?
-</label>
-
-<textarea
-id="writingStruggle"
-name="Writing Weakness"
-rows="5"
-placeholder="Be honest. This helps us understand where you may need support."
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="writingImprove">
-What part of writing would you most like to improve?
-</label>
-
-<textarea
-id="writingImprove"
-name="Writing Improvement Goal"
-rows="5"
-placeholder="What writing skill would you most like to develop?"
-required></textarea>
-
-</div>
-
-</section>
-
-
-<!-- =====================================
-STORYTELLING KNOWLEDGE
-===================================== -->
-
-<section class="form-section">
-
-<h2 class="section-title">
-📚 Storytelling Knowledge
-</h2>
-
-<p class="section-description">
-These questions help us understand your current knowledge of storytelling.
-</p>
-
-<div class="input-group">
-
-<label for="povDefinition">
-What is Point of View (POV)?
-</label>
-
-<textarea
-id="povDefinition"
-name="Understanding of POV"
-rows="5"
-placeholder="Explain what POV means in storytelling..."
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="bestPov">
-Which POV do you understand best?
-</label>
-
-<select id="bestPov" name="Preferred POV" required>
-
-<option value="">Select POV</option>
-<option>First Person</option>
-<option>Second Person</option>
-<option>Third Person Limited</option>
-<option>Third Person Omniscient</option>
-<option>Multiple POV</option>
-<option>I'm still learning about POV</option>
-
-</select>
-
-</div>
-
-<div class="input-group">
-
-<label for="effectiveDialogue">
-What makes dialogue effective?
-</label>
-
-<textarea
-id="effectiveDialogue"
-name="Effective Dialogue"
-rows="5"
-placeholder="What makes conversations between characters feel good to read?"
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="pacing">
-What is pacing, and why is it important?
-</label>
-
-<textarea
-id="pacing"
-name="Understanding of Pacing"
-rows="5"
-placeholder="Explain what pacing means to you..."
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="chapterEnding">
-What makes a chapter ending effective?
-</label>
-
-<textarea
-id="chapterEnding"
-name="Effective Chapter Ending"
-rows="5"
-placeholder="What makes a reader want to open the next chapter?"
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="plotVsStory">
-What do you think is the difference between a plot and a story?
-</label>
-
-<textarea
-id="plotVsStory"
-name="Plot vs Story"
-rows="5"
-placeholder="Explain the difference in your own words..."
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="continueReading">
-What makes a reader want to continue reading?
-</label>
-
-<textarea
-id="continueReading"
-name="Reader Retention"
-rows="5"
-placeholder="What keeps readers coming back for another chapter?"
-required></textarea>
-
-</div>
-
-</section>
-
-
-<!-- =====================================
-WRITING CAPACITY
-===================================== -->
-
-<section class="form-section">
-
-<h2 class="section-title">
-⚡ Writing Capacity & Consistency
-</h2>
-
-<p class="section-description">
-Litdom writers need to be able to produce consistently while maintaining the quality of their work.
-</p>
-
-<div class="input-group">
-
-<label for="chaptersPerWeek">
-How many chapters can you realistically produce per week?
-</label>
-
-<select id="chaptersPerWeek" name="Chapters Per Week" required>
-
-<option value="">Select an option</option>
-<option>1 – 2 chapters</option>
-<option>3 – 5 chapters</option>
-<option>6 – 10 chapters</option>
-<option>11 – 15 chapters</option>
-<option>More than 15 chapters</option>
-
-</select>
-
-</div>
-
-<div class="input-group">
-
-<label for="usualChapterLength">
-What chapter length do you usually write?
-</label>
-
-<input
-type="text"
-id="usualChapterLength"
-name="Usual Chapter Length"
-placeholder="e.g. 800 – 1,200 words"
-required>
-
-</div>
-
-<div class="input-group">
-
-<label for="writingSchedule">
-How consistently can you maintain your writing schedule?
-</label>
-
-<textarea
-id="writingSchedule"
-name="Writing Schedule Consistency"
-rows="5"
-placeholder="Tell us about your realistic writing routine..."
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="productionChallenge">
-What is your biggest challenge when trying to produce chapters consistently?
-</label>
-
-<textarea
-id="productionChallenge"
-name="Writing Consistency Challenge"
-rows="5"
-placeholder="What usually affects your consistency?"
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="qualityUnderPressure">
-How do you maintain quality when working under a tight writing schedule?
-</label>
-
-<textarea
-id="qualityUnderPressure"
-name="Quality Under Pressure"
-rows="5"
-placeholder="Tell us how you balance speed and quality..."
-required></textarea>
-
-</div>
-
-</section>
-
-
-<!-- =====================================
-AI & WRITING TOOLS
-===================================== -->
-
-<section class="form-section">
-
-<h2 class="section-title">
-🤖 AI & Writing Tools
-</h2>
-
-<p class="section-description">
-Litdom permits the use of AI and other writing tools. We simply want to understand how you use them as part of your creative process.
-</p>
-
-<div class="input-group">
-
-<label>
-Do you use AI tools as part of your writing process?
-</label>
-
-<div class="option-group">
-
-<label class="option-label">
-<input type="radio" name="AI Usage" value="Yes" required>
-Yes
-</label>
-
-<label class="option-label">
-<input type="radio" name="AI Usage" value="No">
-No
-</label>
-
-<label class="option-label">
-<input type="radio" name="AI Usage" value="Sometimes">
-Sometimes
-</label>
-
-</div>
-
-</div>
-
-<div class="input-group">
-
-<label>
-How do you use AI in your writing?
-</label>
-
-<div class="option-group">
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Brainstorming">
-Brainstorming
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Plot Development">
-Plot Development
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Character Development">
-Character Development
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Research">
-Research
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Outlining">
-Outlining
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Drafting">
-Drafting
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Rewriting">
-Rewriting
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Editing">
-Editing
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Grammar Correction">
-Grammar Correction
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="AI Uses" value="Improving Descriptions">
-Improving Descriptions
-</label>
-
-</div>
-
-</div>
-
-<div class="input-group">
-
-<label for="aiCreativeDirection">
-How do you ensure that the final work reflects your own creative direction?
-</label>
-
-<textarea
-id="aiCreativeDirection"
-name="AI Creative Responsibility"
-rows="6"
-placeholder="Tell us how you guide, review, edit, and take responsibility for the final work..."
-required></textarea>
-
-</div>
-
-<div class="ai-note">
-
-<strong>Litdom's AI Principle:</strong><br>
-
-AI use is permitted on Litdom. We judge the final work based on its quality, originality, consistency, storytelling, and the writer's responsibility for the finished manuscript.
-
-</div>
-
-</section>
-
-
-<!-- =====================================
-TARGET READER
-===================================== -->
-
-<section class="form-section">
-
-<h2 class="section-title">
-🎯 Target Reader
-</h2>
-
-<div class="input-group">
-
-<label for="targetReader">
-Who do you primarily write for?
-</label>
-
-<select id="targetReader" name="Target Reader" required>
-
-<option value="">Select an audience</option>
-<option>Teens</option>
-<option>Young Adults</option>
-<option>Adults</option>
-<option>General Audience</option>
-<option>Other</option>
-
-</select>
-
-</div>
-
-<div class="input-group">
-
-<label for="idealReader">
-Describe your ideal reader.
-</label>
-
-<textarea
-id="idealReader"
-name="Ideal Reader"
-rows="5"
-placeholder="What kind of person do you imagine reading your stories?"
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="readerEmotion">
-What do you want your readers to feel when they read your stories?
-</label>
-
-<textarea
-id="readerEmotion"
-name="Desired Reader Emotion"
-rows="5"
-placeholder="What emotions or experiences do you want to create?"
-required></textarea>
-
-</div>
-
-</section>
-
-
-<!-- =====================================
-WRITING GOALS
-===================================== -->
-
-<section class="form-section">
-
-<h2 class="section-title">
-🌱 Your Writing Goals
-</h2>
-
-<div class="input-group">
-
-<label>
-Why do you want to write on Litdom?
-</label>
-
-<div class="option-group">
-
-<label class="option-label">
-<input type="checkbox" name="Litdom Goals" value="Build Readership">
-Build Readership
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Litdom Goals" value="Earn">
-Earn
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Litdom Goals" value="Publish My First Book">
-Publish My First Book
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Litdom Goals" value="Become Professional">
-Become Professional
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Litdom Goals" value="Reach International Readers">
-Reach International Readers
-</label>
-
-<label class="option-label">
-<input type="checkbox" name="Litdom Goals" value="Develop My Skills">
-Develop My Skills
-</label>
-
-</div>
-
-</div>
-
-<div class="input-group">
-
-<label for="litdomAchievement">
-What do you hope to achieve as a Litdom writer?
-</label>
-
-<textarea
-id="litdomAchievement"
-name="Litdom Writer Goals"
-rows="5"
-placeholder="Tell us what success on Litdom would look like for you..."
-required></textarea>
-
-</div>
-
-<div class="input-group">
-
-<label for="litdomDuration">
-How long do you intend to write on Litdom?
-</label>
-
-<select id="litdomDuration" name="Litdom Commitment" required>
-
-<option value="">Select an option</option>
-<option>Short-term</option>
-<option>Several months</option>
-<option>Long-term</option>
-<option>I want Litdom to be my main writing platform</option>
-
-</select>
-
-</div>
-
-</section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ==========================================
-// REQUIRED TAG VALIDATION
-// ==========================================
-
-const authorForm = document.getElementById("authorForm");
-
-authorForm.addEventListener("submit", function(e){
-
-    const storyTagsValue =
-        document.getElementById("storyTags").value.trim();
-
-    const protagonistTraitsValue =
-        document.getElementById("protagonistTraits").value.trim();
-
-    const antagonistTraitsValue =
-        document.getElementById("antagonistTraits").value.trim();
-
-
-    if (!storyTagsValue) {
-
-        e.preventDefault();
-
-        alert("Please select at least one Story Tag or Trope.");
-
-        document.getElementById("storyTags").scrollIntoView({
-            behavior:"smooth",
-            block:"center"
-        });
-
-        return;
-
+.litdom-benefit {
+    display: flex;
+    gap: 10px;
+    padding: 11px 12px;
+    border: 1px solid rgba(140,118,37,.45);
+    border-radius: 10px;
+    background: rgba(11,11,15,.45);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.litdom-benefit b {
+    color: #D4AF37;
+    flex-shrink: 0;
+}
+
+.litdom-buttons {
+    display: flex;
+    gap: 11px;
+}
+
+.litdom-buttons button {
+    flex: 1;
+    min-height: 48px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.litdom-ready {
+    border: 1px solid #D4AF37;
+    background: linear-gradient(135deg,#D4AF37,#F4D58D);
+    color: #0B0B0F;
+}
+
+.litdom-later {
+    border: 1px solid #8C7625;
+    background: transparent;
+    color: #FFF8E7;
+}
+
+.litdom-popup small {
+    display: block;
+    margin-top: 15px;
+    color: rgba(255,248,231,.5);
+    line-height: 1.5;
+}
+
+@media(max-width:480px) {
+    .litdom-popup {
+        padding: 27px 18px 20px;
     }
 
-
-    if (!protagonistTraitsValue) {
-
-        e.preventDefault();
-
-        alert("Please select at least one protagonist trait.");
-
-        document.getElementById("protagonistTraits").scrollIntoView({
-            behavior:"smooth",
-            block:"center"
-        });
-
-        return;
-
+    .litdom-popup h2 {
+        font-size: 24px;
     }
 
-
-    if (!antagonistTraitsValue) {
-
-        e.preventDefault();
-
-        alert("Please select at least one antagonist trait.");
-
-        document.getElementById("antagonistTraits").scrollIntoView({
-            behavior:"smooth",
-            block:"center"
-        });
-
-        return;
-
+    .litdom-buttons {
+        flex-direction: column;
     }
+}
+</style>
 
-});
+<div id="litdomWelcome">
+
+    <div class="litdom-popup">
+
+        <div class="litdom-star">✦</div>
+
+        <h2>Hi there! 👋</h2>
+
+        <p class="litdom-intro">
+            Thanks for your interest in becoming a Litdom writer.
+            We're happy to have you here.
+        </p>
+
+        <p class="litdom-note">
+            <strong>Take your time with this form.</strong><br>
+            It is intentionally detailed because we want to understand
+            you, your writing experience, and your storytelling abilities.
+            Please don't rush. Read each question carefully and answer
+            honestly and thoughtfully.
+        </p>
+
+        <div class="litdom-benefits">
+
+            <div class="litdom-benefit">
+                <b>✦</b>
+                <span>
+                    You'll receive a <strong>7-day writer training</strong>
+                    to prepare you for writing on Litdom.
+                </span>
+            </div>
+
+            <div class="litdom-benefit">
+                <b>✦</b>
+                <span>
+                    You'll learn how to write engaging
+                    <strong>serialized fiction</strong> that meets
+                    publishing standards.
+                </span>
+            </div>
+
+            <div class="litdom-benefit">
+                <b>✦</b>
+                <span>
+                    You'll learn techniques for creating stories that
+                    keep readers interested from chapter to chapter.
+                </span>
+            </div>
+
+            <div class="litdom-benefit">
+                <b>✦</b>
+                <span>
+                    After completing the training successfully,
+                    you'll proceed toward becoming a <strong>Litdom writer</strong>.
+                </span>
+            </div>
+
+        </div>
+
+        <div class="litdom-buttons">
+
+            <button
+                type="button"
+                class="litdom-ready"
+                onclick="document.getElementById('litdomWelcome').style.display='none'; document.body.style.overflow='auto';">
+                I'm Ready ✦
+            </button>
+
+            <button
+                type="button"
+                class="litdom-later"
+                onclick="window.location.href='https://litdom.blogspot.com/';">
+                Maybe Later
+            </button>
+
+        </div>
+
+        <small>
+            Your story matters. Take your time and give your application
+            the attention it deserves. 💛
+        </small>
+
+    </div>
+</div>
+
+<script>
+document.body.style.overflow = "hidden";
+</script>
