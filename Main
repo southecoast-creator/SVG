@@ -1,75 +1,53 @@
-if (!session) {
-
-  const popup =
-    document.createElement("div");
-
-  popup.className =
-    "litdom-auth-popup";
-
-  popup.innerHTML = `
-    <div class="litdom-auth-box">
-
-      <button
-        type="button"
-        class="litdom-auth-close"
-        aria-label="Close"
-      >
-        ×
-      </button>
-
-      <h3>
-        Continue Reading
-      </h3>
-
-      <p>
-        Sign in or create a free Litdom account
-        to continue reading this book.
-      </p>
-
-      <a
-        href="/p/sign-up-for-litdom.html"
-        class="litdom-auth-button"
-      >
-        Sign In / Create Account
-      </a>
-
-    </div>
-  `;
-
-  document.body.appendChild(
-    popup
-  );
+loading.style.display = "none";
+  dashboard.style.display = "block";
 
 
-  popup
-    .querySelector(
-      ".litdom-auth-close"
-    )
-    .addEventListener(
-      "click",
-      function () {
+  /* =========================
+     WRITER'S ACADEMY POPUP
+     (repeats every 14 days)
+  ========================= */
 
-        popup.remove();
+  const ACADEMY_POPUP_INTERVAL_DAYS = 14;
 
-      }
-    );
+  const academyPopupKey = "litdom_academy_popup_last_shown";
 
+  const lastShown =
+    Number(localStorage.getItem(academyPopupKey) || 0);
 
-  popup.addEventListener(
-    "click",
-    function (event) {
+  const daysSinceShown =
+    (Date.now() - lastShown) / (1000 * 60 * 60 * 24);
 
-      if (
-        event.target === popup
-      ) {
+  if (daysSinceShown >= ACADEMY_POPUP_INTERVAL_DAYS) {
 
-        popup.remove();
+    const academyOverlay =
+      document.createElement("div");
 
-      }
+    academyOverlay.style.position = "fixed";
+    academyOverlay.style.inset = "0";
+    academyOverlay.style.zIndex = "999999";
+    academyOverlay.style.background = "rgba(0,0,0,0.75)";
+    academyOverlay.style.display = "flex";
+    academyOverlay.style.alignItems = "center";
+    academyOverlay.style.justifyContent = "center";
+    academyOverlay.style.padding = "20px";
 
-    }
-  );
+    academyOverlay.innerHTML =
+      "<div style='max-width:360px; background:#17171C; border:1px solid #8C7625; border-radius:18px; padding:28px; text-align:center; color:#FFF8E7;'>" +
+      "<h2 style='color:#F4D58D; margin:0 0 12px; font-size:20px;'>Increase Your Approval Chances</h2>" +
+      "<p style='color:#B9AE9A; margin:0 0 24px; line-height:1.6; font-size:14px;'>Visit the Litdom Writer's Academy and boost your chances of book approval by up to 100%.</p>" +
+      "<a href='/p/writers-academy.html' style='display:block; width:100%; box-sizing:border-box; padding:14px; border-radius:10px; background:linear-gradient(135deg,#D4AF37,#F4D58D); color:#0B0B0F; font-weight:800; font-size:14px; text-decoration:none; margin-bottom:10px;'>Visit the Academy</a>" +
+      "<button id='academy-popup-dismiss' style='width:100%; padding:14px; border:1px solid #8C7625; border-radius:10px; background:transparent; color:#FFF8E7; font-size:14px; cursor:pointer;'>I am a professional writer</button>" +
+      "</div>";
 
+    document.body.appendChild(academyOverlay);
 
-  return;
-}
+    localStorage.setItem(academyPopupKey, String(Date.now()));
+
+    document.getElementById("academy-popup-dismiss")
+      .addEventListener("click", function () {
+
+        academyOverlay.remove();
+
+      });
+
+  }
