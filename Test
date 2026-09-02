@@ -1,243 +1,68 @@
-<!-- LITDOM WRITER WELCOME POPUP -->
-<style>
-#litdomWelcome {
-    position: fixed;
-    inset: 0;
-    z-index: 999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 18px;
-    background: rgba(5,5,8,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-}
+<div class="chapter-section">
 
-.litdom-popup {
-    width: 100%;
-    max-width: 540px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 32px 25px 25px;
-    text-align: center;
-    border: 1px solid #D4AF37;
-    border-radius: 25px;
-    background:
-        radial-gradient(circle at top, rgba(212,175,55,.16), transparent 45%),
-        #17171C;
-    color: #FFF8E7;
-    box-shadow: 0 20px 70px rgba(0,0,0,.8),
-                0 0 40px rgba(212,175,55,.15);
-    animation: litdomPop .45s ease;
-}
-
-@keyframes litdomPop {
-    from {
-        opacity: 0;
-        transform: scale(.88) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
-.litdom-star {
-    width: 65px;
-    height: 65px;
-    margin: 0 auto 17px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #D4AF37;
-    border-radius: 50%;
-    color: #F4D58D;
-    font-size: 29px;
-    background: rgba(212,175,55,.08);
-    box-shadow: 0 0 25px rgba(212,175,55,.2);
-}
-
-.litdom-popup h2 {
-    margin: 0 0 12px;
-    color: #F4D58D;
-    font-size: 28px;
-}
-
-.litdom-popup p {
-    margin: 0 0 18px;
-    font-size: 14px;
-    line-height: 1.7;
-}
-
-.litdom-intro {
-    color: #FFF8E7;
-}
-
-.litdom-note {
-    padding: 15px;
-    margin-bottom: 18px;
-    border-left: 3px solid #D4AF37;
-    border-radius: 10px;
-    background: rgba(212,175,55,.06);
-    color: #F4D58D;
-    text-align: left;
-}
-
-.litdom-benefits {
-    display: grid;
-    gap: 9px;
-    margin-bottom: 23px;
-    text-align: left;
-}
-
-.litdom-benefit {
-    display: flex;
-    gap: 10px;
-    padding: 11px 12px;
-    border: 1px solid rgba(140,118,37,.45);
-    border-radius: 10px;
-    background: rgba(11,11,15,.45);
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.litdom-benefit b {
-    color: #D4AF37;
-    flex-shrink: 0;
-}
-
-.litdom-buttons {
-    display: flex;
-    gap: 11px;
-}
-
-.litdom-buttons button {
-    flex: 1;
-    min-height: 48px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.litdom-ready {
-    border: 1px solid #D4AF37;
-    background: linear-gradient(135deg,#D4AF37,#F4D58D);
-    color: #0B0B0F;
-}
-
-.litdom-later {
-    border: 1px solid #8C7625;
-    background: transparent;
-    color: #FFF8E7;
-}
-
-.litdom-popup small {
-    display: block;
-    margin-top: 15px;
-    color: rgba(255,248,231,.5);
-    line-height: 1.5;
-}
-
-@media(max-width:480px) {
-    .litdom-popup {
-        padding: 27px 18px 20px;
-    }
-
-    .litdom-popup h2 {
-        font-size: 24px;
-    }
-
-    .litdom-buttons {
-        flex-direction: column;
-    }
-}
-</style>
-
-<div id="litdomWelcome">
-
-    <div class="litdom-popup">
-
-        <div class="litdom-star">✦</div>
-
-        <h2>Hi there! 👋</h2>
-
-        <p class="litdom-intro">
-            Thanks for your interest in becoming a Litdom writer.
-            We're happy to have you here.
-        </p>
-
-        <p class="litdom-note">
-            <strong>Take your time with this form.</strong><br>
-            It is intentionally detailed because we want to understand
-            you, your writing experience, and your storytelling abilities.
-            Please don't rush. Read each question carefully and answer
-            honestly and thoughtfully.
-        </p>
-
-        <div class="litdom-benefits">
-
-            <div class="litdom-benefit">
-                <b>✦</b>
-                <span>
-                    You'll receive a <strong>7-day writer training</strong>
-                    to prepare you for writing on Litdom.
-                </span>
-            </div>
-
-            <div class="litdom-benefit">
-                <b>✦</b>
-                <span>
-                    You'll learn how to write engaging
-                    <strong>serialized fiction</strong> that meets
-                    publishing standards.
-                </span>
-            </div>
-
-            <div class="litdom-benefit">
-                <b>✦</b>
-                <span>
-                    You'll learn techniques for creating stories that
-                    keep readers interested from chapter to chapter.
-                </span>
-            </div>
-
-            <div class="litdom-benefit">
-                <b>✦</b>
-                <span>
-                    After completing the training successfully,
-                    you'll proceed toward becoming a <strong>Litdom writer</strong>.
-                </span>
-            </div>
-
-        </div>
-
-        <div class="litdom-buttons">
-
-            <button
-                type="button"
-                class="litdom-ready"
-                onclick="document.getElementById('litdomWelcome').style.display='none'; document.body.style.overflow='auto';">
-                I'm Ready ✦
-            </button>
-
-            <button
-                type="button"
-                class="litdom-later"
-                onclick="window.location.href='https://litdom.blogspot.com/';">
-                Maybe Later
-            </button>
-
-        </div>
-
-        <small>
-            Your story matters. Take your time and give your application
-            the attention it deserves. 💛
-        </small>
-
+    <div class="chapter-label">
+        <span class="chapter-number">1</span>
+        Chapter One
     </div>
+
+    <p class="chapter-description">
+        Paste the complete text of your first chapter below.
+    </p>
+
+    <textarea
+        id="chapter1"
+        name="chapter1"
+        class="chapter-textarea"
+        placeholder="Begin Chapter One here..."
+        required
+    ></textarea>
+
+    <p class="chapter-note">
+        Please paste your original work exactly as you want it reviewed.
+    </p>
+
 </div>
 
-<script>
-document.body.style.overflow = "hidden";
-</script>
+
+<div class="chapter-section">
+
+    <div class="chapter-label">
+        <span class="chapter-number">2</span>
+        Chapter Two
+    </div>
+
+    <p class="chapter-description">
+        Paste the complete text of your second chapter below.
+    </p>
+
+    <textarea
+        id="chapter2"
+        name="chapter2"
+        class="chapter-textarea"
+        placeholder="Begin Chapter Two here..."
+        required
+    ></textarea>
+
+</div>
+
+
+<div class="chapter-section">
+
+    <div class="chapter-label">
+        <span class="chapter-number">3</span>
+        Chapter Three
+    </div>
+
+    <p class="chapter-description">
+        Paste the complete text of your third chapter below.
+    </p>
+
+    <textarea
+        id="chapter3"
+        name="chapter3"
+        class="chapter-textarea"
+        placeholder="Begin Chapter Three here..."
+        required
+    ></textarea>
+
+</div>
