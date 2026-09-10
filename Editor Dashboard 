@@ -1121,3 +1121,9 @@ if (
 
             updated_at:
               now
+
+})
+          .eq(
+            "id",
+            chapter.id
+          );
