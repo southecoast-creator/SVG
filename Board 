@@ -1862,3 +1862,152 @@ document.getElementById(
   
   createChapterButton.addEventListener(
   "click",
+
+function () {
+
+    openNewChapter();
+
+  }
+);
+  
+  function openNewChapter() {
+
+  editingChapterId =
+    null;
+    
+    deleteChapterRequest.style.display =
+  "none";
+
+  chapterEditorBookTitle.textContent =
+    manageChaptersBookTitle.textContent;
+
+  chapterNumberInput.value =
+    "";
+
+  chapterTitleInput.value =
+    "";
+
+  chapterContentInput.innerHTML =
+  "";
+
+  chapterEditorWordCount.textContent =
+    "0";
+
+  chapterEditorMessage.textContent =
+    "";
+    
+    deleteChapterRequest.style.display =
+  "block";
+
+  chapterEditorModal.style.display =
+    "flex";
+
+}
+  
+  cancelChapterEditor.addEventListener(
+  "click",
+  function () {
+
+    chapterEditorModal.style.display =
+      "none";
+
+  }
+);
+  
+  function openEditChapter(chapter) {
+
+  editingChapterId =
+    chapter.id;
+
+  chapterEditorBookTitle.textContent =
+    manageChaptersBookTitle.textContent;
+
+  chapterNumberInput.value =
+    chapter.chapter_number || "";
+
+  chapterTitleInput.value =
+    chapter.title || "";
+
+  chapterContentInput.innerHTML =
+    chapter.content || "";
+
+  chapterEditorWordCount.textContent =
+    (
+      Number(
+        chapter.word_count
+      ) || 0
+    ).toLocaleString();
+
+  chapterEditorMessage.textContent =
+    "";
+    
+    deleteChapterRequest.style.display =
+  "block";
+
+  chapterEditorModal.style.display =
+    "flex";
+
+}
+  
+  chapterContentInput.addEventListener(
+  "input",
+  function () {
+
+    updateChapterWordCount();
+
+  }
+);
+  
+ function updateChapterWordCount() {
+
+  const plainText =
+    chapterContentInput.innerText
+      .trim();
+
+  const words =
+    plainText
+      ? plainText
+          .split(/\s+/)
+          .filter(Boolean)
+      : [];
+
+  chapterEditorWordCount.textContent =
+    words.length;
+
+}
+  
+  document
+  .querySelectorAll(
+    ".chapter-format-button"
+  )
+  .forEach(
+    function (button) {
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          const command =
+            button.dataset.command;
+const value =
+            button.dataset.value ||
+            null;
+
+          chapterContentInput.focus();
+
+          document.execCommand(
+            command,
+            false,
+            value
+          );
+
+          updateChapterWordCount();
+
+        }
+      );
+
+    }
+  );
+  
+  saveChapterDraft.addEventListener(
+  "click",
