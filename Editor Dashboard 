@@ -1203,3 +1203,137 @@ rejectChapterButton.style.background =
 
     rejectChapterButton.addEventListener(
       "click",
+
+async function () {
+
+        const confirmed =
+          confirm(
+            "Reject Chapter " +
+            (
+              chapter.chapter_number ??
+              ""
+            ) +
+            "?"
+          );
+
+
+        if (!confirmed) {
+          return;
+        }
+        
+        
+                approveChapterButton.disabled =
+          true;
+
+        rejectChapterButton.disabled =
+          true;
+
+
+        const now =
+          new Date().toISOString();
+
+
+        const {
+          error
+        } =
+          await supabaseClient
+            .from("chapters")
+            .update({
+
+              status:
+                "rejected",
+
+              reviewed_at:
+                now,
+
+              reviewed_by:
+                session.user.id,
+
+              updated_at:
+                now
+
+            })
+            .eq(
+              "id",
+              chapter.id
+            );
+        
+                if (error) {
+
+          console.error(
+            "CHAPTER REJECTION ERROR:",
+            error
+          );
+
+
+          alert(
+            "The chapter could not be rejected."
+          );
+
+
+          approveChapterButton.disabled =
+            false;
+
+          rejectChapterButton.disabled =
+            false;
+
+          return;
+        }
+        
+        
+                alert(
+          "Chapter rejected."
+        );
+
+
+        openBookReview(
+          currentReviewBook
+        );
+
+      }
+    );
+
+
+    actions.appendChild(
+      approveChapterButton
+    );
+
+    actions.appendChild(
+      rejectChapterButton
+    );
+
+
+    /* =================================================
+       ADD EVERYTHING TO CHAPTER CARD
+    ================================================= */
+
+    card.appendChild(
+      heading
+    );
+    
+    
+        card.appendChild(
+      meta
+    );
+
+    card.appendChild(
+      content
+    );
+
+    card.appendChild(
+      rubyControl
+    );
+
+    card.appendChild(
+      actions
+    );
+
+
+    chapters.appendChild(
+card
+    );
+
+  }
+);
+
+}
