@@ -2091,5 +2091,550 @@ document.addEventListener(
 
 
         const {
-          error: submissionErro
+          error: submissionError: submissionError
+        } =
+          await supabaseClient
+            .from("book_submissions")
+            .update({
+              status:
+                "rejected"
+            })
+            .eq(
+              "id",
+              currentReviewBook.id
+            );
+
+
+        if (submissionError) {
+
+          console.error(
+            "REJECT SUBMISSION ERROR:",
+            submissionError
+          );
+
+          alert(
+            "Could not reject the submission."
+          );
+
+          rejectBookButton.disabled =
+            false;
+
+          return;
+
+        }
+
+
+        const {
+          error: bookError
+        } =
+          await supabaseClient
+            .from("books")
+            .update({
+              status:
+                "rejected",
+              submission_status:
+                "rejected",
+              updated_at:
+                now
+            })
+            .eq(
+              "id",
+              currentReviewBook.book_id
+            );
+
+
+        if (bookError) {
+
+          console.error(
+            "REJECT BOOK ERROR:",
+            bookError
+          );
+
+          alert(
+            "Submission rejected, but the book itself could not be updated."
+          );
+
+          rejectBookButton.disabled =
+            false;
+
+          return;
+
+        }
+
+
+        alert(
+          "Book rejected."
+        );
+
+
+        rejectBookButton.disabled =
+          false;
+
+
+        await loadBooks();
+
+        reviewPanel.style.display =
+          "none";
+
+        currentReviewBook =
+          null;
+
+      }
+    );
+
+
+    /* =====================================================
+       SAVE DIAMOND PRICE
+    ===================================================== */
+
+    saveDiamondPriceButton.addEventListener(
+      "click",
+      async function () {
+
+        if (
+          !currentReviewBook ||
+          !currentReviewBook.book_id
+        ) {
+          return;
+        }
+
+
+        const rawValue =
+          diamondPriceInput.value.trim();
+
+
+        if (rawValue === "") {
+
+          alert(
+            "Please enter a Diamond price."
+          );
+
+          return;
+
+        }
+
+
+        const amount =
+          parseInt(
+            rawValue,
+            10
+          );
+
+
+        if (
+          !Number.isInteger(amount) ||
+          amount < 0
+        ) {
+
+          alert(
+            "Please enter a valid Diamond amount."
+          );
+
+          return;
+
+        }
+
+
+        const {
+          error
+        } =
+          await supabaseClient
+            .from("books")
+            .update({
+              full_book_unlock_cost:
+                amount,
+              updated_at:
+                new Date().toISOString()
+            })
+            .eq(
+              "id",
+              currentReviewBook.book_id
+            );
+
+
+        if (error) {
+
+          console.error(
+            "SAVE DIAMOND PRICE ERROR:",
+            error
+          );
+
+          alert(
+            "Could not save the Diamond price."
+          );
+
+          return;
+
+        }
+
+
+        alert(
+          "Diamond price saved."
+        );
+
+      }
+    );
+
+
+    /* =====================================================
+       WITHDRAWAL REQUESTS
+    ===================================================== */
+
+    const withdrawalContainer =
+      document.getElementById(
+        "led-withdrawals"
+      );
+
+    const withdrawalCount =
+      document.getElementById(
+        "led-withdrawal-count"
+      );
+
+
+    async function loadWithdrawals() {
+
+      if (!withdrawalContainer) {
+        return;
+      }
+
+
+      withdrawalContainer.innerHTML =
+        "<div class='led-message'>" +
+        "Loading withdrawal requests..." +
+        "</div>";
+
+
+      const {
+        data: withdrawals,
+        error
+      } =
+        await supabaseClient
+          .from("withdrawal_requests")
+          .select(
+            "id,user_id,amount,currency,status,created_at,payout_account_id"
+          )
+          .order(
+            "created_at",
+            {
+              ascending: false
+            }
+          );
+
+
+      if (error) {
+
+        console.error(
+          "WITHDRAWAL LOAD ERROR:",
+          error
+        );
+
+
+        withdrawalContainer.innerHTML =
+          "<div class='led-message'>" +
+          "Could not load withdrawal requests." +
+          "</div>";
+
+        return;
+
+      }
+
+
+      withdrawalCount.textContent =
+        (
+          withdrawals ||
+          []
+        ).length;
+
+
+      if (
+        !withdrawals ||
+        withdrawals.length === 0
+      ) {
+
+        withdrawalContainer.innerHTML =
+          "<div class='led-message'>" +
+          "No withdrawal requests yet." +
+          "</div>";
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         LOAD PAYOUT ACCOUNTS
+      =================================================== */
+
+      const payoutIds =
+        withdrawals
+          .map(function (item) {
+            return item.payout_account_id;
+          })
+          .filter(Boolean);
+
+
+      let payoutAccounts =
+        [];
+
+
+      if (
+        payoutIds.length > 0
+      ) {
+
+        const {
+          data: payoutData,
+          error: payoutError
+        } =
+          await supabaseClient
+            .from("payout_accounts")
+            .select(
+              "id,account_name,bank_name,account_number"
+            )
+            .in(
+              "id",
+              payoutIds
+            );
+
+
+        if (payoutError) {
+
+          console.error(
+            "PAYOUT ACCOUNT LOAD ERROR:",
+            payoutError
+          );
+
+        } else {
+
+          payoutAccounts =
+            payoutData ||
+            [];
+
+        }
+
+      }
+
+
+      withdrawalContainer.innerHTML =
+        "";
+
+
+      withdrawals.forEach(
+        function (request) {
+
+          const payout =
+            payoutAccounts.find(
+              function (account) {
+
+                return (
+                  account.id ===
+                  request.payout_account_id
+                );
+
+              }
+            ) ||
+            {};
+
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+          card.className =
+            "led-withdrawal-card";
+
+
+          const title =
+            document.createElement(
+              "h4"
+            );
+
+          title.textContent =
+            (
+              request.amount ||
+              0
+            ) +
+            " " +
+            (
+              request.currency ||
+              ""
+            );
+
+
+          const status =
+            document.createElement(
+              "p"
+            );
+
+          status.textContent =
+            "Status: " +
+            (
+              request.status ||
+              "pending"
+            );
+
+
+          const date =
+            document.createElement(
+              "p"
+            );
+
+          date.textContent =
+            "Requested: " +
+            new Date(
+              request.created_at
+            ).toLocaleString();
+
+
+          const payoutInfo =
+            document.createElement(
+              "p"
+            );
+
+          payoutInfo.textContent =
+            "Bank: " +
+            (
+              payout.bank_name ||
+              "Not provided"
+            ) +
+            " • Account: " +
+            (
+              payout.account_number ||
+              "Not provided"
+            );
+
+
+          card.appendChild(
+            title
+          );
+
+          card.appendChild(
+            status
+          );
+
+          card.appendChild(
+            date
+          );
+
+          card.appendChild(
+            payoutInfo
+          );
+
+
+          if (
+            String(
+              request.status ||
+              ""
+            ).toLowerCase() ===
+            "pending"
+          ) {
+
+            const payButton =
+              document.createElement(
+                "button"
+              );
+
+            payButton.type =
+              "button";
+
+            payButton.className =
+              "led-small-button";
+
+            payButton.textContent =
+              "Mark as Paid";
+
+
+            payButton.addEventListener(
+              "click",
+              async function () {
+
+                const confirmed =
+                  confirm(
+                    "Mark this withdrawal request as paid?"
+                  );
+
+
+                if (!confirmed) {
+                  return;
+                }
+
+
+                payButton.disabled =
+                  true;
+
+
+                const {
+                  error
+                } =
+                  await supabaseClient
+                    .from("withdrawal_requests")
+                    .update({
+                      status:
+                        "paid",
+                      updated_at:
+                        new Date().toISOString()
+                    })
+                    .eq(
+                      "id",
+                      request.id
+                    );
+
+
+                if (error) {
+
+                  console.error(
+                    "MARK WITHDRAWAL PAID ERROR:",
+                    error
+                  );
+
+                  alert(
+                    "Could not update the withdrawal."
+                  );
+
+                  payButton.disabled =
+                    false;
+
+                  return;
+
+                }
+
+
+                alert(
+                  "Withdrawal marked as paid."
+                );
+
+
+                await loadWithdrawals();
+
+              }
+            );
+
+
+            card.appendChild(
+              payButton
+            );
+
+          }
+
+
+          withdrawalContainer.appendChild(
+            card
+          );
+
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       SET MONTHLY EARNINGS
+    ===================================================== */
+
+    const earningsInput =
+      document.getElementById(
+        "led-earnings-input"
+      );
+
+   
      
