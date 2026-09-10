@@ -1,221 +1,60 @@
-/* =========================================================
-   BOOK GROUPS
-========================================================= */
-
-.led-book-groups {
-  display: grid;
-  grid-template-columns:
-    minmax(220px, .8fr)
-    minmax(0, 2.2fr);
-
-  gap: 20px;
-
-  width: 100%;
-}
+const bookIds =
+  books
+    .map(function (book) {
+      return book.book_id;
+    })
+    .filter(function (id) {
+      return !!id;
+    });
 
 
-.led-book-group {
-  min-width: 0;
-}
+if (bookIds.length > 0) {
+
+  const {
+    data: currentBookRows,
+    error: currentBookError
+  } =
+    await supabaseClient
+      .from("books")
+      .select("id,title,cover_url")
+      .in("id", bookIds);
 
 
-.led-book-group-header {
-  margin-bottom: 14px;
-}
+  if (currentBookError) {
 
-
-.led-group-eyebrow {
-  display: block;
-
-  margin-bottom: 4px;
-
-  color: #a45b82;
-
-  font-size: 10px;
-  font-weight: 800;
-
-  letter-spacing: 1.8px;
-}
-
-
-.led-group-title {
-  margin: 0;
-
-  color: #382731;
-
-  font-size: 20px;
-}
-
-
-/* =========================================================
-   APPROVED BOOKS
-========================================================= */
-
-.led-approved-scroll {
-  width: 100%;
-
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  padding-bottom: 10px;
-
-  -webkit-overflow-scrolling: touch;
-}
-
-
-.led-approved-track {
-  display: flex;
-
-  flex-wrap: nowrap;
-
-  gap: 14px;
-
-  width: max-content;
-
-  min-width: 100%;
-}
-
-
-.led-approved-track .led-book-card {
-  flex: 0 0 190px;
-
-  width: 190px;
-
-  margin: 0;
-}
-
-
-/* =========================================================
-   REJECTED BOOKS
-========================================================= */
-
-.led-rejected-list {
-  display: grid;
-
-  grid-template-columns: 1fr;
-
-  gap: 14px;
-}
-
-
-.led-rejected-list .led-book-card {
-  margin: 0;
-}
-
-
-/* =========================================================
-   BOOKS AWAITING REVIEW
-========================================================= */
-
-.led-other-group {
-  grid-column: 1 / -1;
-
-  margin-top: 5px;
-}
-
-
-.led-other-list {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(220px, 1fr)
+    console.error(
+      "CURRENT BOOK TITLE/COVER LOAD ERROR:",
+      currentBookError
     );
 
-  gap: 16px;
-}
+  } else {
+
+    (currentBookRows || []).forEach(
+      function (currentBook) {
+
+        const submission =
+          books.find(
+            function (book) {
+              return book.book_id === currentBook.id;
+            }
+          );
 
 
-/* =========================================================
-   DELETION REQUEST
-========================================================= */
+        if (submission) {
 
-.led-deletion-dot {
-  display: inline-block;
+          submission.title =
+            currentBook.title ||
+            submission.title;
 
-  width: 7px;
-  height: 7px;
+          submission.cover_url =
+            currentBook.cover_url ||
+            submission.cover_url;
 
-  margin-left: 7px;
+        }
 
-  border-radius: 50%;
+      }
+    );
 
-  background: #d71920;
-
-  vertical-align: middle;
-}
-
-
-.led-deletion-request-badge {
-  display: inline-block;
-
-  margin-top: 7px;
-
-  padding: 4px 8px;
-
-  border-radius: 999px;
-
-  background: #d71920;
-
-  color: white;
-
-  font-size: 10px;
-
-  font-weight: 800;
-}
-
-
-.led-delete-request-button {
-  margin-top: 10px;
-}
-
-
-/* =========================================================
-   MOBILE / TABLET
-========================================================= */
-
-@media (max-width: 900px) {
-
-  .led-book-groups {
-    grid-template-columns: 1fr;
-  }
-
-
-  .led-other-group {
-    grid-column: auto;
-  }
-
-}
-
-
-@media (max-width: 760px) {
-
-  .led-approved-track .led-book-card {
-    flex-basis: 180px;
-
-    width: 180px;
-  }
-
-
-  .led-other-list {
-    grid-template-columns: 1fr;
-  }
-
-}
-
-
-@media (max-width: 500px) {
-
-  .led-book-groups {
-    gap: 16px;
-  }
-
-
-  .led-approved-track .led-book-card {
-    flex-basis: 175px;
-
-    width: 175px;
   }
 
 }
