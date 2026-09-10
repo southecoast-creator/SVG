@@ -2636,5 +2636,115 @@ document.addEventListener(
         "led-earnings-input"
       );
 
+Input.value =
+            "";
+
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       INSIGHTS TOGGLE
+    ===================================================== */
+
+    const insightsButton =
+      document.getElementById(
+        "led-toggle-insights"
+      );
+
+
+    if (insightsButton) {
+
+      const {
+        data: settingData
+      } =
+        await supabaseClient
+          .from("app_settings")
+          .select(
+            "value"
+          )
+          .eq(
+            "key",
+            "insights_enabled"
+          )
+          .maybeSingle();
+
+
+      const insightsEnabled =
+        settingData &&
+        (
+          settingData.value === true ||
+          settingData.value === "true"
+        );
+
+
+      insightsButton.textContent =
+        insightsEnabled
+          ? "Disable Insights"
+          : "Enable Insights";
+
+
+      insightsButton.addEventListener(
+        "click",
+        async function () {
+
+          const newValue =
+            !insightsEnabled;
+
+
+          const {
+            error
+          } =
+            await supabaseClient
+              .from("app_settings")
+              .upsert({
+                key:
+                  "insights_enabled",
+                value:
+                  newValue
+              });
+
+
+          if (error) {
+
+            console.error(
+              "INSIGHTS UPDATE ERROR:",
+              error
+            );
+
+            alert(
+              "Could not update Insights."
+            );
+
+            return;
+
+          }
+
+
+          insightsButton.textContent =
+            newValue
+              ? "Disable Insights"
+              : "Enable Insights";
+
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       INITIAL LOAD
+    ===================================================== */
+
+    await loadBooks();
+
+    await loadWithdrawals();
+
+  }
+);
+
+</script>
    
      
