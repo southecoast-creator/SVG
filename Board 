@@ -2011,3 +2011,702 @@ const value =
   
   saveChapterDraft.addEventListener(
   "click",
+
+async function () {
+
+    chapterEditorMessage.textContent =
+      "Saving draft...";
+
+    const chapterNumber =
+      Number(
+        chapterNumberInput.value
+      );
+
+    const chapterTitle =
+      chapterTitleInput.value.trim();
+    
+        const chapterContent =
+      chapterContentInput.innerHTML.trim();
+
+    const plainText =
+      chapterContentInput.innerText.trim();
+
+    const wordCount =
+      plainText
+        ? plainText
+            .split(/\s+/)
+            .filter(Boolean)
+            .length
+        : 0;
+    
+    const MAX_CHAPTER_WORDS = 1200;
+
+if (wordCount > MAX_CHAPTER_WORDS) {
+
+  chapterEditorMessage.textContent =
+    "Chapter cannot exceed 1,200 words.";
+
+  return;
+}
+
+
+    if (!managingBookId) {
+
+      chapterEditorMessage.textContent =
+        "The book could not be identified.";
+
+      return;
+
+    }
+
+
+    if (
+      !chapterNumber ||
+      chapterNumber < 1
+    ) {
+
+      chapterEditorMessage.textContent =
+        "Please enter a valid chapter number.";
+
+      return;
+
+    }
+    
+    
+        if (!plainText) {
+
+      chapterEditorMessage.textContent =
+        "Please write some chapter content.";
+
+      return;
+
+    }
+
+
+    saveChapterDraft.disabled =
+      true;
+
+
+    let error = null;
+
+
+    /* =========================
+       UPDATE EXISTING DRAFT
+    ========================= */
+
+    if (editingChapterId) {
+
+      const result =
+  await supabaseClient
+    .from("chapters")
+    .update({
+
+      chapter_number:
+        chapterNumber,
+
+      title:
+        chapterTitle || null,
+
+      content:
+        chapterContent,
+
+      word_count:
+        wordCount,
+
+      status:
+        "changes_requested",
+
+      updated_at:
+        new Date().toISOString()
+
+    })
+    .eq(
+      "id",
+      editingChapterId
+    );
+
+      error =
+        result.error;
+
+    }
+
+
+    /* =========================
+       CREATE NEW DRAFT
+    ========================= */
+
+    else {
+      
+            const result =
+        await supabaseClient
+          .from("chapters")
+          .insert({
+
+            book_id:
+              managingBookId,
+
+            chapter_number:
+              chapterNumber,
+
+            title:
+              chapterTitle || null,
+
+            content:
+              chapterContent,
+
+            status:
+              "draft",
+
+            word_count:
+              wordCount
+
+          });
+
+      error =
+        result.error;
+
+    }
+    
+    
+        saveChapterDraft.disabled =
+      false;
+
+
+    if (error) {
+
+      console.error(
+        "CHAPTER SAVE ERROR:",
+        error
+      );
+
+      chapterEditorMessage.textContent =
+        "Unable to save chapter: " +
+        error.message;
+
+      return;
+
+    }
+
+
+    chapterEditorMessage.textContent =
+      "Draft saved successfully.";
+
+    await loadChapters(
+      managingBookId
+    );
+
+  }
+);
+  closeChapterEditor.addEventListener(
+  "click",
+  function () {
+
+    chapterEditorModal.style.display =
+      "none";
+    
+    cancelChapterEditor.addEventListener("click", () => {
+  chapterEditorModal.style.display = "none";
+});
+
+    editingChapterId =
+      null;
+
+  }
+);
+
+let editingChapterId =
+  null;
+
+let managingBookId =
+  null;
+  
+  async function openManageChapters(book) {
+
+  managingBookId =
+    book.id;
+
+  manageChaptersBookTitle.textContent =
+    book.title || "Book Chapters";
+
+  manageChaptersModal.style.display =
+    "flex";
+
+  await loadChapters(
+    book.id
+  );
+}
+  
+  async function loadChapters(bookId) {
+
+  chaptersList.innerHTML =
+    "<p>Loading chapters...</p>";
+
+  chapterCount.textContent =
+    "0";
+
+  chapterWordCount.textContent =
+    "0";
+
+
+  const {
+    data: chapters,
+    error
+  } = await supabaseClient
+    .from("chapters")
+    .select(
+  "id,book_id,chapter_number,title,content,status,word_count,is_locked,deletion_requested,created_at,updated_at,published_at,submitted_at"
+)
+  
+  
+      .eq(
+      "book_id",
+      bookId
+    )
+    .order(
+      "chapter_number",
+      {
+        ascending: true
+      }
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+    chaptersList.innerHTML =
+      "<p>Unable to load chapters.</p>";
+
+    return;
+  }
+
+
+  chapterCount.textContent =
+    chapters.length;
+    
+    
+      const totalWords =
+    chapters.reduce(
+      function (total, chapter) {
+
+        return total +
+          (
+            Number(
+              chapter.word_count
+            ) || 0
+          );
+
+      },
+      0
+    );
+
+
+  chapterWordCount.textContent =
+    totalWords.toLocaleString();
+
+
+  if (!chapters.length) {
+
+    chaptersList.innerHTML =
+      '<p class="empty-chapters">No chapters yet.</p>';
+
+    return;
+  }
+
+
+  chaptersList.innerHTML =
+  "";
+
+chapters.forEach(
+  function (chapter) {
+
+    const chapterCard =
+      document.createElement(
+        "div"
+      );
+
+    chapterCard.className =
+      "chapter-card";
+
+
+    /* =========================
+       CLICK TO EDIT DRAFT
+    ========================= */
+
+    if (
+      chapter.status === "draft" ||
+      chapter.status === "changes_requested"
+    ) {
+      
+            chapterCard.style.cursor =
+        "pointer";
+
+      chapterCard.addEventListener(
+        "click",
+        function () {
+
+          openEditChapter(
+            chapter
+          );
+
+        }
+      );
+
+    }
+    
+    
+        /* =========================
+       CHAPTER TITLE
+    ========================= */
+
+    const chapterTitle =
+      document.createElement(
+        "h3"
+      );
+
+    chapterTitle.textContent =
+      "Chapter " +
+      (
+        chapter.chapter_number ||
+        "\u2014"
+      ) +
+      (
+        chapter.title
+          ? " \u2014 " +
+            chapter.title
+          : ""
+      );
+
+
+    /* =========================
+       CHAPTER META
+    ========================= */
+
+    const chapterMeta =
+      document.createElement(
+        "div"
+      );
+
+    chapterMeta.className =
+      "chapter-meta";
+    
+    
+        const wordCountText =
+  (
+    Number(
+      chapter.word_count
+    ) || 0
+  ).toLocaleString() +
+  " words";
+
+chapterMeta.textContent =
+  wordCountText + " \u2022 ";
+
+const statusBadge =
+  document.createElement("span");
+
+statusBadge.className =
+  "chapter-status " +
+  (
+    chapter.status === "changes_requested"
+      ? "changes-requested"
+      : chapter.status || "draft"
+  );
+
+const statusLabels = {
+  draft: "Draft",
+  changes_requested: "Changes Requested",
+  published: "Published",
+  pending: "Pending",
+  rejected: "Rejected"
+};
+
+statusBadge.textContent =
+  statusLabels[
+    chapter.status
+  ] ||
+  "Draft";
+
+chapterMeta.appendChild(
+  statusBadge
+);
+
+
+    /* =========================
+       BUILD CARD
+    ========================= */
+
+    chapterCard.appendChild(
+      chapterTitle
+    );
+
+    chapterCard.appendChild(
+      chapterMeta
+    );
+
+    chaptersList.appendChild(
+      chapterCard
+    );
+
+  }
+);
+
+}
+  
+  closeManageChapters.addEventListener(
+  "click",
+  function () {
+
+    manageChaptersModal.style.display =
+      "none";
+
+    managingBookId =
+      null;
+
+  }
+);
+
+  async function openEditBook(book) {
+
+  const editingId =
+    book.id;
+    
+    /* =========================
+   RESET COVER PREVIEW
+   THEN LOAD THIS BOOK'S COVER
+========================= */
+
+const fictionCoverInput =
+  document.getElementById("fiction-book-cover");
+
+const fictionCoverMessage =
+  document.getElementById("fiction-cover-message");
+
+const fictionCoverPreview =
+  document.getElementById("fiction-cover-preview");
+
+const nonfictionCoverInput =
+  document.getElementById("book-cover");
+
+const nonfictionCoverMessage =
+  document.getElementById("cover-message");
+    
+    const nonfictionCoverPreview =
+  document.getElementById("cover-preview");
+
+
+/* Clear previous book's file selection */
+
+if (fictionCoverInput) {
+  fictionCoverInput.value = "";
+}
+
+if (nonfictionCoverInput) {
+  nonfictionCoverInput.value = "";
+}
+
+
+/* Clear previous preview */
+
+if (fictionCoverPreview) {
+  fictionCoverPreview.src = "";
+  fictionCoverPreview.style.display = "none";
+}
+    
+    if (nonfictionCoverPreview) {
+  nonfictionCoverPreview.src = "";
+  nonfictionCoverPreview.style.display = "none";
+}
+
+if (fictionCoverMessage) {
+  fictionCoverMessage.textContent = "";
+}
+
+if (nonfictionCoverMessage) {
+  nonfictionCoverMessage.textContent = "";
+}
+
+
+/* Load ONLY the cover belonging to this book */
+
+if (book.book_type === "fiction") {
+
+  if (book.cover_url && fictionCoverPreview) {
+
+    fictionCoverPreview.src =
+      book.cover_url;
+
+    fictionCoverPreview.style.display =
+      "block";
+    
+        if (fictionCoverMessage) {
+      fictionCoverMessage.textContent =
+        "Current cover";
+    }
+
+  }
+
+} else {
+
+  if (book.cover_url && nonfictionCoverPreview) {
+
+    nonfictionCoverPreview.src =
+      book.cover_url;
+
+    nonfictionCoverPreview.style.display =
+      "block";
+
+    if (nonfictionCoverMessage) {
+      nonfictionCoverMessage.textContent =
+        "Current cover";
+    }
+
+  }
+
+}
+    
+  modalLabel.textContent =
+    "EDIT BOOK";
+
+  typeHeading.textContent =
+    book.book_type === "fiction"
+      ? "Edit Fiction Book"
+      : "Edit Non-fiction Book";
+
+  saveBookButton.textContent =
+    "Save Changes";
+
+
+  /* =========================
+     SET BOOK TYPE
+  ========================= */
+
+  selectedType.value =
+    book.book_type || "";
+
+
+  /* =========================
+     INITIALIZE BOOK TYPE FIELDS
+  ========================= */
+
+  openCreateBook(
+    book.book_type === "fiction"
+      ? "fiction"
+      : "non-fiction"
+  );
+    
+    editingBookId =
+  editingId;
+    
+    
+      /* =========================
+     BASIC INFORMATION
+  ========================= */
+
+  titleInput.value =
+    book.title || "";
+
+  document
+    .getElementById("book-description")
+    .value =
+      book.description || "";
+
+
+  /* =========================
+     GENRE
+  ========================= */
+
+  const genreSelect =
+    document.getElementById("book-genre");
+
+  genreSelect.value =
+    book.genre || "";
+
+
+  /* =========================
+     FICTION DETAILS
+  ========================= */
+
+  if (book.book_type === "fiction") {
+
+    document
+      .getElementById("age-rating")
+      .value =
+        book.age_rating || "";
+
+
+    const details =
+      book.type_details || {};
+    
+    
+        document
+      .getElementById("fiction-subgenre")
+      .value =
+        details.subgenre || "";
+
+
+    document
+      .getElementById("fiction-tags")
+      .value =
+        Array.isArray(details.tags)
+          ? details.tags.join(", ")
+          : "";
+
+  }
+
+
+  /* =========================
+     NON-FICTION DETAILS
+  ========================= */
+
+  if (book.book_type === "non-fiction") {
+
+    const details =
+      book.type_details || {};
+
+
+    document
+      .getElementById("nonfiction-subgenre")
+      .value =
+        details.subgenre || "";
+    
+        document
+      .getElementById("nonfiction-tags")
+      .value =
+        Array.isArray(details.tags)
+          ? details.tags.join(", ")
+          : "";
+
+
+    document
+      .getElementById("intended-audience")
+      .value =
+        details.intended_audience || "";
+
+
+    document
+      .getElementById("nonfiction-content-level")
+      .value =
+        details.content_level || "";
+
+  }
+
+
+  /* =========================
+     OPEN MODAL
+  ========================= */
+
+  modal.style.display =
+    "flex";
+
+}
+
+  await loadBooks();
+
+
+  /* =========================
+     DASHBOARD TABS
+  ========================= */
+
+  const dashboardTabs =
+    document.querySelectorAll(".dashboard-tab");
