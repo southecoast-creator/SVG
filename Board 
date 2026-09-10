@@ -3154,3 +3154,151 @@ function initInsightsTab() {
 renderCalendar();
 
     });
+
+calendarNext.addEventListener("click", function () {
+
+      calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+
+      renderCalendar();
+
+    });
+
+    renderCalendar();
+
+  }
+
+  async function renderCalendar() {
+
+    const year = calendarViewDate.getFullYear();
+
+    const month = calendarViewDate.getMonth();
+
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    calendarMonthLabel.textContent =
+      monthNames[month] + " " + year;
+    
+        calendarGrid.innerHTML =
+      "<p>Loading...</p>";
+
+    const bookIds =
+      authorBooksCache.map(function (b) { return b.id; });
+
+    let updatedDates = new Set();
+
+    if (bookIds.length) {
+
+      const monthStart =
+        new Date(year, month, 1).toISOString();
+
+      const monthEnd =
+        new Date(year, month + 1, 1).toISOString();
+
+      const {
+        data: monthChapters,
+        error: monthChaptersError
+      } = await supabaseClient
+        .from("chapters")
+        .select("published_at")
+        .in("book_id", bookIds)
+        .not("published_at", "is", null)
+        .gte("published_at", monthStart)
+      
+              .lt("published_at", monthEnd);
+
+      if (monthChaptersError) {
+
+        console.error("CALENDAR CHAPTERS ERROR:", monthChaptersError);
+
+      } else {
+
+        (monthChapters || []).forEach(function (chapter) {
+
+          const day =
+            new Date(chapter.published_at).getDate();
+
+          updatedDates.add(day);
+
+        });
+
+      }
+
+    }
+    
+        calendarGrid.innerHTML = "";
+
+    const daysInMonth =
+      new Date(year, month + 1, 0).getDate();
+
+    const firstWeekday =
+      new Date(year, month, 1).getDay();
+
+    for (let i = 0; i < firstWeekday; i++) {
+
+      const blank =
+        document.createElement("div");
+
+      blank.className = "calendar-cell empty";
+
+      calendarGrid.appendChild(blank);
+
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      
+            const cell =
+        document.createElement("div");
+
+      cell.className = "calendar-cell";
+
+      if (updatedDates.has(day)) {
+
+        cell.classList.add("updated");
+
+      }
+
+      cell.textContent = day;
+
+      calendarGrid.appendChild(cell);
+
+    }
+
+  }
+
+
+  /* =========================
+     CREATE BOOK MODAL
+  ========================= */
+    
+
+  const modal =
+    document.getElementById("create-book-modal");
+
+  const typeHeading =
+    document.getElementById("book-type-heading");
+  
+  const modalLabel =
+  document.getElementById("book-modal-label");
+
+const saveBookButton =
+  document.getElementById("save-book-button");
+  
+  let editingBookId = null;
+
+  const selectedType =
+    document.getElementById("selected-book-type");
+
+  const titleInput =
+    document.getElementById("book-title");
+
+  const form =
+document.getElementById("create-book-form");
+  
+  const coverInput =
+  document.getElementById("book-cover");
+
+const coverMessage =
+  document.getElementById("cover-message");
