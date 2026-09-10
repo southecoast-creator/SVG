@@ -1157,4 +1157,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     const submissionStatusByBookId = {};
 
     (existingSubmissions || []).forEach(function (s) {
-      submissionStatusByB
+      submissionStatusByBookId[s.book_id] = s.status;
+    });
+
+
+    booksList.innerHTML = "";
