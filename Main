@@ -1,53 +1,1125 @@
-loading.style.display = "none";
-  dashboard.style.display = "block";
+<script>
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async function () {
+
+    /* =====================================================
+       SUPABASE
+    ===================================================== */
+
+    const SUPABASE_URL =
+      "https://uniecvgkxhcbedppadgx.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_UhqP7y8Cjyiv8RebOSMUDA_lBj0QuTE";
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        }
+      );
 
 
-  /* =========================
-     WRITER'S ACADEMY POPUP
-     (repeats every 14 days)
-  ========================= */
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
 
-  const ACADEMY_POPUP_INTERVAL_DAYS = 14;
+    const booksContainer =
+      document.getElementById(
+        "led-books"
+      );
 
-  const academyPopupKey = "litdom_academy_popup_last_shown";
+    const bookCount =
+      document.getElementById(
+        "led-book-count"
+      );
 
-  const lastShown =
-    Number(localStorage.getItem(academyPopupKey) || 0);
+    const reviewPanel =
+      document.getElementById(
+        "led-review-panel"
+      );
 
-  const daysSinceShown =
-    (Date.now() - lastShown) / (1000 * 60 * 60 * 24);
+    const closeReview =
+      document.getElementById(
+        "led-close-review"
+      );
 
-  if (daysSinceShown >= ACADEMY_POPUP_INTERVAL_DAYS) {
+    const approveBookButton =
+      document.getElementById(
+        "led-approve-book"
+      );
 
-    const academyOverlay =
-      document.createElement("div");
+    const rejectBookButton =
+      document.getElementById(
+        "led-reject-book"
+      );
 
-    academyOverlay.style.position = "fixed";
-    academyOverlay.style.inset = "0";
-    academyOverlay.style.zIndex = "999999";
-    academyOverlay.style.background = "rgba(0,0,0,0.75)";
-    academyOverlay.style.display = "flex";
-    academyOverlay.style.alignItems = "center";
-    academyOverlay.style.justifyContent = "center";
-    academyOverlay.style.padding = "20px";
+    const diamondPriceInput =
+      document.getElementById(
+        "led-book-diamond-price"
+      );
 
-    academyOverlay.innerHTML =
-      "<div style='max-width:360px; background:#17171C; border:1px solid #8C7625; border-radius:18px; padding:28px; text-align:center; color:#FFF8E7;'>" +
-      "<h2 style='color:#F4D58D; margin:0 0 12px; font-size:20px;'>Increase Your Approval Chances</h2>" +
-      "<p style='color:#B9AE9A; margin:0 0 24px; line-height:1.6; font-size:14px;'>Visit the Litdom Writer's Academy and boost your chances of book approval by up to 100%.</p>" +
-      "<a href='/p/writers-academy.html' style='display:block; width:100%; box-sizing:border-box; padding:14px; border-radius:10px; background:linear-gradient(135deg,#D4AF37,#F4D58D); color:#0B0B0F; font-weight:800; font-size:14px; text-decoration:none; margin-bottom:10px;'>Visit the Academy</a>" +
-      "<button id='academy-popup-dismiss' style='width:100%; padding:14px; border:1px solid #8C7625; border-radius:10px; background:transparent; color:#FFF8E7; font-size:14px; cursor:pointer;'>I am a professional writer</button>" +
-      "</div>";
+    const saveDiamondPriceButton =
+      document.getElementById(
+        "led-save-diamond-price"
+      );
 
-    document.body.appendChild(academyOverlay);
+    let currentReviewBook = null;
 
-    localStorage.setItem(academyPopupKey, String(Date.now()));
+    let allBooks = [];
 
-    document.getElementById("academy-popup-dismiss")
-      .addEventListener("click", function () {
+    let deletionRequestedBookIds =
+      new Set();
 
-        academyOverlay.remove();
 
-      });
+    /* =====================================================
+       CHECK LOGIN
+    ===================================================== */
 
-  }
+    const {
+      data: {
+        session
+      }
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (!session) {
+
+      booksContainer.innerHTML =
+        "<div class='led-message'>" +
+        "Please log in to use the Editor Dashboard." +
+        "</div>";
+
+      return;
+    }
+
+
+    /* =====================================================
+       DELETION REQUEST NOTIFICATION
+    ===================================================== */
+
+    async function updateDeletionNotification() {
+
+      deletionRequestedBookIds =
+        new Set();
+
+      if (!allBooks.length) {
+        updateDeletionDot();
+        return;
+      }
+
+      const bookIds =
+        allBooks
+          .map(function (book) {
+            return book.book_id;
+          })
+          .filter(Boolean);
+
+
+      if (!bookIds.length) {
+        updateDeletionDot();
+        return;
+      }
+
+
+      const {
+        data: deletionRequests,
+        error
+      } =
+        await supabaseClient
+          .from("chapters")
+          .select(
+            "id,book_id"
+          )
+          .in(
+            "book_id",
+            bookIds
+          )
+          .eq(
+            "deletion_requested",
+            true
+          );
+
+
+      if (error) {
+
+        console.error(
+          "CHAPTER DELETION REQUEST LOAD ERROR:",
+          error
+        );
+
+        updateDeletionDot();
+
+        return;
+      }
+
+
+      (deletionRequests || []).forEach(
+        function (chapter) {
+
+          deletionRequestedBookIds.add(
+            chapter.book_id
+          );
+
+        }
+      );
+
+
+      updateDeletionDot();
+
+    }
+
+
+    /* =====================================================
+       RED NOTIFICATION DOT
+    ===================================================== */
+
+    function updateDeletionDot() {
+
+      let dot =
+        document.getElementById(
+          "led-deletion-notification-dot"
+        );
+
+
+      if (!dot) {
+
+        dot =
+          document.createElement(
+            "span"
+          );
+
+        dot.id =
+          "led-deletion-notification-dot";
+
+        dot.className =
+          "led-deletion-dot";
+
+        dot.setAttribute(
+          "aria-label",
+          "Chapter deletion requests pending"
+        );
+
+        dot.title =
+          "There are pending chapter deletion requests";
+
+
+        const booksHeading =
+          document.querySelector(
+            "#litdom-editor-dashboard .led-section:first-of-type .led-section-title h2"
+          );
+
+
+        if (booksHeading) {
+
+          booksHeading.appendChild(
+            dot
+          );
+
+        }
+
+      }
+
+
+      dot.style.display =
+        deletionRequestedBookIds.size > 0
+          ? "inline-block"
+          : "none";
+
+    }
+
+
+    /* =====================================================
+       LOAD ALL BOOK SUBMISSIONS
+    ===================================================== */
+
+    async function loadBooks() {
+
+      booksContainer.innerHTML =
+        "<div class='led-message'>" +
+        "Loading books..." +
+        "</div>";
+
+
+      const {
+        data: submissions,
+        error
+      } =
+        await supabaseClient
+          .from("book_submissions")
+          .select(
+            "id,author_id,book_id,title,description,genre,cover_url,status,created_at,submitted_at,subgenre,book_outline,protagonist,antagonist,additional_details,author_details"
+          )
+          .order(
+            "created_at",
+            {
+              ascending: false
+            }
+          );
+
+
+      if (error) {
+
+        console.error(
+          "EDITOR BOOK LOAD ERROR:",
+          error
+        );
+
+
+        booksContainer.innerHTML =
+          "<div class='led-message'>" +
+          "Could not load book submissions." +
+          "</div>";
+
+        return;
+
+      }
+
+
+      allBooks =
+        submissions || [];
+
+
+      bookCount.textContent =
+        allBooks.length;
+
+
+      await updateDeletionNotification();
+
+
+      if (allBooks.length === 0) {
+
+        booksContainer.innerHTML =
+          "<div class='led-message'>" +
+          "No book submissions yet." +
+          "</div>";
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         BOOK GROUPS
+      =================================================== */
+
+      const approvedBooks =
+        allBooks.filter(
+          function (book) {
+
+            return (
+              String(
+                book.status || ""
+              ).toLowerCase() ===
+              "approved" ||
+              String(
+                book.status || ""
+              ).toLowerCase() ===
+              "published"
+            );
+
+          }
+        );
+
+
+      const rejectedBooks =
+        allBooks.filter(
+          function (book) {
+
+            return (
+              String(
+                book.status || ""
+              ).toLowerCase() ===
+              "rejected"
+            );
+
+          }
+        );
+
+
+      const otherBooks =
+        allBooks.filter(
+          function (book) {
+
+            const status =
+              String(
+                book.status || ""
+              ).toLowerCase();
+
+            return (
+              status !== "approved" &&
+              status !== "published" &&
+              status !== "rejected"
+            );
+
+          }
+        );
+
+
+      booksContainer.innerHTML =
+        "";
+
+
+      /* ===================================================
+         BOOK GROUP WRAPPER
+      =================================================== */
+
+      const groups =
+        document.createElement(
+          "div"
+        );
+
+      groups.className =
+        "led-book-groups";
+
+
+      /* ===================================================
+         APPROVED BOOKS
+      =================================================== */
+
+      const approvedSection =
+        document.createElement(
+          "div"
+        );
+
+      approvedSection.className =
+        "led-book-group led-approved-group";
+
+
+      const approvedHeader =
+        document.createElement(
+          "div"
+        );
+
+      approvedHeader.className =
+        "led-book-group-header";
+
+
+      const approvedEyebrow =
+        document.createElement(
+          "div"
+        );
+
+      approvedEyebrow.className =
+        "led-eyebrow";
+
+      approvedEyebrow.textContent =
+        "APPROVED";
+
+
+      const approvedTitle =
+        document.createElement(
+          "h3"
+        );
+
+      approvedTitle.textContent =
+        "Approved Books";
+
+
+      approvedHeader.appendChild(
+        approvedEyebrow
+      );
+
+      approvedHeader.appendChild(
+        approvedTitle
+      );
+
+
+      const approvedScroller =
+        document.createElement(
+          "div"
+        );
+
+      approvedScroller.className =
+        "led-approved-scroll";
+
+
+      const approvedTrack =
+        document.createElement(
+          "div"
+        );
+
+      approvedTrack.className =
+        "led-approved-track";
+
+
+      if (approvedBooks.length === 0) {
+
+        approvedScroller.innerHTML =
+          "<div class='led-message'>" +
+          "No approved books yet." +
+          "</div>";
+
+      } else {
+
+        approvedBooks.forEach(
+          function (book) {
+
+            approvedTrack.appendChild(
+              createBookCard(book)
+            );
+
+          }
+        );
+
+        approvedScroller.appendChild(
+          approvedTrack
+        );
+
+      }
+
+
+      approvedSection.appendChild(
+        approvedHeader
+      );
+
+      approvedSection.appendChild(
+        approvedScroller
+      );
+
+
+      groups.appendChild(
+        approvedSection
+      );
+
+
+      /* ===================================================
+         REJECTED BOOKS
+      =================================================== */
+
+      const rejectedSection =
+        document.createElement(
+          "div"
+        );
+
+      rejectedSection.className =
+        "led-book-group led-rejected-group";
+
+
+      const rejectedHeader =
+        document.createElement(
+          "div"
+        );
+
+      rejectedHeader.className =
+        "led-book-group-header";
+
+
+      const rejectedEyebrow =
+        document.createElement(
+          "div"
+        );
+
+      rejectedEyebrow.className =
+        "led-eyebrow";
+
+      rejectedEyebrow.textContent =
+        "REJECTED";
+
+
+      const rejectedTitle =
+        document.createElement(
+          "h3"
+        );
+
+      rejectedTitle.textContent =
+        "Rejected Books";
+
+
+      rejectedHeader.appendChild(
+        rejectedEyebrow
+      );
+
+      rejectedHeader.appendChild(
+        rejectedTitle
+      );
+
+
+      const rejectedList =
+        document.createElement(
+          "div"
+        );
+
+      rejectedList.className =
+        "led-rejected-list";
+
+
+      if (rejectedBooks.length === 0) {
+
+        rejectedList.innerHTML =
+          "<div class='led-message'>" +
+          "No rejected books." +
+          "</div>";
+
+      } else {
+
+        rejectedBooks.forEach(
+          function (book) {
+
+            rejectedList.appendChild(
+              createBookCard(book)
+            );
+
+          }
+        );
+
+      }
+
+
+      rejectedSection.appendChild(
+        rejectedHeader
+      );
+
+      rejectedSection.appendChild(
+        rejectedList
+      );
+
+
+      groups.appendChild(
+        rejectedSection
+      );
+
+
+      /* ===================================================
+         OTHER / PENDING BOOKS
+      =================================================== */
+
+      if (otherBooks.length > 0) {
+
+        const otherSection =
+          document.createElement(
+            "div"
+          );
+
+        otherSection.className =
+          "led-book-group led-other-group";
+
+
+        const otherHeader =
+          document.createElement(
+            "div"
+          );
+
+        otherHeader.className =
+          "led-book-group-header";
+
+
+        const otherEyebrow =
+          document.createElement(
+            "div"
+          );
+
+        otherEyebrow.className =
+          "led-eyebrow";
+
+        otherEyebrow.textContent =
+          "REVIEW QUEUE";
+
+
+        const otherTitle =
+          document.createElement(
+            "h3"
+          );
+
+        otherTitle.textContent =
+          "Books Awaiting Review";
+
+
+        otherHeader.appendChild(
+          otherEyebrow
+        );
+
+        otherHeader.appendChild(
+          otherTitle
+        );
+
+
+        const otherList =
+          document.createElement(
+            "div"
+          );
+
+        otherList.className =
+          "led-other-list";
+
+
+        otherBooks.forEach(
+          function (book) {
+
+            otherList.appendChild(
+              createBookCard(book)
+            );
+
+          }
+        );
+
+
+        otherSection.appendChild(
+          otherHeader
+        );
+
+        otherSection.appendChild(
+          otherList
+        );
+
+
+        groups.appendChild(
+          otherSection
+        );
+
+      }
+
+
+      booksContainer.appendChild(
+        groups
+      );
+
+    }
+
+
+    /* =====================================================
+       CREATE BOOK CARD
+    ===================================================== */
+
+    function createBookCard(
+      book
+    ) {
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+      card.className =
+        "led-book-card";
+
+
+      const cover =
+        document.createElement(
+          "div"
+        );
+
+      cover.className =
+        "led-book-cover";
+
+
+      if (book.cover_url) {
+
+        cover.style.backgroundImage =
+          "url('" +
+          book.cover_url +
+          "')";
+
+      }
+
+
+      const info =
+        document.createElement(
+          "div"
+        );
+
+      info.className =
+        "led-book-info";
+
+
+      const title =
+        document.createElement(
+          "h3"
+        );
+
+      title.textContent =
+        book.title ||
+        "Untitled Book";
+
+
+      const author =
+        document.createElement(
+          "p"
+        );
+
+      const authorDetails =
+        book.author_details ||
+        {};
+
+
+      author.textContent =
+        "Author: " +
+        (
+          authorDetails.pen_name ||
+          authorDetails.full_name ||
+          "Unknown"
+        );
+
+
+      const genre =
+        document.createElement(
+          "p"
+        );
+
+      genre.textContent =
+        "Genre: " +
+        (
+          book.genre ||
+          "Not specified"
+        );
+
+
+      const status =
+        document.createElement(
+          "span"
+        );
+
+      status.className =
+        "led-status";
+
+      status.textContent =
+        book.status ||
+        "draft";
+
+
+      info.appendChild(
+        title
+      );
+
+      info.appendChild(
+        author
+      );
+
+      info.appendChild(
+        genre
+      );
+
+      info.appendChild(
+        status
+      );
+
+
+      /* ===================================================
+         DELETION REQUEST BADGE
+      =================================================== */
+
+      if (
+        deletionRequestedBookIds.has(
+          book.book_id
+        )
+      ) {
+
+        const deletionBadge =
+          document.createElement(
+            "span"
+          );
+
+        deletionBadge.className =
+          "led-deletion-request-badge";
+
+        deletionBadge.textContent =
+          "Chapter deletion requested";
+
+
+        info.appendChild(
+          deletionBadge
+        );
+
+      }
+
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+      button.type =
+        "button";
+
+      button.className =
+        "led-review-button";
+
+      button.textContent =
+        "Open Review";
+
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          openBookReview(
+            book
+          );
+
+        }
+      );
+
+
+      card.appendChild(
+        cover
+      );
+
+      card.appendChild(
+        info
+      );
+
+      card.appendChild(
+        button
+      );
+
+
+      return card;
+
+    }
+
+
+    /* =====================================================
+       OPEN BOOK REVIEW
+    ===================================================== */
+
+    async function openBookReview(
+      book
+    ) {
+
+      currentReviewBook =
+        book;
+
+
+      const title =
+        document.getElementById(
+          "led-review-title"
+        );
+
+      const author =
+        document.getElementById(
+          "led-review-author"
+        );
+
+      const details =
+        document.getElementById(
+          "led-review-details"
+        );
+
+      const chapters =
+        document.getElementById(
+          "led-review-chapters"
+        );
+
+
+      title.textContent =
+        book.title ||
+        "Untitled Book";
+
+
+      const authorDetails =
+        book.author_details ||
+        {};
+
+
+      author.textContent =
+        "Author: " +
+        (
+          authorDetails.pen_name ||
+          authorDetails.full_name ||
+          "Unknown author"
+        );
+
+
+      /* ===================================================
+         CLEAR OLD DETAILS FIRST
+      =================================================== */
+
+      details.innerHTML =
+        "";
+
+      diamondPriceInput.value =
+        "";
+
+
+      /* ===================================================
+         BASIC BOOK DETAILS
+      =================================================== */
+
+      addDetail(
+        details,
+        "Status",
+        book.status ||
+        "Not provided"
+      );
+
+
+      addDetail(
+        details,
+        "Genre",
+        book.genre
+      );
+
+
+      addDetail(
+        details,
+        "Subgenre",
+        book.subgenre
+      );
+
+
+      addDetail(
+        details,
+        "Description",
+        book.description
+      );
+
+
+      addDetail(
+        details,
+        "Book Outline",
+        book.book_outline
+      );
+
+
+      addDetail(
+        details,
+        "Author Name",
+        authorDetails.full_name
+      );
+
+
+      addDetail(
+        details,
+        "Pen Name",
+        authorDetails.pen_name
+      );
+
+
+      addDetail(
+        details,
+        "Author Bio",
+        authorDetails.bio
+      );
+
+
+      addDetail(
+        details,
+        "Email",
+        authorDetails.email
+      );
+
+
+      addDetail(
+        details,
+        "Phone",
+        authorDetails.phone
+      );
+
+
+      /* ===================================================
+         SUBMITTED PAYOUT INFORMATION
+      =================================================== */
+
+      const additionalDetails =
+        book.additional_details ||
+        {};
+
+
+      addDetail(
+        details,
+        "Bank Name",
+        additionalDetails.bank_name
+      );
+
+
+      addDetail(
+        details,
+        "Account Name",
+        additionalDetails.account_name
+      );
+
+
+      addDetail(
+        details,
+        "Account Number",
+        additionalDetails.account_number
+      );
+
+
+      /* ===================================================
+         BOOK STATISTICS
+      =================================================== */
+
+      if (book.book_id) {
+
+        const {
+          count: rubyCount
+        } =
+          await supabaseClient
+            .from("chapter_unlocks")
+            .select(
+              "id",
+              {
+                count: "exact",
+                head: true
+              }
+            )
+            .eq(
+              "book_id",
+              book.book_id
+            );
+
+
+        const {
+          count: diamondCount
+        } =
+          await supabaseClient
+            .from("book_unlocks")
+            .select(
+              "id",
+              {
+                count: "exact",
+                head: true
+              }
+            )
+            .eq(
+              "book_id",
+              book.book_id
+            );
+
+
+        addDetail(
+          details,
+          "Total Rubies Spent (Chapter Unlocks)",
+          String(
+            rubyCount || 0
+          )
+        );
+
+
+        addDetail(
+          details,
+          "Total Diamonds Spent (Book Unlocks)",
+          String(
+            diamondCount || 0
+          )
+        );
+
+      }
+
+
+      /* ===================================================
+         LOAD SAVED DIAMOND PRICE
+      =================================================== */
+
+      if (book.book_id) {
+
+        const {
+          data: bookPricing,
+          error: bookPricingError
+        } =
+          await supabaseClient
+            .from("books")
+            .select(
+              "full_book_unlock_cost"
+            )
+     
