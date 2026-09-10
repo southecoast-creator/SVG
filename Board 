@@ -1752,3 +1752,45 @@ const chapterTitleInput =
   document.getElementById(
     "chapter-title"
   );
+
+const chapterContentInput =
+  document.getElementById(
+    "chapter-content"
+  );
+
+const chapterEditorWordCount =
+  document.getElementById(
+    "chapter-editor-word-count"
+  );
+
+const saveChapterDraft =
+  document.getElementById(
+    "save-chapter-draft"
+  );
+  
+const chapterEditorMessage =
+  document.getElementById(
+    "chapter-editor-message"
+  );
+  
+  const deleteChapterRequest =
+  document.getElementById(
+    "delete-chapter-request"
+  );
+  
+  deleteChapterRequest.addEventListener(
+  "click",
+  async function () {
+
+    if (!editingChapterId) {
+
+      chapterEditorMessage.textContent =
+        "Only an existing chapter can be requested for deletion.";
+
+      return;
+}
+    
+        const confirmed =
+      window.confirm(
+        "Request deletion of this chapter? The chapter will not be deleted immediately. An editor must approve the deletion."
+      );
