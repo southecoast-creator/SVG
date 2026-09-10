@@ -1162,3 +1162,557 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
     booksList.innerHTML = "";
+books.forEach(function (book) {
+
+  const card =
+    document.createElement("div");
+
+  card.className =
+    "book-card";
+
+
+  /* =========================
+     BOOK HEADER
+  ========================= */
+
+  const bookHeader =
+    document.createElement("div");
+
+  bookHeader.className =
+    "book-card-header";
+     
+
+
+  /* =========================
+     COVER
+  ========================= */
+     
+       const cover =
+    document.createElement("img");
+
+  cover.className =
+    "book-card-cover";
+
+  cover.alt =
+    book.title + " cover";
+
+  if (book.cover_url) {
+
+    cover.src =
+      book.cover_url;
+
+  } else {
+
+    cover.style.display =
+      "none";
+
+  }
+
+
+  /* =========================
+     BOOK INFORMATION
+  ========================= */
+     
+       const info =
+    document.createElement("div");
+
+  info.className =
+    "book-card-info";
+
+
+  const title =
+    document.createElement("h3");
+
+  title.textContent =
+    book.title;
+     
+     
+       const meta =
+    document.createElement("div");
+
+  meta.className =
+    "book-meta";
+
+  meta.textContent =
+    book.book_type === "non-fiction"
+      ? "Non-fiction"
+      : "Fiction";
+     
+     
+       /* =========================
+     TAGS
+  ========================= */
+
+  const tagsContainer =
+    document.createElement("div");
+
+  tagsContainer.className =
+    "book-card-tags";
+
+
+  const tags =
+    book.type_details &&
+    Array.isArray(book.type_details.tags)
+      ? book.type_details.tags
+      : [];
+
+
+  tags.slice(0, 3).forEach(function (tag) {
+    
+        const tagElement =
+      document.createElement("span");
+
+    tagElement.className =
+      "book-tag";
+
+    tagElement.textContent =
+      tag;
+
+    tagsContainer.appendChild(
+      tagElement
+    );
+
+  });
+     
+     
+       /* =========================
+     STATUS
+  ========================= */
+
+  const rawStatus =
+    (
+      book.submission_status ||
+      book.status ||
+      "draft"
+    ).toLowerCase();
+
+  const status =
+    document.createElement("span");
+
+  status.className =
+    "book-status status-" + rawStatus;
+
+  status.textContent =
+    rawStatus.toUpperCase();
+
+
+  info.appendChild(title);
+  info.appendChild(meta);
+  info.appendChild(tagsContainer);
+  info.appendChild(status);
+
+  if (rawStatus === "rejected") {
+
+    const rejectionNote =
+      document.createElement("p");
+
+    rejectionNote.style.color = "#F0908C";
+
+    rejectionNote.style.fontSize = "12px";
+
+    rejectionNote.style.fontWeight = "700";
+
+    rejectionNote.style.marginTop = "8px";
+
+    rejectionNote.textContent =
+      "Your book was not accepted, Check your email for full details.";
+
+    info.appendChild(rejectionNote);
+
+  }
+
+
+  bookHeader.appendChild(cover);
+  bookHeader.appendChild(info);
+
+
+  card.appendChild(bookHeader);
+
+
+/* =========================
+   BOOK ACTIONS
+========================= */
+
+const actions =
+  document.createElement("div");
+
+actions.className =
+  "book-card-actions";
+
+
+const editButton =
+  document.createElement("button");
+
+editButton.type =
+  "button";
+
+editButton.className =
+  "book-action-button";
+
+editButton.textContent =
+  "Edit Book";
+
+
+editButton.addEventListener(
+  "click",
+  function () {
+
+    openEditBook(book);
+
+  }
+);
+
+const manageChaptersButton =
+  document.createElement("button");
+
+manageChaptersButton.type =
+  "button";
+
+manageChaptersButton.className =
+  "book-action-button";
+
+manageChaptersButton.textContent =
+  "Manage Chapters";
+
+manageChaptersButton.addEventListener(
+  "click",
+  function () {
+
+    openManageChapters(book);
+
+  }
+);
+     
+ actions.appendChild(editButton);
+
+actions.appendChild(
+  manageChaptersButton
+);
+
+
+/* =========================
+   APPLY FOR PUBLICATION
+========================= */
+
+const applyPublicationButton =
+  document.createElement("button");
+
+applyPublicationButton.type =
+  "button";
+
+applyPublicationButton.className =
+  "book-action-button";
+
+applyPublicationButton.textContent =
+  "Apply for Publication";
+
+applyPublicationButton.style.display =
+  "none";
+     
+     actions.appendChild(
+  applyPublicationButton
+);
+
+
+/* =========================
+   CHECK PUBLICATION
+   ELIGIBILITY
+========================= */
+
+setPublicationButtonVisibility(
+  book,
+  applyPublicationButton,
+  submittedBookIds
+);
+
+     applyPublicationButton.addEventListener(
+  "click",
+  function () {
+
+
+    openPublicationApplication(
+      book
+    );
+
+  }
+);
+
+
+/* =========================
+   DELETE BOOK BUTTON
+========================= */
+     
+     const submissionStatus =
+  submissionStatusByBookId[book.id];
+
+const canDelete =
+  !submittedBookIds.has(book.id) ||
+  submissionStatus === "rejected";
+
+if (canDelete && book.status !== "published") {
+
+  const deleteBookButton =
+    document.createElement("button");
+
+  deleteBookButton.type = "button";
+
+  deleteBookButton.className =
+    "book-action-button";
+
+  deleteBookButton.textContent =
+    "Delete Book";
+
+  deleteBookButton.style.color = "#F0908C";
+
+    deleteBookButton.addEventListener(
+    "click",
+    async function () {
+
+      const confirmed =
+        confirm(
+          "Delete \"" + book.title + "\"? This cannot be undone."
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      deleteBookButton.disabled = true;
+
+      await supabaseClient
+        .from("chapters")
+        .delete()
+        .eq("book_id", book.id);
+
+      await supabaseClient
+        .from("chapter_unlocks")
+        .delete()
+        .eq("book_id", book.id);
+
+      await supabaseClient
+        .from("book_unlocks")
+        .delete()
+        .eq("book_id", book.id);
+
+      await supabaseClient
+        .from("author_earnings")
+        .delete()
+        .eq("book_id", book.id);
+
+      await supabaseClient
+        .from("book_submissions")
+        .delete()
+        .eq("book_id", book.id);
+
+      const {
+        error: deleteError
+      } = await supabaseClient
+        .from("books")
+        .delete()
+        .eq("id", book.id);
+
+      if (deleteError) {
+
+        console.error("BOOK DELETE ERROR:", deleteError);
+
+        alert(
+          "Could not delete this book.\n\nError: " +
+                    (deleteError.message || "Unknown") +
+          "\n\nCode: " +
+          (deleteError.code || "Unknown")
+        );
+
+        deleteBookButton.disabled = false;
+
+        return;
+
+      }
+
+      await loadBooks();
+
+    }
+  );
+
+  actions.appendChild(deleteBookButton);
+
+}
+
+
+card.appendChild(actions);
+
+
+  booksList.appendChild(card);
+
+});
+    
+}
+  
+  function setPublicationButtonVisibility(
+    book,
+    applyButton,
+    submittedBookIds
+  ) {
+
+    if (submittedBookIds.has(book.id)) {
+      applyButton.style.display = "none";
+      return;
+    }
+
+    if (book.status === "published") {
+      applyButton.style.display = "none";
+      return;
+    }
+
+    const totalWords =
+      Number(book.total_word_count) || 0;
+
+    applyButton.style.display =
+  totalWords >= 5000
+    ? "inline-block"
+    : "none";
+
+  }
+  
+  function openPublicationApplication(
+  book
+) {
+    
+    window.currentPublicationBook =
+  book;
+
+  const publicationModal =
+    document.getElementById(
+      "publication-application-modal"
+    );
+
+  if (!publicationModal) {
+
+    alert(
+      "ERROR: publication-application-modal was not found."
+    );
+
+    return;
+
+  }
+
+
+  /* =========================
+     BOOK TYPE
+  ========================= */
+
+  const publicationBookType =
+    document.getElementById(
+      "publication-book-type"
+    );
+
+  if (
+    publicationBookType
+  ) {
+    
+    publicationBookType.textContent =
+      book.book_type === "fiction"
+        ? "Fiction"
+        : "Non-fiction";
+
+  }
+
+
+  /* =========================
+     FICTION-ONLY FIELDS
+  ========================= */
+
+  const fictionFields =
+    document.getElementById(
+      "fiction-publication-fields"
+    );
+
+  if (fictionFields) {
+
+    if (
+      book.book_type === "fiction"
+    ) {
+
+      fictionFields.style.display =
+        "block";
+
+    } else {
+
+      fictionFields.style.display =
+        "none";
+
+    }
+
+  }
+    
+    /* =========================
+   GENRE DROPDOWN
+========================= */
+
+const publicationGenre =
+  document.getElementById(
+    "publication-genre"
+  );
+
+if (publicationGenre) {
+
+  publicationGenre.innerHTML =
+    '<option value="">Select a genre</option>';
+
+  const genres =
+    book.book_type === "fiction"
+      ? fictionGenres
+      : nonfictionGenres;
+
+  genres.forEach(
+    function (genre) {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        genre;
+
+      option.textContent =
+        genre;
+
+      publicationGenre.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+    
+    /* =========================
+     OPEN MODAL
+  ========================= */
+
+  publicationModal.style.display =
+    "flex";
+
+}
+  
+const manageChaptersModal =
+  document.getElementById(
+    "manage-chapters-modal"
+  );
+
+const closeManageChapters =
+  document.getElementById(
+    "close-manage-chapters"
+  );
+
+const manageChaptersBookTitle =
+  document.getElementById(
+    "manage-chapters-book-title"
+  );
+
+const chapterCount =
+  document.getElementById(
+    "chapter-count"
+  );
+
+const chapterWordCount =
