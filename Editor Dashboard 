@@ -1858,3 +1858,185 @@ saveDiamondPriceButton.addEventListener(
       document.getElementById("led-set-earnings");
 
     const earningsInput =
+document.getElementById("led-earnings-amount");
+
+    if (setEarningsButton) {
+
+      setEarningsButton.addEventListener("click", async function () {
+
+        if (!currentReviewBook) {
+          alert("No book is currently selected.");
+          return;
+        }
+        
+                const amount =
+          Number(earningsInput.value);
+
+        if (!Number.isFinite(amount) || amount < 0) {
+          alert("Please enter a valid amount.");
+          return;
+        }
+
+        setEarningsButton.disabled = true;
+
+        const {
+          error
+        } = await supabaseClient
+          .from("author_earnings")
+          .insert({
+            author_id: currentReviewBook.author_id,
+            book_id: currentReviewBook.book_id,
+            source_type: "book_unlock",
+            currency: "ruby",
+            gross_amount: amount,
+            platform_share: 0,
+            author_share: amount,
+            status: "available"
+          });
+
+        setEarningsButton.disabled = false;
+
+        if (error) {
+
+          console.error("SET EARNINGS ERROR:", error);
+
+          alert(
+            "Could not set earnings.\n\nError: " +
+            (error.message || "Unknown") +
+            "\n\nCode: " +
+            (error.code || "Unknown")
+          );
+
+          return;
+
+        }
+
+        alert("Earnings set: \u20A6" + amount.toLocaleString() + " for this book.");
+
+        earningsInput.value = "";
+
+      });
+
+    }
+    
+    document.getElementById("led-toggle-insights")
+  .addEventListener("click", async function () {
+
+    const { data } = await supabaseClient
+      .from("app_settings")
+      .select("value")
+      .eq("key", "insights_enabled")
+      .single();
+
+    const currentlyEnabled =
+      data && data.value === "true";
+
+    const { error } = await supabaseClient
+      .from("app_settings")
+      .update({ value: currentlyEnabled ? "false" : "true" })
+      .eq("key", "insights_enabled");
+
+    if (error) {
+      alert("Could not update setting: " + error.message);
+      return;
+    }
+
+    alert(
+      "Author Insights is now " +
+      (currentlyEnabled ? "DISABLED" : "ENABLED") +
+      " for all authors."
+    );
+
+  });
+
+
+    /* =====================================================
+       HELPER: BOOK DETAIL
+    ===================================================== */
+
+    function addDetail(
+      container,
+      label,
+      value
+    ) {
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+      row.className =
+        "led-detail";
+
+
+      const labelElement =
+        document.createElement(
+          "span"
+        );
+
+      labelElement.className =
+        "led-detail-label";
+
+      labelElement.textContent =
+        label;
+
+
+      const valueElement =
+        document.createElement(
+          "div"
+        );
+
+      valueElement.className =
+        "led-detail-value";
+
+      valueElement.textContent =
+        value ||
+        "Not provided";
+
+
+      row.appendChild(
+        labelElement
+      );
+
+      row.appendChild(
+        valueElement
+      );
+
+
+      container.appendChild(
+        row
+      );
+
+    }
+
+
+    /* =====================================================
+       HELPER: CHAPTER BADGE
+    ===================================================== */
+
+    function addChapterBadge(
+      container,
+      label
+    ) {
+
+      const badge =
+        document.createElement(
+          "span"
+        );
+
+      badge.className =
+        "led-chapter-badge";
+
+      badge.textContent =
+        label;
+
+      container.appendChild(
+        badge
+      );
+
+    }
+
+  }
+);
+
+</script>
