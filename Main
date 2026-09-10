@@ -1,60 +1,402 @@
-const bookIds =
-  books
-    .map(function (book) {
-      return book.book_id;
-    })
-    .filter(function (id) {
-      return !!id;
-    });
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+#litdom-editor-dashboard {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 20px;
+  font-family: inherit;
+  color: #342731;
+}
 
 
-if (bookIds.length > 0) {
+/* =========================================================
+   HEADER
+========================================================= */
 
-  const {
-    data: currentBookRows,
-    error: currentBookError
-  } =
-    await supabaseClient
-      .from("books")
-      .select("id,title,cover_url")
-      .in("id", bookIds);
+.led-header {
+  padding: 32px;
+  margin-bottom: 25px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #2d2029, #59354b);
+  color: white;
+  box-shadow: 0 18px 45px rgba(50, 30, 42, .18);
+}
 
+.led-header h1 {
+  margin: 5px 0 8px;
+  font-size: 36px;
+}
 
-  if (currentBookError) {
-
-    console.error(
-      "CURRENT BOOK TITLE/COVER LOAD ERROR:",
-      currentBookError
-    );
-
-  } else {
-
-    (currentBookRows || []).forEach(
-      function (currentBook) {
-
-        const submission =
-          books.find(
-            function (book) {
-              return book.book_id === currentBook.id;
-            }
-          );
+.led-header p {
+  margin: 0;
+  color: #eadce3;
+}
 
 
-        if (submission) {
+/* =========================================================
+   EYEBROW
+========================================================= */
 
-          submission.title =
-            currentBook.title ||
-            submission.title;
+.led-eyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #a45b82;
+}
 
-          submission.cover_url =
-            currentBook.cover_url ||
-            submission.cover_url;
+.led-header .led-eyebrow {
+  color: #e8b7d0;
+}
 
-        }
 
-      }
-    );
+/* =========================================================
+   SECTION
+========================================================= */
 
+.led-section {
+  padding: 25px;
+  border-radius: 23px;
+  background: #fff;
+  border: 1px solid #eadde5;
+  box-shadow: 0 10px 30px rgba(70, 40, 55, .06);
+}
+
+.led-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.led-section-title h2 {
+  margin: 4px 0 0;
+  font-size: 22px;
+}
+
+.led-count {
+  min-width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f4e5ed;
+  color: #66394f;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.led-message {
+  padding: 25px;
+  border-radius: 16px;
+  background: #faf6f8;
+  border: 1px dashed #decbd6;
+  text-align: center;
+  color: #927c87;
+}
+
+
+/* =========================================================
+   BOOK CARD (rewritten)
+========================================================= */
+
+.led-book-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 14px;
+  margin: 0;
+  border-radius: 18px;
+  background: #fffafd;
+  border: 1px solid #eee0e8;
+  text-align: left;
+}
+
+.led-book-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  height: auto;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ead4df, #f8edf3);
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.led-book-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+}
+
+.led-book-info h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+  color: #432d39;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.6em;
+}
+
+.led-book-info p {
+  margin: 0;
+  color: #897581;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.led-status {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #f3e5ec;
+  color: #814d69;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.led-review-button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 9px 0;
+  border: none;
+  border-radius: 999px;
+  background: #5d334b;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+
+
+/* =========================================================
+   HORIZONTAL SCROLL ROWS (max 10 per row)
+========================================================= */
+
+.led-books-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.led-book-row-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #c98bb0 transparent;
+}
+
+.led-book-row-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.led-book-row-scroll::-webkit-scrollbar-thumb {
+  background: #c98bb0;
+  border-radius: 999px;
+}
+
+.led-book-row-track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+  width: max-content;
+}
+
+.led-book-row-track .led-book-card {
+  flex: 0 0 200px;
+  width: 200px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.led-book-row-track .led-book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(70,40,55,.14);
+}
+
+
+/* =========================================================
+   REVIEW PANEL
+========================================================= */
+
+.led-review-panel {
+  position: fixed;
+  z-index: 99999;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(750px, calc(100% - 25px));
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 30px;
+  border-radius: 25px;
+  background: white;
+  border: 1px solid #eadde5;
+  box-shadow: 0 30px 80px rgba(0,0,0,.30);
+}
+
+.led-review-panel h2 {
+  margin: 5px 0;
+  color: #392831;
+}
+
+#led-review-author {
+  color: #806b76;
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.led-close {
+  position: absolute;
+  top: 14px;
+  right: 15px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: #f5e9ef;
+  color: #65394f;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+#led-review-details {
+  margin-top: 20px;
+}
+
+.led-detail {
+  padding: 13px 0;
+  border-bottom: 1px solid #f0e5eb;
+}
+
+.led-detail-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #9a8290;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.led-detail-value {
+  white-space: pre-wrap;
+  color: #55434d;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   CHAPTERS
+========================================================= */
+
+.led-chapters-area {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid #eadde5;
+}
+
+.led-chapters-area h3 {
+  margin: 5px 0 18px;
+  color: #432d39;
+}
+
+.led-chapter {
+  margin-bottom: 15px;
+  padding: 18px;
+  border-radius: 18px;
+  background: #fffafd;
+  border: 1px solid #eadde5;
+}
+
+.led-chapter h4 {
+  margin: 0 0 10px;
+  color: #432d39;
+  font-size: 17px;
+}
+
+.led-chapter-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 13px;
+}
+
+.led-chapter-badge {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #f3e5ec;
+  color: #75455f;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.led-chapter-content {
+  padding: 15px;
+  border-radius: 12px;
+  background: #faf7f9;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  color: #51414a;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+  #litdom-editor-dashboard {
+    padding: 12px;
   }
 
+  .led-header {
+    padding: 25px 20px;
+  }
+
+  .led-header h1 {
+    font-size: 29px;
+  }
+
+  .led-section {
+    padding: 18px;
+  }
+
+  .led-book-row-track .led-book-card {
+    flex-basis: 170px;
+    width: 170px;
+  }
+
+  .led-review-panel {
+    padding: 23px 18px;
+  }
 }
