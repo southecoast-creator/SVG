@@ -2803,3 +2803,354 @@ const tabPanels = {
     document.getElementById("withdraw-funds-button");
 
 let currentBookEarnings = 0;
+
+function initInsightsTab() {
+
+    withdrawButton.disabled = false;
+
+    withdrawButton.addEventListener("click", handleWithdrawClick);
+
+    insightsBookSelect.innerHTML = "";
+
+    if (!authorBooksCache.length) {
+
+      insightsBookSelect.innerHTML =
+        '<option value="">No books yet</option>';
+
+      return;
+
+    }
+    
+        authorBooksCache.forEach(function (book) {
+
+      const option =
+        document.createElement("option");
+
+      option.value = book.id;
+      option.textContent = book.title;
+
+      insightsBookSelect.appendChild(option);
+
+    });
+
+    insightsBookSelect.addEventListener(
+      "change",
+      function () {
+
+        loadInsightsForBook(insightsBookSelect.value);
+
+      }
+    );
+
+    loadFollowerCount();
+
+    loadInsightsForBook(insightsBookSelect.value);
+
+  }
+
+  async function handleWithdrawClick() {
+
+    const bookId = insightsBookSelect.value;
+
+    if (!bookId) {
+      alert("Please select a book first.");
+      return;
+    }
+
+    if (!currentBookEarnings || currentBookEarnings <= 0) {
+      alert("This book has no available earnings to withdraw.");
+      return;
+    }
+    
+        withdrawButton.disabled = true;
+
+    const {
+      data: existingAccounts,
+      error: accountsError
+    } = await supabaseClient
+      .from("payout_accounts")
+      .select("id")
+      .eq("author_id", session.user.id)
+      .eq("is_primary", true)
+      .maybeSingle();
+
+    if (accountsError) {
+
+      console.error("PAYOUT ACCOUNT LOOKUP ERROR:", accountsError);
+
+      alert("Could not check your payout account. Please try again.");
+
+      withdrawButton.disabled = false;
+      
+            return;
+
+    }
+
+    let payoutAccountId =
+      existingAccounts ? existingAccounts.id : null;
+
+    if (!payoutAccountId) {
+
+      const bankName =
+        prompt("Enter your bank name:");
+
+      if (!bankName) {
+        withdrawButton.disabled = false;
+        return;
+      }
+
+      const accountName =
+        prompt("Enter the account name:");
+
+      if (!accountName) {
+        withdrawButton.disabled = false;
+        return;
+      }
+      
+            const accountNumber =
+        prompt("Enter the account number:");
+
+      if (!accountNumber) {
+        withdrawButton.disabled = false;
+        return;
+      }
+
+      const {
+        data: newAccount,
+        error: createAccountError
+      } = await supabaseClient
+        .from("payout_accounts")
+        .insert({
+          author_id: session.user.id,
+          bank_name: bankName.trim(),
+          account_name: accountName.trim(),
+          account_number: accountNumber.trim(),
+          is_primary: true
+        })
+        .select("id")
+        .single();
+      
+            if (createAccountError) {
+
+        console.error("PAYOUT ACCOUNT CREATE ERROR:", createAccountError);
+
+        alert("Could not save your payout account. Please try again.");
+
+        withdrawButton.disabled = false;
+
+        return;
+
+      }
+
+      payoutAccountId = newAccount.id;
+
+    }
+
+    const {
+      error: withdrawalError
+    } = await supabaseClient
+      .from("withdrawal_requests")
+      .insert({
+        author_id: session.user.id,
+        payout_account_id: payoutAccountId,
+                amount: currentBookEarnings,
+        currency: "NGN",
+        status: "pending"
+      });
+
+    withdrawButton.disabled = false;
+
+    if (withdrawalError) {
+
+      console.error("WITHDRAWAL REQUEST ERROR:", withdrawalError);
+
+      alert(
+        "Withdrawal failed.\n\nError: " +
+        (withdrawalError.message || "Unknown") +
+        "\n\nCode: " +
+        (withdrawalError.code || "Unknown")
+      );
+
+      return;
+
+    }
+
+    const {
+      error: markPaidError
+    } = await supabaseClient
+      .from("author_earnings")
+      .update({ status: "paid" })
+      .eq("book_id", bookId)
+      .eq("status", "available");
+
+    if (markPaidError) {
+
+      console.error("MARK EARNINGS PAID ERROR:", markPaidError);
+
+      alert(
+        "Withdrawal saved, but earnings could not be marked paid.\n\nError: " +
+        (markPaidError.message || "Unknown") +
+        "\n\nCode: " +
+        (markPaidError.code || "Unknown")
+      );
+
+    }
+
+    alert("Withdrawal requested. You will receive your funds within the next 24 hours.");
+
+    loadInsightsForBook(bookId);
+
+  }
+  
+    async function loadFollowerCount() {
+
+    const {
+      count,
+      error
+    } = await supabaseClient
+      .from("follows")
+      .select("id", { count: "exact", head: true })
+      .eq("following_id", session.user.id);
+
+    if (error) {
+
+      console.error("FOLLOWER COUNT ERROR:", error);
+
+      insightsFollowers.textContent = "—";
+
+      return;
+
+    }
+
+    insightsFollowers.textContent =
+      (count || 0).toLocaleString();
+
+  }
+
+  async function loadInsightsForBook(bookId) {
+
+    if (!bookId) {
+      return;
+    }
+
+    insightsMessage.textContent =
+      "Loading insights...";
+
+    insightsLikes.textContent = "—";
+    insightsReads.textContent = "—";
+    insightsEarnings.textContent = "—";
+       
+        const {
+      count: readCount,
+      error: readError
+    } = await supabaseClient
+      .from("book_reads")
+      .select("id", { count: "exact", head: true })
+      .eq("book_id", bookId);
+
+    if (readError) {
+      console.error("READ COUNT ERROR:", readError);
+    }
+
+    insightsReads.textContent =
+      (readCount || 0).toLocaleString();
+
+
+    const {
+      data: bookChapters,
+      error: chaptersError
+    } = await supabaseClient
+      .from("chapters")
+      .select("id")
+      .eq("book_id", bookId);
+
+    if (chaptersError) {
+      
+            console.error("CHAPTERS FOR LIKES ERROR:", chaptersError);
+
+      insightsLikes.textContent = "0";
+
+    } else {
+
+      const chapterIds =
+        bookChapters.map(function (c) { return c.id; });
+
+      if (!chapterIds.length) {
+
+        insightsLikes.textContent = "0";
+
+      } else {
+
+        const {
+          count: likeCount,
+          error: likeError
+        } = await supabaseClient
+          .from("chapter_likes")
+          .select("id", { count: "exact", head: true })
+          .in("chapter_id", chapterIds);
+
+        if (likeError) {
+          console.error("LIKE COUNT ERROR:", likeError);
+        }
+
+        insightsLikes.textContent =
+          (likeCount || 0).toLocaleString();
+
+      }
+
+    }
+    
+        const {
+      data: earningsRows,
+      error: earningsError
+    } = await supabaseClient
+      .from("author_earnings")
+      .select("author_share")
+      .eq("book_id", bookId)
+      .eq("status", "available");
+
+    if (earningsError) {
+      console.error("EARNINGS ERROR:", earningsError);
+    }
+
+    const totalEarnings =
+      (earningsRows || []).reduce(function (sum, row) {
+        return sum + (Number(row.author_share) || 0);
+      }, 0);
+
+    insightsEarnings.textContent =
+      "\u20A6" + totalEarnings.toLocaleString();
+
+    currentBookEarnings = totalEarnings;
+
+    insightsMessage.textContent = "";
+
+  }
+  
+    /* =========================
+     CALENDAR TAB
+  ========================= */
+
+  const calendarGrid =
+    document.getElementById("calendar-grid");
+
+  const calendarMonthLabel =
+    document.getElementById("calendar-month-label");
+
+  const calendarPrev =
+    document.getElementById("calendar-prev");
+
+  const calendarNext =
+    document.getElementById("calendar-next");
+
+  let calendarViewDate = new Date();
+
+  function initCalendarTab() {
+
+    calendarPrev.addEventListener("click", function () {
+      
+            calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+
+renderCalendar();
+
+    });
