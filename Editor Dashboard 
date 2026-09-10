@@ -1017,6 +1017,126 @@ addDetail(
 
     actions.style.marginTop =
       "15px";
+
+/* =================================================
+   DELETE REQUEST ACTION
+================================================= */
+
+if (chapter.deletion_requested === true) {
+
+  const deleteRequestedChapterButton =
+    document.createElement(
+      "button"
+    );
+
+  deleteRequestedChapterButton.type =
+    "button";
+
+  deleteRequestedChapterButton.className =
+    "led-action-button";
+
+  deleteRequestedChapterButton.textContent =
+    "Delete Chapter";
+
+  deleteRequestedChapterButton.style.background =
+    "#8b4055";
+
+
+  deleteRequestedChapterButton.addEventListener(
+    "click",
+    async function () {
+
+      const confirmed =
+        confirm(
+          "The author requested deletion of Chapter " +
+          (
+            chapter.chapter_number ??
+            ""
+          ) +
+          " — " +
+          (
+            chapter.title ||
+            "Untitled Chapter"
+          ) +
+          ".\n\nDelete this chapter permanently?"
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      deleteRequestedChapterButton.disabled =
+        true;
+
+
+      const {
+        error: deleteError
+      } =
+        await supabaseClient
+          .from("chapters")
+          .delete()
+          .eq(
+            "id",
+            chapter.id
+          )
+          .eq(
+            "deletion_requested",
+            true
+          );
+
+
+      if (deleteError) {
+
+        console.error(
+          "CHAPTER DELETION ERROR:",
+          deleteError
+        );
+
+
+        alert(
+          "The chapter could not be deleted.\n\n" +
+          (
+            deleteError.message ||
+            "Unknown error"
+          )
+        );
+
+
+        deleteRequestedChapterButton.disabled =
+          false;
+
+        return;
+      }
+
+
+      alert(
+        "Chapter deleted successfully."
+      );
+
+
+      /*
+       * Reload the current book review so:
+       * - the chapter disappears
+       * - the red request indicator updates
+       * - the notification disappears when
+       *   there are no remaining requests
+       */
+
+      openBookReview(
+        currentReviewBook
+      );
+
+    }
+  );
+
+
+  actions.appendChild(
+    deleteRequestedChapterButton
+  );
+
+}
     
     
         /* =================================================
