@@ -1337,3 +1337,524 @@ card
 );
 
 }
+
+/* =====================================================
+       CLOSE REVIEW
+    ===================================================== */
+
+    closeReview.addEventListener(
+      "click",
+      function () {
+
+        reviewPanel.style.display =
+          "none";
+
+      }
+    );
+    
+    
+    /* =====================================================
+   BOOK APPROVAL
+===================================================== */
+
+approveBookButton.addEventListener(
+  "click",
+  async function () {
+
+    if (!currentReviewBook) {
+      alert("No book is currently selected.");
+      return;
+    }
+
+    const confirmed =
+      confirm(
+        "Approve this book for publication?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+    
+       approveBookButton.disabled = true;
+    rejectBookButton.disabled = true;
+
+    const now =
+      new Date().toISOString();
+
+    const {
+      error: submissionError
+    } =
+      await supabaseClient
+        .from("book_submissions")
+        .update({
+          status: "approved",
+          reviewed_at: now,
+          reviewed_by: session.user.id
+        })
+        .eq(
+          "id",
+          currentReviewBook.id
+        );
+
+    if (submissionError) {
+
+      console.error(
+        "BOOK SUBMISSION APPROVAL ERROR:",
+        submissionError
+      );
+
+      alert(
+        "The book could not be approved."
+      );
+
+      approveBookButton.disabled = false;
+      rejectBookButton.disabled = false;
+
+      return;
+    }
+    
+    
+        const {
+      error: bookError
+    } =
+      await supabaseClient
+        .from("books")
+        .update({
+          status: "published",
+          submission_status: "approved",
+          published_at: now,
+          updated_at: now
+        })
+        .eq(
+          "id",
+          currentReviewBook.book_id
+        );
+
+
+    if (bookError) {
+
+      console.error(
+        "BOOK APPROVAL ERROR:",
+        bookError
+      );
+
+      alert(
+        "The submission was approved, but the book itself could not be updated."
+      );
+
+      approveBookButton.disabled = false;
+      rejectBookButton.disabled = false;
+
+      return;
+    }
+    
+    
+        alert(
+      "Book approved and published."
+    );
+
+
+    reviewPanel.style.display =
+      "none";
+
+
+    window.location.reload();
+
+  }
+);
+
+
+/* =====================================================
+   BOOK REJECTION
+===================================================== */
+
+rejectBookButton.addEventListener(
+  "click",
+  async function () {
+
+    if (!currentReviewBook) {
+      alert("No book is currently selected.");
+      return;
+    }
+
+    const confirmed =
+      confirm(
+        "Reject this book?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    approveBookButton.disabled = true;
+    rejectBookButton.disabled = true;
+
+    const now =
+      new Date().toISOString();
+    
+    
+        const {
+      error: submissionError
+    } =
+      await supabaseClient
+        .from("book_submissions")
+        .update({
+          status: "rejected",
+          reviewed_at: now,
+          reviewed_by: session.user.id
+        })
+        .eq(
+          "id",
+          currentReviewBook.id
+        );
+
+
+    if (submissionError) {
+
+      console.error(
+        "BOOK SUBMISSION REJECTION ERROR:",
+        submissionError
+      );
+
+      alert(
+        "The book could not be rejected."
+      );
+
+      approveBookButton.disabled = false;
+      rejectBookButton.disabled = false;
+
+      return;
+    }
+    
+        const {
+      error: bookError
+    } =
+      await supabaseClient
+        .from("books")
+        .update({
+          status: "rejected",
+          submission_status: "rejected",
+          updated_at: now
+        })
+        .eq(
+          "id",
+          currentReviewBook.book_id
+        );
+
+
+    if (bookError) {
+
+      console.error(
+        "BOOK REJECTION ERROR:",
+        bookError
+      );
+
+      alert(
+        "The submission was rejected, but the book itself could not be updated."
+      );
+
+      approveBookButton.disabled = false;
+      rejectBookButton.disabled = false;
+
+      return;
+    }
+    
+    
+        alert(
+      "Book rejected."
+    );
+
+
+    reviewPanel.style.display =
+      "none";
+
+
+    window.location.reload();
+
+  }
+);
+    
+    /* =====================================================
+   SAVE FULL BOOK DIAMOND PRICE
+===================================================== */
+
+saveDiamondPriceButton.addEventListener(
+  "click",
+  async function () {
+
+    if (!currentReviewBook) {
+      alert("No book is currently selected.");
+      return;
+    }
+
+    const diamondPrice =
+      Number(
+        diamondPriceInput.value
+      );
+
+    if (
+      !Number.isInteger(diamondPrice) ||
+      diamondPrice < 0
+    ) {
+      alert(
+        "Please enter a valid diamond amount."
+      );
+
+      return;
+    }
+    
+    
+        const confirmed =
+      confirm(
+        "Set the full-book unlock price to " +
+        diamondPrice +
+        " diamonds?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    saveDiamondPriceButton.disabled = true;
+
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("books")
+        .update({
+          full_book_unlock_cost:
+            diamondPrice,
+          updated_at:
+            new Date().toISOString()
+        })
+        .eq(
+          "id",
+          currentReviewBook.book_id
+        );
+    
+    
+        if (error) {
+
+      console.error(
+        "DIAMOND PRICE SAVE ERROR:",
+        error
+      );
+
+      alert(
+        "The diamond price could not be saved."
+      );
+
+      saveDiamondPriceButton.disabled =
+        false;
+
+      return;
+    }
+    
+    
+        alert(
+      "Full book diamond price saved: " +
+      diamondPrice +
+      " diamonds."
+    );
+
+
+    saveDiamondPriceButton.disabled =
+      false;
+
+  }
+
+);
+
+
+    /* =====================================================
+       LOAD WITHDRAWAL REQUESTS
+    ===================================================== */
+
+    const withdrawalsContainer =
+      document.getElementById("led-withdrawals");
+
+    const withdrawalCount =
+      document.getElementById("led-withdrawal-count");
+
+    async function loadWithdrawalRequests() {
+
+      const {
+        data: withdrawals,
+        error: withdrawalsError
+      } = await supabaseClient
+        .from("withdrawal_requests")
+        .select(
+          "id,author_id,payout_account_id,amount,currency,status,admin_note,requested_at,processed_at"
+        )
+              .order("requested_at", { ascending: false });
+
+      if (withdrawalsError) {
+
+        console.error("WITHDRAWALS LOAD ERROR:", withdrawalsError);
+
+        withdrawalsContainer.innerHTML =
+          "<div class='led-message'>Could not load withdrawal requests.</div>";
+
+        return;
+
+      }
+
+      const rows = withdrawals || [];
+
+      withdrawalCount.textContent = rows.length;
+      
+            if (rows.length === 0) {
+
+        withdrawalsContainer.innerHTML =
+          "<div class='led-message'>No withdrawal requests yet.</div>";
+
+        return;
+
+      }
+
+      const payoutAccountIds =
+        rows.map(function (r) { return r.payout_account_id; });
+
+      const {
+        data: accounts,
+        error: accountsError
+      } = await supabaseClient
+        .from("payout_accounts")
+        .select("id,bank_name,account_name,account_number")
+        .in("id", payoutAccountIds);
+      
+            if (accountsError) {
+        console.error("PAYOUT ACCOUNTS LOAD ERROR:", accountsError);
+      }
+
+      const accountsById = {};
+
+      (accounts || []).forEach(function (acc) {
+        accountsById[acc.id] = acc;
+      });
+
+      withdrawalsContainer.innerHTML = "";
+
+      rows.forEach(function (request) {
+
+        const card =
+          document.createElement("div");
+
+        card.className = "led-book-card";
+        card.style.display = "block";
+
+        const account =
+          accountsById[request.payout_account_id] || {};
+        
+                const title =
+          document.createElement("h3");
+
+        title.textContent =
+          (request.currency || "NGN") + " " +
+          Number(request.amount).toLocaleString();
+
+        const bankInfo =
+          document.createElement("p");
+
+        bankInfo.textContent =
+          (account.bank_name || "Unknown bank") + " \u2014 " +
+          (account.account_name || "Unknown name") + " \u2014 " +
+          (account.account_number || "Unknown number");
+
+        const requestedInfo =
+          document.createElement("p");
+
+        requestedInfo.textContent =
+          "Requested: " +
+          new Date(request.requested_at).toLocaleString();
+
+        const status =
+          document.createElement("span");
+
+        status.className = "led-status";
+        
+                status.textContent = request.status || "pending";
+
+        card.appendChild(title);
+        card.appendChild(bankInfo);
+        card.appendChild(requestedInfo);
+        card.appendChild(status);
+
+        if (request.status === "pending") {
+
+          const markPaidButton =
+            document.createElement("button");
+
+          markPaidButton.type = "button";
+
+          markPaidButton.className = "led-action-button";
+
+          markPaidButton.textContent = "Mark as Paid";
+
+          markPaidButton.style.marginTop = "10px";
+
+          markPaidButton.style.display = "block";
+          
+                    markPaidButton.addEventListener("click", async function () {
+
+            const confirmed =
+              confirm("Confirm this withdrawal has been paid?");
+
+            if (!confirmed) {
+              return;
+            }
+
+            markPaidButton.disabled = true;
+
+            const {
+              error: updateError
+            } = await supabaseClient
+              .from("withdrawal_requests")
+              .update({
+                status: "paid",
+                processed_at: new Date().toISOString(),
+                processed_by: session.user.id
+              })
+            
+                          .eq("id", request.id);
+
+            if (updateError) {
+
+              console.error("WITHDRAWAL UPDATE ERROR:", updateError);
+
+              alert("Could not update this withdrawal request.");
+
+              markPaidButton.disabled = false;
+
+              return;
+
+            }
+
+            loadWithdrawalRequests();
+
+          });
+
+          card.appendChild(markPaidButton);
+          
+                  }
+
+        withdrawalsContainer.appendChild(card);
+
+      });
+
+    }
+
+    loadWithdrawalRequests();
+
+
+    /* =====================================================
+       SET MONTHLY EARNINGS
+    ===================================================== */
+
+    const setEarningsButton =
+      document.getElementById("led-set-earnings");
+
+    const earningsInput =
