@@ -2710,3 +2710,96 @@ if (book.book_type === "fiction") {
 
   const dashboardTabs =
     document.querySelectorAll(".dashboard-tab");
+
+const tabPanels = {
+    mybooks: document.getElementById("tab-mybooks"),
+    insights: document.getElementById("tab-insights"),
+    calendar: document.getElementById("tab-calendar")
+  };
+
+  let insightsInitialized = false;
+  let calendarInitialized = false;
+
+  dashboardTabs.forEach(function (tabButton) {
+    
+        tabButton.addEventListener("click", function () {
+
+      dashboardTabs.forEach(function (btn) {
+        btn.classList.remove("active");
+      });
+
+      tabButton.classList.add("active");
+
+      Object.keys(tabPanels).forEach(function (key) {
+        tabPanels[key].classList.remove("active");
+      });
+
+      const target = tabButton.dataset.tab;
+
+      tabPanels[target].classList.add("active");
+          
+                if (target === "insights" && !insightsInitialized) {
+
+        insightsInitialized = true;
+
+        supabaseClient
+          .from("app_settings")
+          .select("value")
+          .eq("key", "insights_enabled")
+          .single()
+          .then(function (result) {
+
+            const enabled =
+              result.data && result.data.value === "true";
+
+            if (enabled) {
+
+              initInsightsTab();
+
+            } else {
+
+              tabPanels.insights.innerHTML =
+                "<p style='color:#B9AE9A; padding:30px; text-align:center;'>Insights & Earnings is currently unavailable. Please check back this weekend.</p>";
+
+            }
+
+          });
+
+      }
+
+      if (target === "calendar" && !calendarInitialized) {
+        calendarInitialized = true;
+        initCalendarTab();
+      }
+
+    });
+
+  });
+
+
+  /* =========================
+     INSIGHTS & EARNINGS TAB
+  ========================= */
+
+  const insightsBookSelect =
+    document.getElementById("insights-book-select");
+
+  const insightsLikes =
+    document.getElementById("insights-likes");
+
+  const insightsReads =
+    document.getElementById("insights-reads");
+  
+    const insightsFollowers =
+    document.getElementById("insights-followers");
+
+  const insightsEarnings =
+    document.getElementById("insights-earnings");
+
+  const insightsMessage =
+    document.getElementById("insights-message");
+
+  const withdrawButton =
+    document.getElementById("withdraw-funds-button");
+
+let currentBookEarnings = 0;
