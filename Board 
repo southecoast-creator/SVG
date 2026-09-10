@@ -1794,3 +1794,71 @@ const chapterEditorMessage =
       window.confirm(
         "Request deletion of this chapter? The chapter will not be deleted immediately. An editor must approve the deletion."
       );
+
+if (!confirmed) {
+      return;
+    }
+
+    deleteChapterRequest.disabled =
+      true;
+
+    chapterEditorMessage.textContent =
+      "Sending deletion request...";
+
+
+    const {
+      error
+    } = await supabaseClient
+      .from("chapters")
+      .update({
+
+        deletion_requested:
+          true,
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        editingChapterId
+      );
+    
+    
+        deleteChapterRequest.disabled =
+      false;
+
+
+    if (error) {
+
+      console.error(
+        "CHAPTER DELETION REQUEST ERROR:",
+        error
+      );
+
+      chapterEditorMessage.textContent =
+        "Unable to request deletion: " +
+        error.message;
+
+      return;
+
+    }
+
+
+    chapterEditorMessage.textContent =
+      "Deletion request sent to the editor.";
+
+    await loadChapters(
+      managingBookId
+    );
+
+  }
+);
+  
+  const createChapterButton =
+document.getElementById(
+    "create-chapter-button"
+  );
+  
+  createChapterButton.addEventListener(
+  "click",
