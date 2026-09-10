@@ -1122,4 +1122,974 @@ document.addEventListener(
             .select(
               "full_book_unlock_cost"
             )
+            .eq(
+              "id",
+              book.book_id
+            )
+            .maybeSingle();
+
+
+        if (
+          bookPricingError
+        ) {
+
+          console.error(
+            "BOOK PRICING LOAD ERROR:",
+            bookPricingError
+          );
+
+        } else if (
+          bookPricing &&
+          bookPricing.full_book_unlock_cost !== null &&
+          bookPricing.full_book_unlock_cost !== undefined
+        ) {
+
+          diamondPriceInput.value =
+            bookPricing.full_book_unlock_cost;
+
+        }
+
+      }
+
+
+      /* ===================================================
+         LOAD CHAPTERS
+      =================================================== */
+
+      chapters.innerHTML =
+        "<div class='led-message'>" +
+        "Loading chapters..." +
+        "</div>";
+
+
+      if (!book.book_id) {
+
+        chapters.innerHTML =
+          "<div class='led-message'>" +
+          "This submission has no linked book." +
+          "</div>";
+
+        reviewPanel.style.display =
+          "block";
+
+        return;
+
+      }
+
+
+      const {
+        data: chapterData,
+        error: chapterError
+      } =
+        await supabaseClient
+          .from("chapters")
+          .select(
+            "id,book_id,chapter_number,title,content,status,word_count,is_locked,unlock_cost,updated_at,created_at,published_at,submitted_at,reviewed_at,reviewed_by,deletion_requested"
+          )
+          .eq(
+            "book_id",
+            book.book_id
+          )
+          .order(
+            "chapter_number",
+            {
+              ascending: true
+            }
+          );
+
+
+      if (chapterError) {
+
+        console.error(
+          "CHAPTER LOAD ERROR:",
+          chapterError
+        );
+
+
+        chapters.innerHTML =
+          "<div class='led-message'>" +
+          "Could not load chapters." +
+          "</div>";
+
+      } else if (
+        !chapterData ||
+        chapterData.length === 0
+      ) {
+
+        chapters.innerHTML =
+          "<div class='led-message'>" +
+          "No chapters submitted yet." +
+          "</div>";
+
+      } else {
+
+        chapters.innerHTML =
+          "";
+
+
+        chapterData.forEach(
+          function (chapter) {
+
+            const chapterCard =
+              document.createElement(
+                "div"
+              );
+
+            chapterCard.className =
+              "led-chapter-card";
+
+
+            const chapterInfo =
+              document.createElement(
+                "div"
+              );
+
+            chapterInfo.className =
+              "led-chapter-info";
+
+
+            const chapterTitle =
+              document.createElement(
+                "h4"
+              );
+
+            chapterTitle.textContent =
+              "Chapter " +
+              (
+                chapter.chapter_number ||
+                "?"
+              ) +
+              ": " +
+              (
+                chapter.title ||
+                "Untitled Chapter"
+              );
+
+
+            const chapterMeta =
+              document.createElement(
+                "p"
+              );
+
+            chapterMeta.textContent =
+              (
+                chapter.word_count ||
+                0
+              ) +
+              " words • " +
+              (
+                chapter.status ||
+                "draft"
+              );
+
+
+            const lockedMeta =
+              document.createElement(
+                "p"
+              );
+
+            lockedMeta.textContent =
+              chapter.is_locked
+                ? "Locked chapter • " +
+                  (
+                    chapter.unlock_cost ||
+                    0
+                  ) +
+                  " rubies"
+                : "Free chapter";
+
+
+            chapterInfo.appendChild(
+              chapterTitle
+            );
+
+            chapterInfo.appendChild(
+              chapterMeta
+            );
+
+            chapterInfo.appendChild(
+              lockedMeta
+            );
+
+
+            /* =================================================
+               RUBY PRICE CONTROL
+            ================================================= */
+
+            const priceWrap =
+              document.createElement(
+                "div"
+              );
+
+            priceWrap.className =
+              "led-chapter-price-wrap";
+
+
+            const priceLabel =
+              document.createElement(
+                "label"
+              );
+
+            priceLabel.textContent =
+              "Ruby price";
+
+
+            const priceInput =
+              document.createElement(
+                "input"
+              );
+
+            priceInput.type =
+              "number";
+
+            priceInput.min =
+              "0";
+
+            priceInput.step =
+              "1";
+
+            priceInput.placeholder =
+              "Free";
+
+
+            if (
+              chapter.unlock_cost !== null &&
+              chapter.unlock_cost !== undefined
+            ) {
+
+              priceInput.value =
+                chapter.unlock_cost;
+
+            }
+
+
+            const savePriceButton =
+              document.createElement(
+                "button"
+              );
+
+            savePriceButton.type =
+              "button";
+
+            savePriceButton.className =
+              "led-small-button";
+
+            savePriceButton.textContent =
+              "Save Ruby Price";
+
+
+            savePriceButton.addEventListener(
+              "click",
+              async function () {
+
+                const rawValue =
+                  priceInput.value.trim();
+
+
+                if (rawValue === "") {
+
+                  const {
+                    error
+                  } =
+                    await supabaseClient
+                      .from("chapters")
+                      .update({
+                        unlock_cost: null,
+                        is_locked: false,
+                        updated_at:
+                          new Date().toISOString()
+                      })
+                      .eq(
+                        "id",
+                        chapter.id
+                      );
+
+
+                  if (error) {
+
+                    console.error(
+                      "CLEAR RUBY PRICE ERROR:",
+                      error
+                    );
+
+                    alert(
+                      "Could not clear the Ruby price."
+                    );
+
+                    return;
+
+                  }
+
+
+                  alert(
+                    "Chapter is now free."
+                  );
+
+                  openBookReview(
+                    currentReviewBook
+                  );
+
+                  return;
+
+                }
+
+
+                const amount =
+                  parseInt(
+                    rawValue,
+                    10
+                  );
+
+
+                if (
+                  !Number.isInteger(amount) ||
+                  amount < 0
+                ) {
+
+                  alert(
+                    "Please enter a valid Ruby amount."
+                  );
+
+                  return;
+
+                }
+
+
+                const {
+                  error
+                } =
+                  await supabaseClient
+                    .from("chapters")
+                    .update({
+                      unlock_cost:
+                        amount,
+                      is_locked:
+                        amount > 0,
+                      updated_at:
+                        new Date().toISOString()
+                    })
+                    .eq(
+                      "id",
+                      chapter.id
+                    );
+
+
+                if (error) {
+
+                  console.error(
+                    "SAVE RUBY PRICE ERROR:",
+                    error
+                  );
+
+                  alert(
+                    "Could not save the Ruby price."
+                  );
+
+                  return;
+
+                }
+
+
+                alert(
+                  amount > 0
+                    ? "Ruby price saved."
+                    : "Chapter is now free."
+                );
+
+
+                openBookReview(
+                  currentReviewBook
+                );
+
+              }
+            );
+
+
+            priceWrap.appendChild(
+              priceLabel
+            );
+
+            priceWrap.appendChild(
+              priceInput
+            );
+
+            priceWrap.appendChild(
+              savePriceButton
+            );
+
+
+            /* =================================================
+               REVIEW ACTIONS
+            ================================================= */
+
+            const actions =
+              document.createElement(
+                "div"
+              );
+
+            actions.className =
+              "led-review-actions";
+
+
+            /* =================================================
+               DELETE CHAPTER REQUEST
+            ================================================= */
+
+            if (
+              chapter.deletion_requested ===
+              true
+            ) {
+
+              const deleteChapterButton =
+                document.createElement(
+                  "button"
+                );
+
+              deleteChapterButton.type =
+                "button";
+
+              deleteChapterButton.className =
+                "led-delete-request-button";
+
+              deleteChapterButton.textContent =
+                "Delete Chapter";
+
+
+              deleteChapterButton.addEventListener(
+                "click",
+                async function () {
+
+                  const confirmed =
+                    confirm(
+                      "Delete this chapter permanently? This cannot be undone."
+                    );
+
+
+                  if (!confirmed) {
+                    return;
+                  }
+
+
+                  deleteChapterButton.disabled =
+                    true;
+
+                  deleteChapterButton.textContent =
+                    "Deleting...";
+
+
+                  const {
+                    error
+                  } =
+                    await supabaseClient
+                      .from("chapters")
+                      .delete()
+                      .eq(
+                        "id",
+                        chapter.id
+                      )
+                      .eq(
+                        "deletion_requested",
+                        true
+                      );
+
+
+                  if (error) {
+
+                    console.error(
+                      "DELETE CHAPTER ERROR:",
+                      error
+                    );
+
+                    alert(
+                      "Could not delete the chapter."
+                    );
+
+
+                    deleteChapterButton.disabled =
+                      false;
+
+                    deleteChapterButton.textContent =
+                      "Delete Chapter";
+
+                    return;
+
+                  }
+
+
+                  alert(
+                    "Chapter deleted successfully."
+                  );
+
+
+                  await loadBooks();
+
+
+                  if (
+                    currentReviewBook
+                  ) {
+
+                    await openBookReview(
+                      currentReviewBook
+                    );
+
+                  }
+
+                }
+              );
+
+
+              actions.appendChild(
+                deleteChapterButton
+              );
+
+            }
+
+
+            /* =================================================
+               APPROVE CHAPTER
+            ================================================= */
+
+            const approveChapterButton =
+              document.createElement(
+                "button"
+              );
+
+            approveChapterButton.type =
+              "button";
+
+            approveChapterButton.className =
+              "led-small-button";
+
+            approveChapterButton.textContent =
+              "Approve Chapter";
+
+
+            approveChapterButton.addEventListener(
+              "click",
+              async function () {
+
+                const {
+                  error
+                } =
+                  await supabaseClient
+                    .from("chapters")
+                    .update({
+                      status:
+                        "published",
+                      reviewed_at:
+                        new Date().toISOString(),
+                      reviewed_by:
+                        session.user.id,
+                      published_at:
+                        new Date().toISOString(),
+                      updated_at:
+                        new Date().toISOString()
+                    })
+                    .eq(
+                      "id",
+                      chapter.id
+                    );
+
+
+                if (error) {
+
+                  console.error(
+                    "APPROVE CHAPTER ERROR:",
+                    error
+                  );
+
+                  alert(
+                    "Could not approve the chapter."
+                  );
+
+                  return;
+
+                }
+
+
+                alert(
+                  "Chapter approved and published."
+                );
+
+
+                await loadBooks();
+
+                await openBookReview(
+                  currentReviewBook
+                );
+
+              }
+            );
+
+
+            /* =================================================
+               REJECT CHAPTER
+            ================================================= */
+
+            const rejectChapterButton =
+              document.createElement(
+                "button"
+              );
+
+            rejectChapterButton.type =
+              "button";
+
+            rejectChapterButton.className =
+              "led-small-button";
+
+            rejectChapterButton.textContent =
+              "Reject Chapter";
+
+
+            rejectChapterButton.addEventListener(
+              "click",
+              async function () {
+
+                const {
+                  error
+                } =
+                  await supabaseClient
+                    .from("chapters")
+                    .update({
+                      status:
+                        "rejected",
+                      reviewed_at:
+                        new Date().toISOString(),
+                      reviewed_by:
+                        session.user.id,
+                      updated_at:
+                        new Date().toISOString()
+                    })
+                    .eq(
+                      "id",
+                      chapter.id
+                    );
+
+
+                if (error) {
+
+                  console.error(
+                    "REJECT CHAPTER ERROR:",
+                    error
+                  );
+
+                  alert(
+                    "Could not reject the chapter."
+                  );
+
+                  return;
+
+                }
+
+
+                alert(
+                  "Chapter rejected."
+                );
+
+
+                await loadBooks();
+
+                await openBookReview(
+                  currentReviewBook
+                );
+
+              }
+            );
+
+
+            actions.appendChild(
+              approveChapterButton
+            );
+
+            actions.appendChild(
+              rejectChapterButton
+            );
+
+
+            chapterCard.appendChild(
+              chapterInfo
+            );
+
+            chapterCard.appendChild(
+              priceWrap
+            );
+
+            chapterCard.appendChild(
+              actions
+            );
+
+
+            chapters.appendChild(
+              chapterCard
+            );
+
+          }
+        );
+
+      }
+
+
+      /* ===================================================
+         SHOW REVIEW PANEL
+      =================================================== */
+
+      reviewPanel.style.display =
+        "block";
+
+
+      reviewPanel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+    }
+
+
+    /* =====================================================
+       ADD DETAIL HELPER
+    ===================================================== */
+
+    function addDetail(
+      container,
+      label,
+      value
+    ) {
+
+      if (
+        value === null ||
+        value === undefined ||
+        String(value).trim() === ""
+      ) {
+        return;
+      }
+
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+      row.className =
+        "led-detail-row";
+
+
+      const labelElement =
+        document.createElement(
+          "strong"
+        );
+
+      labelElement.textContent =
+        label;
+
+
+      const valueElement =
+        document.createElement(
+          "span"
+        );
+
+      valueElement.textContent =
+        String(value);
+
+
+      row.appendChild(
+        labelElement
+      );
+
+      row.appendChild(
+        valueElement
+      );
+
+
+      container.appendChild(
+        row
+      );
+
+    }
+
+
+    /* =====================================================
+       CLOSE REVIEW
+    ===================================================== */
+
+    closeReview.addEventListener(
+      "click",
+      function () {
+
+        reviewPanel.style.display =
+          "none";
+
+        currentReviewBook =
+          null;
+
+      }
+    );
+
+
+    /* =====================================================
+       APPROVE BOOK
+    ===================================================== */
+
+    approveBookButton.addEventListener(
+      "click",
+      async function () {
+
+        if (
+          !currentReviewBook ||
+          !currentReviewBook.id
+        ) {
+          return;
+        }
+
+
+        const confirmed =
+          confirm(
+            "Approve this book and publish it?"
+          );
+
+
+        if (!confirmed) {
+          return;
+        }
+
+
+        approveBookButton.disabled =
+          true;
+
+
+        const now =
+          new Date().toISOString();
+
+
+        const {
+          error: submissionError
+        } =
+          await supabaseClient
+            .from("book_submissions")
+            .update({
+              status:
+                "approved"
+            })
+            .eq(
+              "id",
+              currentReviewBook.id
+            );
+
+
+        if (submissionError) {
+
+          console.error(
+            "APPROVE SUBMISSION ERROR:",
+            submissionError
+          );
+
+          alert(
+            "Could not approve the submission."
+          );
+
+          approveBookButton.disabled =
+            false;
+
+          return;
+
+        }
+
+
+        const {
+          error: bookError
+        } =
+          await supabaseClient
+            .from("books")
+            .update({
+              status:
+                "published",
+              submission_status:
+                "approved",
+              published_at:
+                now,
+              updated_at:
+                now
+            })
+            .eq(
+              "id",
+              currentReviewBook.book_id
+            );
+
+
+        if (bookError) {
+
+          console.error(
+            "APPROVE BOOK ERROR:",
+            bookError
+          );
+
+          alert(
+            "Submission approved, but the book itself could not be published."
+          );
+
+          approveBookButton.disabled =
+            false;
+
+          return;
+
+        }
+
+
+        alert(
+          "Book approved and published."
+        );
+
+
+        approveBookButton.disabled =
+          false;
+
+
+        await loadBooks();
+
+        reviewPanel.style.display =
+          "none";
+
+        currentReviewBook =
+          null;
+
+      }
+    );
+
+
+    /* =====================================================
+       REJECT BOOK
+    ===================================================== */
+
+    rejectBookButton.addEventListener(
+      "click",
+      async function () {
+
+        if (
+          !currentReviewBook ||
+          !currentReviewBook.id
+        ) {
+          return;
+        }
+
+
+        const confirmed =
+          confirm(
+            "Reject this book submission?"
+          );
+
+
+        if (!confirmed) {
+          return;
+        }
+
+
+        rejectBookButton.disabled =
+          true;
+
+
+        const now =
+          new Date().toISOString();
+
+
+        const {
+          error: submissionErro
      
