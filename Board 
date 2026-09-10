@@ -1716,3 +1716,39 @@ const chapterCount =
   );
 
 const chapterWordCount =
+document.getElementById(
+    "chapter-word-count"
+  );
+
+const chaptersList =
+  document.getElementById(
+    "chapters-list"
+  );
+  
+const chapterEditorModal =
+  document.getElementById(
+    "chapter-editor-modal"
+  );
+
+const closeChapterEditor =
+  document.getElementById(
+    "close-chapter-editor"
+  );
+  
+  const cancelChapterEditor =
+  document.getElementById("cancel-chapter-editor");
+
+const chapterEditorBookTitle =
+  document.getElementById(
+    "chapter-editor-book-title"
+  );
+
+const chapterNumberInput =
+  document.getElementById(
+    "chapter-number"
+  );
+
+const chapterTitleInput =
+  document.getElementById(
+    "chapter-title"
+  );
