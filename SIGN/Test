@@ -1,4 +1,5 @@
-gif (payRubyBtn) {
+
+if (payRubyBtn) {
   payRubyBtn.disabled = true;
   payRubyBtn.textContent = "Processing...";
 
