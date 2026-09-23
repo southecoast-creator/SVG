@@ -1,4 +1,4 @@
-if (payRubyBtn) {
+gif (payRubyBtn) {
   payRubyBtn.disabled = true;
   payRubyBtn.textContent = "Processing...";
 
@@ -72,5 +72,94 @@ if (payRubyBtn) {
   }
 
   alert("The chapter could not be unlocked. Please try again.");
+  return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+if (payDiamondBtn) {
+  payDiamondBtn.disabled = true;
+  payDiamondBtn.textContent = "Processing...";
+
+  const { data, error } = await litdomSupabase
+    .rpc("unlock_book_with_diamonds", {
+      p_book_id: bookId
+    });
+
+  payDiamondBtn.disabled = false;
+  payDiamondBtn.textContent = `Pay ${diamondCost} Diamonds`;
+
+  if (error) {
+    console.error("Diamond unlock error:", error);
+
+    if (error.message && error.message.includes("Insufficient Diamonds")) {
+      chapterContent.innerHTML = `
+        <div class="chapter-lock-blocker" style="
+          padding: 32px 20px;
+          text-align: center;
+          background: #0b0b0f;
+          border-radius: 16px;
+          border: 1px solid #8c7625;
+        ">
+          <p style="
+            font-size: 17px;
+            margin-bottom: 14px;
+            font-weight: 600;
+          ">
+            Your Diamond balance is not enough to unlock this book.
+          </p>
+
+          <p style="
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #f4d58d;
+          ">
+            You need ${diamondCost} Diamonds to continue.
+          </p>
+
+          <button
+            type="button"
+            class="check-wallet-button"
+            style="
+              width: 100%;
+              max-width: 320px;
+              padding: 13px 20px;
+              border: none;
+              border-radius: 10px;
+              background: #d4af37;
+              color: #111;
+              font-size: 15px;
+              font-weight: 600;
+              cursor: pointer;
+            "
+          >
+            Check My Wallet Balance
+          </button>
+        </div>
+      `;
+
+      return;
+    }
+
+    alert("Unable to unlock this book. Please try again.");
+    return;
+  }
+
+  if (data === true) {
+    location.reload();
+    return;
+  }
+
+  alert("The book could not be unlocked. Please try again.");
   return;
 }
