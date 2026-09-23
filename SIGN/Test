@@ -1,176 +1,218 @@
-<!-- ============================================================
-     LITDOM APP-SHELL SNIPPET
-     Paste this ENTIRE block once, right before </body> in your
-     Blogger theme (Theme → Edit HTML → search for </body>,
-     paste just above it, then Save).
+chapters.forEach(function (chapter) {
+    const article = document.createElement("article");
+    article.className = "reader-chapter";
 
-     BEFORE PASTING: replace the 5 placeholder URLs below
-     (search for "REPLACE-WITH") with your real Blogger page URLs.
-     ============================================================ -->
+    const chapterHeading = document.createElement("h2");
+    chapterHeading.textContent = "Chapter " + chapter.chapter_number;
 
-<style>
-  /* Reserve space at the bottom of every page so content never
-     hides behind the fixed nav bar */
-  body{
-    padding-bottom: 64px;
-  }
+    const chapterTitle = document.createElement("h3");
+    chapterTitle.textContent = chapter.title || "";
 
-  /* ---------- BOTTOM NAV BAR ---------- */
-  #litdom-bottom-nav{
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    background: #1d1d1d;              /* swap for your obsidian bg */
-    border-top: 1px solid rgba(212,175,55,0.25); /* gold hairline */
-    z-index: 9999;
-  }
-  .litdom-tab{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    flex: 1;
-    height: 100%;
-  }
-  .litdom-tab svg{
-    width: 24px;
-    height: 24px;
-    fill: none;
-    stroke: #9a9a9a;              /* inactive outline color */
-    stroke-width: 1.8;
-  }
-  .litdom-tab span{
-    font-size: 10px;
-    margin-top: 3px;
-    color: #9a9a9a;
-    font-family: Roboto, sans-serif;
-  }
-  /* ACTIVE state: filled icon + gold color */
-  .litdom-tab.active svg{
-    fill: #d4af37;
-    stroke: #d4af37;
-  }
-  .litdom-tab.active span{
-    color: #d4af37;
-    font-weight: 700;
-  }
+    const chapterContent = document.createElement("div");
+    chapterContent.className = "chapter-content";
+    chapterContent.style.width = "100%";
+    chapterContent.style.maxWidth = "900px";
+    chapterContent.style.margin = "0 auto";
+    chapterContent.style.textAlign = "left";
+    chapterContent.style.boxSizing = "border-box";
+    chapterContent.style.lineHeight = "1.8";
+    chapterContent.style.fontSize = "18px";
 
-  /* ---------- HEADER / LOGO AREA ---------- */
-  /* Hides Blogger's default plain-text blog title */
-  .Header .title, .Header h1{
-    display: none !important;
-  }
-  #litdom-app-header{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 14px 0 10px;
-    background: #000;
-  }
-  #litdom-app-header img{
-    height: 34px;      /* adjust to taste */
-  }
+    async function renderChapterAccess() {
+      if (!chapter.is_locked || !chapter.unlock_cost || chapter.unlock_cost <= 0) {
+        chapterContent.innerHTML = chapter.content || "";
+        return;
+      }
 
-  /* ---------- PAGE / POST TITLE REDESIGN ---------- */
-  /* Makes individual post/page titles smaller + more elegant,
-     app-like, instead of Blogger's oversized default */
-  .post-title, h3.post-title{
-    font-family: 'Playfair Display', serif !important;
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.2px;
-    color: #f5f0e6 !important;   /* ivory */
-    margin: 10px 0 !important;
-  }
+      const { data: { user } } = await litdomSupabase.auth.getUser();
 
-  /* ---------- FOOTER ---------- */
-  #litdom-footer{
-    text-align: center;
-    padding: 24px 16px 80px;   /* extra bottom padding clears the nav bar */
-    background: #000;
-    color: #7a7a7a;
-    font-family: Roboto, sans-serif;
-    font-size: 12px;
-  }
-  #litdom-footer img{
-    height: 22px;
-    margin-bottom: 8px;
-    opacity: 0.85;
-  }
-  #litdom-footer a{
-    color: #d4af37;
-    text-decoration: none;
-  }
-</style>
+      if (user) {
+        const { data: existingChapterUnlock } = await litdomSupabase
+          .from("chapter_unlocks")
+          .select("id")
+          .eq("chapter_id", chapter.id)
+          .eq("reader_id", user.id)
+          .maybeSingle();
 
-<!-- APP HEADER (put your logo image URL in) -->
-<div id="litdom-app-header">
-  <a href="/" aria-label="Litdom Home">
-    <img src="REPLACE-WITH-YOUR-LOGO-IMAGE-URL" alt="Litdom"/>
-  </a>
-</div>
+        if (existingChapterUnlock) {
+          chapterContent.innerHTML = chapter.content || "";
+          return;
+        }
 
-<!-- BOTTOM NAV -->
-<nav id="litdom-bottom-nav">
+        const { data: existingBookUnlock } = await litdomSupabase
+          .from("book_unlocks")
+          .select("id")
+          .eq("book_id", bookId)
+          .eq("reader_id", user.id)
+          .maybeSingle();
 
-  <a class="litdom-tab" data-match="REPLACE-WITH-HOME-URL" href="REPLACE-WITH-HOME-URL">
-    <svg viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9"/></svg>
-    <span>Home</span>
-  </a>
+        if (existingBookUnlock) {
+          chapterContent.innerHTML = chapter.content || "";
+          return;
+        }
+      }
 
-  <a class="litdom-tab" data-match="REPLACE-WITH-FICTION-URL" href="REPLACE-WITH-FICTION-URL">
-    <svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 016.5 2H20v17H6.5A2.5 2.5 0 004 16.5v-12z"/><path d="M4 16.5A2.5 2.5 0 016.5 19H20"/></svg>
-    <span>Fiction</span>
-  </a>
+      const { data: bookPricing } = await litdomSupabase
+        .from("books")
+        .select("full_book_unlock_cost")
+        .eq("id", bookId)
+        .maybeSingle();
 
-  <a class="litdom-tab" data-match="REPLACE-WITH-NONFICTION-URL" href="REPLACE-WITH-NONFICTION-URL">
-    <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
-    <span>Non-fiction</span>
-  </a>
+      const diamondCost = bookPricing?.full_book_unlock_cost || 0;
 
-  <a class="litdom-tab" data-match="REPLACE-WITH-WALLET-URL" href="REPLACE-WITH-WALLET-URL">
-    <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16.5" cy="14" r="1.2"/></svg>
-    <span>Wallet</span>
-  </a>
-
-  <a class="litdom-tab" data-match="REPLACE-WITH-PROFILE-URL" href="REPLACE-WITH-PROFILE-URL">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6"/></svg>
-    <span>Profile</span>
-  </a>
-
-</nav>
-
-<!-- FOOTER -->
-<div id="litdom-footer">
-  <img src="REPLACE-WITH-YOUR-LOGO-IMAGE-URL" alt="Litdom"/>
-  <p>&#169; <span id="litdom-year"></span> Litdom. All rights reserved.</p>
-</div>
-
-<script>
-(function(){
-  // Auto-highlight the active tab based on current page URL
-  var current = window.location.href.split('?')[0].replace(/\/$/, '');
-  var tabs = document.querySelectorAll('.litdom-tab');
-  var bestMatch = null;
-  var bestLen = -1;
-
-  tabs.forEach(function(tab){
-    var match = (tab.getAttribute('data-match') || '').replace(/\/$/, '');
-    if (match && current.indexOf(match) === 0 && match.length > bestLen){
-      bestMatch = tab;
-      bestLen = match.length;
+      chapterContent.innerHTML = `
+        <div class="chapter-lock-blocker" style="
+          padding: 32px 20px;
+          text-align: center;
+          background: #0b0b0f;
+          border-radius: 16px;
+          border: 1px solid #8c7625;
+        ">
+          <p style="font-size: 17px; margin-bottom: 14px; font-weight: 600;">
+            You need ${chapter.unlock_cost} Rubies to unlock this chapter
+          </p>
+          <div style="width: 96px; height: 96px; margin: 0 auto 14px; border-radius: 16px; overflow: hidden;">
+            <img src="https://res.cloudinary.com/dgsjpxv4f/image/upload/v1789137965/07_ruby_cluster_dyr8k6.png" alt="Ruby" style="width: 100%; height: 100%; object-fit: contain;" />
+          </div>
+          <button type="button" class="pay-ruby-button" style="width: 100%; max-width: 320px; padding: 13px 20px; border: none; border-radius: 10px; background: #d4af37; color: #111; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 26px;">
+            Pay ${chapter.unlock_cost} Rubies
+          </button>
+          <div style="height: 1px; background: #0b0b0f; margin: 0 0 26px;"></div>
+          <p style="font-size: 17px; margin-bottom: 14px; font-weight: 600;">
+            You need ${diamondCost} Diamonds to unlock this book
+          </p>
+          <div style="width: 96px; height: 96px; margin: 0 auto 14px; border-radius: 16px; overflow: hidden;">
+            <img src="https://res.cloudinary.com/dgsjpxv4f/image/upload/v1789137706/06_diamond_cluster_tbeqei.png" alt="Diamond" style="width: 100%; height: 100%; object-fit: contain;" />
+          </div>
+          <button type="button" class="pay-diamond-button" style="width: 100%; max-width: 320px; padding: 13px 20px; border: none; border-radius: 10px; background: #d4af37; color: #111; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 20px;">
+            Pay ${diamondCost} Diamonds
+          </button>
+          <div>
+            <button type="button" class="check-wallet-button" style="border: none; background: transparent; color: #ffffff; font-size: 13px; text-decoration: underline; cursor: pointer;">
+              Check my wallet balance
+            </button>
+          </div>
+        </div>
+      `;
     }
-  });
-  if (bestMatch){ bestMatch.classList.add('active'); }
 
-  // Footer year
-  var yearEl = document.getElementById('litdom-year');
-  if (yearEl){ yearEl.textContent = new Date().getFullYear(); }
-})();
-</script>
+    chapterContent.addEventListener("click", async function (e) {
+      const payRubyBtn = e.target.closest(".pay-ruby-button");
+      const payDiamondBtn = e.target.closest(".pay-diamond-button");
+      const checkWalletBtn = e.target.closest(".check-wallet-button");
+
+      if (checkWalletBtn) {
+        window.location.href = "/p/wallet.html";
+        return;
+      }
+
+      const { data: { user } } = await litdomSupabase.auth.getUser();
+      if (!user) {
+        alert("Please log in to unlock chapters.");
+        return;
+      }
+
+      if (payRubyBtn) {
+        const { data: wallet, error: walletError } = await litdomSupabase
+          .from("wallets")
+          .select("id, rubies")
+          .eq("user_id", user.id)
+          .single();
+
+        if (walletError || !wallet) {
+          alert("Unable to load your wallet. Please try again.");
+          return;
+        }
+
+        if (wallet.rubies < chapter.unlock_cost) {
+          alert("Your Ruby balance is not enough to unlock this chapter.");
+          return;
+        }
+
+        const { error: deductError } = await litdomSupabase
+          .from("wallets")
+          .update({ rubies: wallet.rubies - chapter.unlock_cost })
+          .eq("id", wallet.id);
+
+        if (deductError) {
+          alert("Something went wrong deducting Rubies. Please try again.");
+          return;
+        }
+
+        await litdomSupabase.from("chapter_unlocks").insert({
+          chapter_id: chapter.id,
+          reader_id: user.id
+        });
+
+        await litdomSupabase.from("wallet_transactions").insert({
+          wallet_id: wallet.id,
+          type: "chapter_unlock",
+          amount: chapter.unlock_cost,
+          currency: "rubies",
+          reference_id: chapter.id
+        });
+
+        chapterContent.innerHTML = chapter.content || "";
+        return;
+      }
+
+      if (payDiamondBtn) {
+        const { data: bookPricing } = await litdomSupabase
+          .from("books")
+          .select("full_book_unlock_cost")
+          .eq("id", bookId)
+          .maybeSingle();
+
+        const diamondCost = bookPricing?.full_book_unlock_cost || 0;
+
+        const { data: wallet, error: walletError } = await litdomSupabase
+          .from("wallets")
+          .select("id, diamonds")
+          .eq("user_id", user.id)
+          .single();
+
+        if (walletError || !wallet) {
+          alert("Unable to load your wallet. Please try again.");
+          return;
+        }
+
+        if (wallet.diamonds < diamondCost) {
+          alert("Your Diamond balance is not enough to unlock this book.");
+          return;
+        }
+
+        const { error: deductError } = await litdomSupabase
+          .from("wallets")
+          .update({ diamonds: wallet.diamonds - diamondCost })
+          .eq("id", wallet.id);
+
+        if (deductError) {
+          alert("Something went wrong deducting Diamonds. Please try again.");
+          return;
+        }
+
+        await litdomSupabase.from("book_unlocks").insert({
+          book_id: bookId,
+          reader_id: user.id
+        });
+
+        await litdomSupabase.from("wallet_transactions").insert({
+          wallet_id: wallet.id,
+          type: "book_unlock",
+          amount: diamondCost,
+          currency: "diamonds",
+          reference_id: bookId
+        });
+
+        location.reload();
+        return;
+      }
+    });
+
+    renderChapterAccess();
+
+    article.appendChild(chapterHeading);
+    article.appendChild(chapterTitle);
+    article.appendChild(chapterContent);
+    chaptersContainer.appendChild(article);
+  });
