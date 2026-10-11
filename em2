@@ -1,0 +1,295 @@
+/**
+ * Litdom resource delivery (Google Apps Script)
+ *
+ * Blogger form -> this web app -> Google Sheet -> Brevo sends the email.
+ *
+ * Sheet tabs (create them with exactly these names):
+ *   Resources: id | title | template_id | link | active
+ *   Signups:   timestamp | email | name | resource_id | status | sent_at | note | marketing_optin
+ *
+ * Script properties (Project Settings > Script properties):
+ *   BREVO_API_KEY  (required)  your Brevo API key
+ *   SENDER_EMAIL   (optional)  e.g. contact@litdompress.com, must be a verified Brevo sender
+ *   SENDER_NAME    (optional)  e.g. Litdom
+ *   TEST_EMAIL     (optional)  address testSend() should email
+ *   SHEET_ID       (needed if you opened Apps Script directly, not from the Sheet)
+ */
+
+var CFG = {
+  RESOURCES_SHEET: 'Resources',
+  SIGNUPS_SHEET: 'Signups',
+  DAILY_LIMIT: 280,        // Brevo free = 300/day; keep a safety margin
+  MIN_FILL_MS: 2500,       // a form "filled" faster than this is almost surely a bot
+  MAX_PENDING_DAYS: 3      // give up on a queued signup after this many days
+};
+
+/* ---------- helpers ---------- */
+
+function prop_(k) {
+  return PropertiesService.getScriptProperties().getProperty(k);
+}
+
+function json_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function ss_() {
+  // Works both when opened from inside the Sheet and as a standalone script.
+  var id = prop_('SHEET_ID');
+  return id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActiveSpreadsheet();
+}
+
+function todayKey_() {
+  return 'sent_' + Utilities.formatDate(new Date(), 'UTC', 'yyyy-MM-dd');
+}
+
+function sentToday_() {
+  return Number(prop_(todayKey_()) || 0);
+}
+
+function bumpSent_() {
+  PropertiesService.getScriptProperties().setProperty(todayKey_(), String(sentToday_() + 1));
+}
+
+function cleanupCounters_() {
+  var props = PropertiesService.getScriptProperties();
+  var all = props.getProperties();
+  var keep = todayKey_();
+  for (var k in all) {
+    if (k.indexOf('sent_') === 0 && k !== keep) props.deleteProperty(k);
+  }
+}
+
+/* ---------- catalogue ---------- */
+
+function getResource_(id) {
+  var wanted = String(id || '').trim().toLowerCase();
+  if (!wanted) return null;
+  var sh = ss_().getSheetByName(CFG.RESOURCES_SHEET);
+  var rows = sh.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    var r = rows[i];
+    if (String(r[0]).trim().toLowerCase() === wanted) {
+      var active = String(r[4]).trim().toLowerCase();
+      if (active === 'no' || active === 'false') return null;
+      var link = String(r[3]).trim();
+      // Safety: never send an email without a real link or a template number.
+      if (!/^https?:\/\//i.test(link) || !Number(r[2])) return null;
+      return {
+        id: String(r[0]).trim(),
+        title: String(r[1]),
+        templateId: Number(r[2]),
+        link: link
+      };
+    }
+  }
+  return null;
+}
+
+/* ---------- web app endpoints ---------- */
+
+// Used by the Blogger page to show the resource title. Never returns the link.
+function doGet(e) {
+  var id = e && e.parameter ? e.parameter.r : '';
+  if (!id) return json_({ ok: true, service: 'litdom-delivery' });
+  try {
+    var res = getResource_(id);
+    if (!res) return json_({ ok: false, error: 'unknown_resource' });
+    return json_({ ok: true, title: res.title });
+  } catch (err) {
+    Logger.log(err);
+    return json_({ ok: false, error: 'server' });
+  }
+}
+
+function doPost(e) {
+  var out;
+  try {
+    var d = JSON.parse((e.postData && e.postData.contents) || '{}');
+    out = handleSignup_(d);
+  } catch (err) {
+    Logger.log(err);
+    out = { ok: false, error: 'bad_request' };
+  }
+  return json_(out);
+}
+
+function handleSignup_(d) {
+  // Bots: hidden field filled, or form submitted impossibly fast. Pretend success.
+  if (d.website) return { ok: true, status: 'queued' };
+  if (!(Number(d.elapsed) >= CFG.MIN_FILL_MS)) return { ok: true, status: 'queued' };
+
+  var email = String(d.email || '').trim().toLowerCase();
+  if (email.length > 254 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return { ok: false, error: 'invalid_email' };
+  }
+
+  var res = getResource_(d.resource);
+  if (!res) return { ok: false, error: 'unknown_resource' };
+
+  var name = String(d.name || '').replace(/[<>"]/g, '').trim().slice(0, 60);
+  var optin = d.optin ? 'yes' : 'no';
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(25000);
+  try {
+    var sh = ss_().getSheetByName(CFG.SIGNUPS_SHEET);
+    var last = sh.getLastRow();
+    var rowNum = 0;
+
+    if (last >= 2) {
+      var rows = sh.getRange(2, 1, last - 1, 8).getValues();
+      for (var i = 0; i < rows.length; i++) {
+        var same = String(rows[i][1]).toLowerCase() === email &&
+                   String(rows[i][3]).toLowerCase() === res.id.toLowerCase();
+        if (same) {
+          if (String(rows[i][4]) === 'failed') {
+            // Retry a previously failed signup instead of ignoring it.
+            rowNum = i + 2;
+            sh.getRange(rowNum, 5).setValue('pending');
+            break;
+          }
+          return { ok: true, status: 'duplicate' };
+        }
+      }
+    }
+
+    if (!rowNum) {
+      sh.appendRow([new Date(), email, name, res.id, 'pending', '', '', optin]);
+      rowNum = sh.getLastRow();
+    }
+
+    var status = deliver_(sh, rowNum, { email: email, name: name }, res);
+    return { ok: true, status: status };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/* ---------- sending ---------- */
+
+function brevoSend_(rec, res) {
+  var body = {
+    to: [{ email: rec.email, name: rec.name || rec.email }],
+    templateId: res.templateId,
+    params: {
+      NAME: rec.name || 'there',
+      RESOURCE_TITLE: res.title,
+      RESOURCE_LINK: res.link
+    },
+    tags: ['resource-' + res.id]
+  };
+  var senderEmail = prop_('SENDER_EMAIL');
+  if (senderEmail) {
+    body.sender = { email: senderEmail, name: prop_('SENDER_NAME') || 'Litdom' };
+  }
+  try {
+    var resp = UrlFetchApp.fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { 'api-key': prop_('BREVO_API_KEY'), 'accept': 'application/json' },
+      payload: JSON.stringify(body),
+      muteHttpExceptions: true
+    });
+    return { code: resp.getResponseCode(), text: resp.getContentText() };
+  } catch (err) {
+    return { code: 0, text: String(err) };
+  }
+}
+
+// Sends one signup's email, or leaves it queued. Returns sent | queued | error.
+function deliver_(sh, rowNum, rec, res) {
+  if (sentToday_() >= CFG.DAILY_LIMIT) return 'queued';
+
+  var r = brevoSend_(rec, res);
+
+  if (r.code >= 200 && r.code < 300) {
+    bumpSent_();
+    sh.getRange(rowNum, 5, 1, 3).setValues([['sent', new Date(), '']]);
+    return 'sent';
+  }
+
+  var note = ('HTTP ' + r.code + ' ' + r.text).slice(0, 300);
+  if (r.code === 0 || r.code === 429 || r.code >= 500) {
+    sh.getRange(rowNum, 7).setValue(note);   // temporary problem: stays pending
+    return 'queued';
+  }
+  sh.getRange(rowNum, 5, 1, 3).setValues([['failed', '', note]]);
+  return 'error';
+}
+
+// Runs hourly via trigger: sends queued signups while today's limit allows.
+function sendPending() {
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return;
+  try {
+    cleanupCounters_();
+    var sh = ss_().getSheetByName(CFG.SIGNUPS_SHEET);
+    var last = sh.getLastRow();
+    if (last < 2) return;
+    var rows = sh.getRange(2, 1, last - 1, 8).getValues();
+
+    for (var i = 0; i < rows.length; i++) {
+      if (String(rows[i][4]) !== 'pending') continue;
+      if (sentToday_() >= CFG.DAILY_LIMIT) break;
+
+      var rowNum = i + 2;
+      var ageDays = (Date.now() - new Date(rows[i][0]).getTime()) / 86400000;
+      if (ageDays > CFG.MAX_PENDING_DAYS) {
+        sh.getRange(rowNum, 5, 1, 3).setValues([['failed', '', 'expired while queued']]);
+        continue;
+      }
+      var res = getResource_(rows[i][3]);
+      if (!res) {
+        sh.getRange(rowNum, 5, 1, 3).setValues([['failed', '', 'resource missing or inactive']]);
+        continue;
+      }
+      deliver_(sh, rowNum, { email: String(rows[i][1]), name: String(rows[i][2]) }, res);
+    }
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/* ---------- one-time setup helpers (run from the editor) ---------- */
+
+function createTrigger() {
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'sendPending') ScriptApp.deleteTrigger(triggers[i]);
+  }
+  ScriptApp.newTrigger('sendPending').timeBased().everyHours(1).create();
+}
+
+// Sends the first active resource's email to TEST_EMAIL so you can check
+// Brevo, your template and spam placement before opening the form to anyone.
+function testSend() {
+  var to = prop_('TEST_EMAIL');
+  if (!to) throw new Error('Add TEST_EMAIL in Script properties first.');
+  var firstId = ss_().getSheetByName(CFG.RESOURCES_SHEET).getRange(2, 1).getValue();
+  var res = getResource_(firstId);
+  if (!res) throw new Error('Put an active resource in row 2 of the Resources sheet.');
+  var r = brevoSend_({ email: to, name: 'Test' }, res);
+  Logger.log(r.code + ' ' + r.text);
+  if (r.code < 200 || r.code >= 300) throw new Error('Brevo replied ' + r.code + ': ' + r.text);
+}
+
+// Shows every Brevo template with its ID number, so you never have to hunt for it.
+// Run it from the editor, then open View > Logs (or Execution log).
+function listTemplates() {
+  var resp = UrlFetchApp.fetch('https://api.brevo.com/v3/smtp/templates?limit=50', {
+    method: 'get',
+    headers: { 'api-key': prop_('BREVO_API_KEY'), 'accept': 'application/json' },
+    muteHttpExceptions: true
+  });
+  if (resp.getResponseCode() !== 200) {
+    throw new Error('Brevo replied ' + resp.getResponseCode() + ': ' + resp.getContentText());
+  }
+  var list = JSON.parse(resp.getContentText()).templates || [];
+  if (!list.length) throw new Error('Brevo returned no templates. Save a template in Brevo first.');
+  for (var i = 0; i < list.length; i++) {
+    var t = list[i];
+    Logger.log('ID ' + t.id + '  =  ' + t.name + (t.isActive ? '' : '   (NOT ACTIVE: open it in Brevo and activate it)'));
+  }
+}
