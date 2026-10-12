@@ -1,233 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thought bubble words</title>
 
-/* Litdom structured commentary note */
-.litdom-comment-trigger {
-  appearance: none;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  color: #F4D58D;
-  font: inherit;
-  cursor: pointer;
-  text-decoration: none;
+<!--
+  HOW TO USE
+  1. Mark any word:  <span class="thought-word" data-thought="Your thought here">mobile</span>
+     (optional: data-thought-title="Custom heading")
+  2. Paste the <style id="thought-bubble-css"> block into your theme CSS.
+  3. Paste the <script id="thought-bubble-js"> block just before </body>.
+  Everything else in this file is only the demo page.
+-->
+
+<style>
+/* ---------- demo page only ---------- */
+html{background:#0B0B0F}
+body{margin:0;padding:28px 20px 140px;background:#0B0B0F;color:#E9E5D8;font:18px/1.85 Georgia,"Times New Roman",serif}
+.article{max-width:640px;margin:0 auto}
+.article h1{font-size:22px;line-height:1.3;color:#fff;margin:0 0 6px}
+.hint{font:13px/1.4 system-ui,sans-serif;color:#8d8a80;margin:0 0 22px}
+</style>
+
+<style id="thought-bubble-css">
+/* ===================== THOUGHT BUBBLE ===================== */
+:root{--tb-gold:#D4AF37;--tb-pale:#F4D58D;--tb-ink:#0B0B0F}
+
+/* trigger word */
+.thought-word{
+  color:var(--tb-pale);
+  text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;
+  cursor:pointer;border-radius:3px;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transition:text-shadow .25s;
 }
+.thought-word:focus-visible{outline:2px solid var(--tb-pale);outline-offset:2px}
+.thought-word[aria-expanded="true"]{text-shadow:0 0 12px rgba(244,213,141,.55)}
 
-.litdom-comment-trigger:focus-visible {
-  outline: 1px dotted #F4D58D;
-  outline-offset: 3px;
-  border-radius: 2px;
+/* scene = a zero-size anchor sitting right under the first letter of the word.
+   Everything (circles, box, sparkles) is positioned relative to it. */
+.tb-scene{position:absolute;width:0;height:0;z-index:9999;pointer-events:none}
+.tb-svg{position:absolute;left:0;top:0;overflow:visible;display:block}
+.tb-svg .o{fill:var(--tb-ink)}   /* outline layer (shapes drawn slightly bigger) */
+.tb-svg .f{fill:var(--tb-gold)}  /* gold fill layer */
+
+/* thought box */
+.tb-box{
+  position:absolute;box-sizing:border-box;
+  width:max-content;min-width:120px;
+  padding:11px 14px 13px;border-radius:16px;
+  color:var(--tb-ink);
+  font:500 14.5px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  text-align:left;text-decoration:none;text-shadow:none;letter-spacing:normal;
+  overflow-wrap:anywhere;text-wrap:pretty;
+  pointer-events:auto;transform-origin:0 0;
 }
-
-.litdom-comment-bubble[hidden] {
-  display: none !important;
+.tb-box.tb-l{transform-origin:100% 0}
+.tb-head{display:flex;align-items:center;gap:6px;margin:0 0 4px;padding-right:22px;font-weight:800;font-size:13px;line-height:1.3}
+.tb-bulb{flex:none;display:block;transform-origin:50% 90%}
+.tb-text{margin:0}
+.tb-x{
+  position:absolute;top:5px;right:5px;width:26px;height:26px;padding:0;border:0;border-radius:50%;
+  display:grid;place-items:center;background:transparent;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
+.tb-x svg{display:block;fill:none;stroke:var(--tb-ink);stroke-width:2.4;stroke-linecap:round}
+.tb-x:active{background:rgba(11,11,15,.14)}
+.tb-x:focus-visible{outline:2px solid var(--tb-ink);outline-offset:1px}
 
-.litdom-comment-bubble {
-  position: absolute;
-  z-index: 9999;
-  box-sizing: border-box;
-  width: 280px;
-  max-width: calc(100vw - 24px);
-  padding: 14px 15px;
-  background: #17171C;
-  color: #FFF8E7;
-  border: 1px solid #D4AF37;
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-  overflow-wrap: anywhere;
-  font-size: 14px;
-  line-height: 1.65;
+/* ---------- cute animation ---------- */
+.tb-c{transform-box:fill-box;transform-origin:center;
+  animation:tb-pop .55s ease-out var(--d,0s) both,
+            tb-breathe 2.4s ease-in-out calc(var(--d,0s) + .8s) infinite}
+.tb-c1{--d:0s;--cd:.09s}
+.tb-c2{--d:.09s;--cd:.04s}
+.tb-merge{transform-box:view-box;animation:tb-pop-box .55s ease-out .2s both}
+.tb-box{animation:tb-pop-box .55s ease-out .2s both}
+.tb-inner,.tb-x{animation:tb-rise .28s ease-out .42s both}
+.tb-bulb{animation:tb-wink 3s ease-in-out 1.2s infinite}
+.tb-spark{
+  fill:var(--tb-pale);stroke:var(--tb-ink);stroke-width:1;stroke-linejoin:round;
+  transform-box:fill-box;transform-origin:center;
+  animation:tb-spark-in .5s ease-out .45s both, tb-twinkle 1.8s ease-in-out 1.1s infinite;
 }
+.tb-spark2{animation-delay:.55s,1.5s}
 
-/* The tail points toward the tapped word */
-.litdom-comment-bubble::after {
-  content: "";
-  position: absolute;
-  left: var(--tail-x, 24px);
-  width: 11px;
-  height: 11px;
-  background: #17171C;
-  transform: translateX(-50%) rotate(45deg);
-  pointer-events: none;
+@keyframes tb-pop{0%{transform:scale(0)}60%{transform:scale(1.28)}82%{transform:scale(.93)}100%{transform:scale(1)}}
+@keyframes tb-pop-box{0%{transform:scale(0)}58%{transform:scale(1.07)}80%{transform:scale(.975)}100%{transform:scale(1)}}
+@keyframes tb-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.13)}}
+@keyframes tb-rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes tb-wink{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-14deg)}95%{transform:rotate(10deg)}}
+@keyframes tb-spark-in{0%{transform:scale(0) rotate(-90deg)}70%{transform:scale(1.3) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes tb-twinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(.55) rotate(25deg)}}
+@keyframes tb-away{to{transform:scale(0)}}
+
+/* closing: shrink back into the word, big shapes first */
+.tb-closing .tb-merge,.tb-closing .tb-box{animation:tb-away .17s ease-in both}
+.tb-closing .tb-c{animation:tb-away .15s ease-in var(--cd,0s) both}
+.tb-closing .tb-spark{animation:tb-away .12s ease-in both}
+.tb-closing .tb-inner,.tb-closing .tb-x,.tb-closing .tb-bulb{animation:none}
+.tb-closing .tb-inner,.tb-closing .tb-x{opacity:0}
+.tb-closing{pointer-events:none}
+
+@media (prefers-reduced-motion:reduce){
+  .tb-scene *{animation:none !important}
 }
+</style>
+</head>
 
-.litdom-comment-bubble[data-tail="top"]::after {
-  top: -6px;
-  border-top: 1px solid #D4AF37;
-  border-left: 1px solid #D4AF37;
-}
+<body>
+<main class="article">
+  <h1>Reading, anywhere</h1>
+  <p class="hint">Tap the gold words.</p>
 
-.litdom-comment-bubble[data-tail="bottom"]::after {
-  bottom: -6px;
-  border-right: 1px solid #D4AF37;
-  border-bottom: 1px solid #D4AF37;
-}
+  <p>
+    Stories used to wait for you at a desk. Now they travel with the
+    <span class="thought-word" data-thought="Every chapter fits in my pocket. I read on the bus, in bed, and in the queue at the bank. No desk needed.">mobile</span>
+    person, in stolen minutes between errands, classes and everything else life throws at them.
+  </p>
 
-.litdom-comment-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
-}
+  <p>
+    A <span class="thought-word" data-thought="Waiting for the next chapter is half the fun. A cliffhanger at midnight hits differently when you know tomorrow brings more of the story, and I will probably reread the last scene three times before then, just to be sure I did not miss a single hint.">serialized</span>
+    story gives readers a reason to come back tomorrow, and the day after that.
+  </p>
 
-.litdom-comment-top svg {
-  width: 19px;
-  height: 19px;
-  color: #F4D58D;
-  flex: 0 0 auto;
-}
+  <p>
+    Some authors write in the <span class="thought-word" data-thought="Quiet hours are when my best ideas show up.">small hours</span>,
+    others between lectures, and a few brave ones while the generator is humming and the kettle is on.
+    Whatever the schedule, the <span class="thought-word" data-thought="Gold is for the things worth keeping.">gold</span> stays the same.
+  </p>
+</main>
 
-.litdom-comment-close {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: #F4D58D;
-  font-size: 21px;
-  line-height: 1;
-  padding: 0 2px;
-  cursor: pointer;
-}
-
-.litdom-comment-text {
-  white-space: normal;
-}
-
-@media (max-width: 480px) {
-  .litdom-comment-bubble {
-    width: min(280px, calc(100vw - 24px));
-    padding: 12px 13px;
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<script id="thought-bubble-js">
+/* ===================== THOUGHT BUBBLE ===================== */
 (function () {
-  function initLitdomCommentary() {
-    document.querySelectorAll(
-      '.litdom-comment-trigger:not([data-comment-ready])'
-    ).forEach(function (trigger) {
-      trigger.setAttribute('data-comment-ready', 'true');
+  'use strict';
 
-      var bubble = document.getElementById(
-        trigger.getAttribute('aria-controls')
-      );
+  /* --- tuning knobs --- */
+  var R   = [3.5, 6, 10];   // radii of the 3 trail circles (small -> large)
+  var SW  = 2;              // outline thickness
+  var RC  = 16;             // thought-box corner radius
+  var DY1 = 0.5;            // first circle sits right under the first letter
+  var DX2 = 7.5, DY2 = 10.5;  // circle 1 -> circle 2 (diagonal step)
+  var DX3 = 11,  DY3 = 16;    // circle 2 -> circle 3 (diagonal step)
+  var MARGIN = 10;          // min gap to the screen edge
+  var MAXW = 300, MINW = 130;
 
-      if (!bubble) return;
+  var BULB = '<svg class="tb-bulb" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0B0B0F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>';
+  var XICON = '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>';
+  var SPARK = 'M0-6C.8-2 2-.8 6 0 2 .8.8 2 0 6-.8 2-2 .8-6 0-2-.8-.8-2 0-6Z';
 
-      function closeBubble() {
-        bubble.hidden = true;
-        trigger.setAttribute('aria-expanded', 'false');
-      }
+  var active = null, raf = 0;
 
-      function openBubble() {
-        document.querySelectorAll('.litdom-comment-bubble')
-          .forEach(function (other) {
-            other.hidden = true;
-          });
+  /* rect of the first visible letter (so the trail starts under the "M") */
+  function firstCharRect(word) {
+    var walker = document.createTreeWalker(word, NodeFilter.SHOW_TEXT, null);
+    var t = walker.nextNode();
+    while (t && !/\S/.test(t.nodeValue)) t = walker.nextNode();
+    if (t) {
+      var i = t.nodeValue.search(/\S/);
+      var r = document.createRange();
+      r.setStart(t, i); r.setEnd(t, i + 1);
+      var b = r.getBoundingClientRect();
+      if (b.width || b.height) return b;
+    }
+    return word.getBoundingClientRect();
+  }
 
-        document.querySelectorAll('.litdom-comment-trigger')
-          .forEach(function (other) {
-            other.setAttribute('aria-expanded', 'false');
-          });
+  function setCircle(n, x, y, r) {
+    n.setAttribute('cx', x); n.setAttribute('cy', y); n.setAttribute('r', r);
+  }
+  function setRect(n, x, y, w, h, rx) {
+    n.setAttribute('x', x); n.setAttribute('y', y);
+    n.setAttribute('width', w); n.setAttribute('height', h); n.setAttribute('rx', rx);
+  }
 
-        bubble.hidden = false;
-        trigger.setAttribute('aria-expanded', 'true');
+  function build(word) {
+    var scene = document.createElement('div');
+    scene.className = 'tb-scene';
+    scene.innerHTML =
+      '<svg class="tb-svg" width="1" height="1" aria-hidden="true" focusable="false">' +
+        '<g class="tb-c tb-c1"><circle class="o"/><circle class="f"/></g>' +
+        '<g class="tb-c tb-c2"><circle class="o"/><circle class="f"/></g>' +
+        '<g class="tb-merge"><g class="o"><rect/><circle/></g><g class="f"><rect/><circle/></g></g>' +
+        '<g class="sp-a"><path class="tb-spark" d="' + SPARK + '"/></g>' +
+        '<g class="sp-b"><path class="tb-spark tb-spark2" d="' + SPARK + '"/></g>' +
+      '</svg>' +
+      '<div class="tb-box" role="dialog" aria-label="Thought">' +
+        '<button type="button" class="tb-x" aria-label="Close thought">' + XICON + '</button>' +
+        '<div class="tb-inner"><div class="tb-head">' + BULB + '<span class="tb-title"></span></div>' +
+        '<div class="tb-text"></div></div>' +
+      '</div>';
+    scene.querySelector('.tb-title').textContent =
+      word.getAttribute('data-thought-title') || "A thought I'm having";
+    scene.querySelector('.tb-text').textContent = word.getAttribute('data-thought') || '';
 
-        bubble.style.left = '0px';
-        bubble.style.top = '0px';
+    var q = function (s) { return scene.querySelector(s); };
+    return {
+      word: word, scene: scene, box: q('.tb-box'),
+      c1: scene.querySelectorAll('.tb-c1 circle'),
+      c2: scene.querySelectorAll('.tb-c2 circle'),
+      merge: q('.tb-merge'),
+      mo: q('.tb-merge .o'), mf: q('.tb-merge .f'),
+      spA: q('.sp-a'), spB: q('.sp-b')
+    };
+  }
 
-        var triggerRect = trigger.getBoundingClientRect();
-        var bubbleRect = bubble.getBoundingClientRect();
+  /* Positioning is measured from the live word every time (and on resize),
+     so it follows the word through line wraps and any screen size. */
+  function place(a, first) {
+    var box = a.box;
+    var fr  = firstCharRect(a.word);
+    var vw  = document.documentElement.clientWidth;
+    var sxv = fr.left + fr.width / 2;                 // viewport x under the "M"
+    var sx  = sxv + window.pageXOffset;
+    var sy  = fr.bottom + window.pageYOffset;         // just under the word
 
-        var left = window.scrollX + triggerRect.left;
-        var top = window.scrollY + triggerRect.bottom + 12;
+    // 1. natural size of the box
+    box.style.maxWidth = Math.min(MAXW, vw - 2 * MARGIN) + 'px';
+    var w = box.offsetWidth;
 
-        var minLeft = window.scrollX + 12;
-        var maxLeft = window.scrollX + window.innerWidth
-          - bubbleRect.width - 12;
+    // 2. choose the side with room (default: box hangs to the lower-left)
+    var cbx    = DX2 + DX3 - 1;                       // corner distance from the "M"
+    var spaceL = sxv - cbx - MARGIN;
+    var spaceR = vw - MARGIN - (sxv + cbx);
+    var sgn = spaceL >= w ? -1 : spaceR >= w ? 1 : (spaceL >= spaceR ? -1 : 1);
+    var space = sgn < 0 ? spaceL : spaceR;
+    if (space < w) {                                  // not enough room: wrap the text tighter
+      box.style.maxWidth = Math.max(space, MINW) + 'px';
+      w = box.offsetWidth;
+    }
+    var h = box.offsetHeight;
 
-        left = Math.max(minLeft, Math.min(left, maxLeft));
+    // 3. trail geometry, relative to the scene origin (under the "M")
+    var P1 = { x: 0, y: DY1 + R[0] };
+    var P2 = { x: sgn * DX2, y: P1.y + DY2 };
+    var P3 = { x: P2.x + sgn * DX3, y: P2.y + DY3 };
+    var C  = { x: P3.x - sgn, y: P3.y - 1 };          // box corner the big circle fuses with
+    var bx = sgn < 0 ? C.x - w : C.x;
+    var by = C.y;
 
-        if (triggerRect.bottom + 12 + bubbleRect.height
-            > window.innerHeight - 12
-            && triggerRect.top > bubbleRect.height + 24) {
-          top = window.scrollY + triggerRect.top
-            - bubbleRect.height - 12;
-          bubble.style.setProperty('--bubble-above', '1');
-        } else {
-          bubble.style.setProperty('--bubble-above', '0');
-        }
+    a.scene.style.left = sx + 'px';
+    a.scene.style.top  = sy + 'px';
+    box.style.left = bx + 'px';
+    box.style.top  = by + 'px';
+    box.classList.toggle('tb-l', sgn < 0);
 
-        bubble.style.left = left + 'px';
-        bubble.style.top = top + 'px';
-      }
+    setCircle(a.c1[0], P1.x, P1.y, R[0] + SW); setCircle(a.c1[1], P1.x, P1.y, R[0]);
+    setCircle(a.c2[0], P2.x, P2.y, R[1] + SW); setCircle(a.c2[1], P2.x, P2.y, R[1]);
 
-      trigger.addEventListener('click', function (event) {
-        event.stopPropagation();
+    // box + big circle: outline layer first, fill layer on top = one merged shape
+    setRect(a.mo.firstChild, bx - SW, by - SW, w + 2 * SW, h + 2 * SW, RC + SW);
+    setCircle(a.mo.lastChild, P3.x, P3.y, R[2] + SW);
+    setRect(a.mf.firstChild, bx, by, w, h, RC);
+    setCircle(a.mf.lastChild, P3.x, P3.y, R[2]);
+    a.merge.style.transformOrigin = C.x + 'px ' + C.y + 'px';
 
-        if (!bubble.hidden) {
-          closeBubble();
-        } else {
-          openBubble();
-        }
-      });
+    // sparkles on the far side of the box
+    var ax = sgn < 0 ? bx + 10 : bx + w - 10;
+    var bxp = sgn < 0 ? bx + w * 0.6 : bx + w * 0.4;
+    a.spA.setAttribute('transform', 'translate(' + ax + ' ' + (by - 8) + ')');
+    a.spB.setAttribute('transform', 'translate(' + bxp + ' ' + (by + h + 8) + ') scale(.75)');
 
-      bubble.querySelector('.litdom-comment-close')
-        .addEventListener('click', function (event) {
-          event.stopPropagation();
-          closeBubble();
-        });
+    // keep the whole thing on screen vertically
+    if (first) {
+      var bottom = sy + by + h + 16;
+      var view = window.pageYOffset + window.innerHeight;
+      if (bottom > view) window.scrollBy({ top: bottom - view, behavior: 'smooth' });
+    }
+  }
 
-      bubble.addEventListener('click', function (event) {
-        event.stopPropagation();
-      });
+  function open(word) {
+    var a = build(word);
+    document.documentElement.appendChild(a.scene);
+    active = a;
+    word.setAttribute('aria-expanded', 'true');
+    place(a, true);
+  }
 
-      document.addEventListener('click', function (event) {
-        if (!bubble.hidden &&
-            !bubble.contains(event.target) &&
-            !trigger.contains(event.target)) {
-          closeBubble();
-        }
-      });
+  function close(immediate, refocus) {
+    var a = active;
+    if (!a) return;
+    active = null;
+    a.word.setAttribute('aria-expanded', 'false');
+    if (refocus) a.word.focus({ preventScroll: true });
+    if (immediate) { a.scene.remove(); return; }
+    a.scene.classList.add('tb-closing');
+    setTimeout(function () { a.scene.remove(); }, 230);
+  }
 
-      document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape' && !bubble.hidden) {
-          closeBubble();
-          trigger.focus();
-        }
-      });
+  function toggle(word) {
+    if (active && active.word === word) { close(); return; }
+    close(true);
+    open(word);
+  }
 
-      window.addEventListener('resize', function () {
-        if (!bubble.hidden) closeBubble();
-      });
+  /* --- events (delegated, so words added later also work) --- */
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var w = t.closest('.thought-word');
+    if (w) { e.preventDefault(); toggle(w); return; }
+    if (t.closest('.tb-x')) { close(false, true); return; }
+    if (active && !t.closest('.tb-scene')) close();
+  });
 
-      window.addEventListener('scroll', function () {
-        if (!bubble.hidden) closeBubble();
-      }, true);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && active) { close(false, true); return; }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList &&
+        e.target.classList.contains('thought-word')) {
+      e.preventDefault(); toggle(e.target);
+    }
+  });
+
+  function reflow() {
+    if (!active || raf) return;
+    raf = requestAnimationFrame(function () {
+      raf = 0;
+      if (active) place(active, false);
     });
   }
+  window.addEventListener('resize', reflow);
+  window.addEventListener('orientationchange', reflow);
+  if (window.ResizeObserver) new ResizeObserver(reflow).observe(document.documentElement);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(reflow);
 
-  if (document.readyState === 'loading') {
-    document.addEventListener(
-      'DOMContentLoaded', initLitdomCommentary
-    );
-  } else {
-    initLitdomCommentary();
+  /* make trigger words keyboard/screen-reader friendly */
+  function enhance() {
+    var words = document.querySelectorAll('.thought-word');
+    for (var i = 0; i < words.length; i++) {
+      var w = words[i];
+      if (!w.hasAttribute('role')) w.setAttribute('role', 'button');
+      if (!w.hasAttribute('tabindex')) w.setAttribute('tabindex', '0');
+      if (!w.hasAttribute('aria-expanded')) w.setAttribute('aria-expanded', 'false');
+    }
   }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enhance);
+  else enhance();
 })();
+</script>
+</body>
+</html>
