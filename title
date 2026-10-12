@@ -1,0 +1,233 @@
+
+/* Litdom structured commentary note */
+.litdom-comment-trigger {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: #F4D58D;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.litdom-comment-trigger:focus-visible {
+  outline: 1px dotted #F4D58D;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.litdom-comment-bubble[hidden] {
+  display: none !important;
+}
+
+.litdom-comment-bubble {
+  position: absolute;
+  z-index: 9999;
+  box-sizing: border-box;
+  width: 280px;
+  max-width: calc(100vw - 24px);
+  padding: 14px 15px;
+  background: #17171C;
+  color: #FFF8E7;
+  border: 1px solid #D4AF37;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* The tail points toward the tapped word */
+.litdom-comment-bubble::after {
+  content: "";
+  position: absolute;
+  left: var(--tail-x, 24px);
+  width: 11px;
+  height: 11px;
+  background: #17171C;
+  transform: translateX(-50%) rotate(45deg);
+  pointer-events: none;
+}
+
+.litdom-comment-bubble[data-tail="top"]::after {
+  top: -6px;
+  border-top: 1px solid #D4AF37;
+  border-left: 1px solid #D4AF37;
+}
+
+.litdom-comment-bubble[data-tail="bottom"]::after {
+  bottom: -6px;
+  border-right: 1px solid #D4AF37;
+  border-bottom: 1px solid #D4AF37;
+}
+
+.litdom-comment-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.litdom-comment-top svg {
+  width: 19px;
+  height: 19px;
+  color: #F4D58D;
+  flex: 0 0 auto;
+}
+
+.litdom-comment-close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #F4D58D;
+  font-size: 21px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.litdom-comment-text {
+  white-space: normal;
+}
+
+@media (max-width: 480px) {
+  .litdom-comment-bubble {
+    width: min(280px, calc(100vw - 24px));
+    padding: 12px 13px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(function () {
+  function initLitdomCommentary() {
+    document.querySelectorAll(
+      '.litdom-comment-trigger:not([data-comment-ready])'
+    ).forEach(function (trigger) {
+      trigger.setAttribute('data-comment-ready', 'true');
+
+      var bubble = document.getElementById(
+        trigger.getAttribute('aria-controls')
+      );
+
+      if (!bubble) return;
+
+      function closeBubble() {
+        bubble.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+
+      function openBubble() {
+        document.querySelectorAll('.litdom-comment-bubble')
+          .forEach(function (other) {
+            other.hidden = true;
+          });
+
+        document.querySelectorAll('.litdom-comment-trigger')
+          .forEach(function (other) {
+            other.setAttribute('aria-expanded', 'false');
+          });
+
+        bubble.hidden = false;
+        trigger.setAttribute('aria-expanded', 'true');
+
+        bubble.style.left = '0px';
+        bubble.style.top = '0px';
+
+        var triggerRect = trigger.getBoundingClientRect();
+        var bubbleRect = bubble.getBoundingClientRect();
+
+        var left = window.scrollX + triggerRect.left;
+        var top = window.scrollY + triggerRect.bottom + 12;
+
+        var minLeft = window.scrollX + 12;
+        var maxLeft = window.scrollX + window.innerWidth
+          - bubbleRect.width - 12;
+
+        left = Math.max(minLeft, Math.min(left, maxLeft));
+
+        if (triggerRect.bottom + 12 + bubbleRect.height
+            > window.innerHeight - 12
+            && triggerRect.top > bubbleRect.height + 24) {
+          top = window.scrollY + triggerRect.top
+            - bubbleRect.height - 12;
+          bubble.style.setProperty('--bubble-above', '1');
+        } else {
+          bubble.style.setProperty('--bubble-above', '0');
+        }
+
+        bubble.style.left = left + 'px';
+        bubble.style.top = top + 'px';
+      }
+
+      trigger.addEventListener('click', function (event) {
+        event.stopPropagation();
+
+        if (!bubble.hidden) {
+          closeBubble();
+        } else {
+          openBubble();
+        }
+      });
+
+      bubble.querySelector('.litdom-comment-close')
+        .addEventListener('click', function (event) {
+          event.stopPropagation();
+          closeBubble();
+        });
+
+      bubble.addEventListener('click', function (event) {
+        event.stopPropagation();
+      });
+
+      document.addEventListener('click', function (event) {
+        if (!bubble.hidden &&
+            !bubble.contains(event.target) &&
+            !trigger.contains(event.target)) {
+          closeBubble();
+        }
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !bubble.hidden) {
+          closeBubble();
+          trigger.focus();
+        }
+      });
+
+      window.addEventListener('resize', function () {
+        if (!bubble.hidden) closeBubble();
+      });
+
+      window.addEventListener('scroll', function () {
+        if (!bubble.hidden) closeBubble();
+      }, true);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener(
+      'DOMContentLoaded', initLitdomCommentary
+    );
+  } else {
+    initLitdomCommentary();
+  }
+})();
