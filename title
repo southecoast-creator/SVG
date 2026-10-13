@@ -615,3 +615,92 @@ Notes
 }
 /*]]>*/
 </style>
+<!-- ===================== PRO TIP ===================== -->
+<div class="ld2-card ld2-tip" role="note">
+ <svg class="ld2-fold" viewBox="0 0 30 30" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <defs><linearGradient id="ld2g-tip" gradientUnits="userSpaceOnUse" x1="30" y1="0" x2="15" y2="15"><stop offset="0" style="stop-color:var(--fl1)"/><stop offset="1" style="stop-color:var(--fl2)"/></linearGradient></defs>
+  <polygon points="0,0 30,0 30,30" fill="url(#ld2g-tip)"/>
+  <polyline points="0,0 30,0 30,30" fill="none" stroke="var(--bd)" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+  <line x1="0" y1="0" x2="30" y2="30" stroke="var(--bd)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+ </svg>
+ <div class="ld2-head">
+  <span class="ld2-tile"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></span>
+  <div class="ld2-titles">
+   <div class="ld2-title">
+    <svg class="ld2-emoji" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><defs><radialGradient id="ld2-eb" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#FFF4B0"/><stop offset=".6" stop-color="#FFD43B"/><stop offset="1" stop-color="#F59F0B"/></radialGradient></defs><path d="M12 1.6c-4 0-7.1 3-7.1 6.8 0 2.4 1.2 3.9 2.3 5.1.6.7 1 1.3 1 2.1v.7h7.6v-.7c0-.8.4-1.4 1-2.1 1.1-1.2 2.3-2.7 2.3-5.1 0-3.8-3.1-6.8-7.1-6.8z" fill="url(#ld2-eb)"/><path d="M8.6 6c.8-1.3 2-2 3.4-2.1" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.3" stroke-linecap="round"/><path d="M10.3 15.8v-4c0-1.1 1.1-1.5 1.7-.6.6-.9 1.7-.5 1.7.6v4" fill="none" stroke="#E38A00" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round"/><rect x="8.5" y="16.9" width="7" height="2" rx="1" fill="#B8C0C7"/><rect x="8.9" y="19" width="6.2" height="1.9" rx=".95" fill="#8D969D"/><path d="M10.4 21h3.2a1.6 1.6 0 0 1-3.2 0z" fill="#69737A"/></svg>
+    <span>Pro Tip!</span>
+   </div>
+   <div class="ld2-sub">A little wisdom from Litdom</div>
+  </div>
+  <svg class="ld2-corner" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9.5 5.5C10 10.2 11.8 12 16.8 12.5 11.8 13 10 14.8 9.5 19.5 9 14.8 7.2 13 2.2 12.5 7.2 12 9 10.2 9.5 5.5Z"/><circle cx="18" cy="5.6" r="2"/></svg>
+ </div>
+ <p class="ld2-body">Want your website to look professional without spending a fortune? Start with consistent fonts, a simple colour palette, and clear spacing before buying fancy themes.</p>
+ <p class="ld2-foot">Save this little tip <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3.5c.6 4.4 2.6 6.4 7 7-4.4.6-6.4 2.6-7 7-.6-4.4-2.6-6.4-7-7 4.4-.6 6.4-2.6 7-7z" fill="#FFD43B"/><path d="M18.2 12.6c.3 2 1.2 3 3.2 3.2-2 .3-2.9 1.2-3.2 3.2-.3-2-1.2-2.9-3.2-3.2 2-.2 2.9-1.2 3.2-3.2z" fill="#FFB020"/><path d="M18 2.4c.2 1.3.8 1.9 2.1 2.1-1.3.2-1.9.8-2.1 2.1-.2-1.3-.8-1.9-2.1-2.1 1.3-.2 1.9-.8 2.1-2.1z" fill="#FFE27A"/></svg></p>
+</div>
+
+<!-- ===================== FUN FACT ===================== -->
+<div class="ld2-card ld2-fact" role="note">
+ <svg class="ld2-fold" viewBox="0 0 30 30" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <defs><linearGradient id="ld2g-fact" gradientUnits="userSpaceOnUse" x1="30" y1="0" x2="15" y2="15"><stop offset="0" style="stop-color:var(--fl1)"/><stop offset="1" style="stop-color:var(--fl2)"/></linearGradient></defs>
+  <polygon points="0,0 30,0 30,30" fill="url(#ld2g-fact)"/>
+  <polyline points="0,0 30,0 30,30" fill="none" stroke="var(--bd)" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+  <line x1="0" y1="0" x2="30" y2="30" stroke="var(--bd)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+ </svg>
+ <div class="ld2-head">
+  <span class="ld2-tile"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"/><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/></svg></span>
+  <div class="ld2-titles">
+   <div class="ld2-title">
+    <svg class="ld2-emoji" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><clipPath id="ld2-ec"><path d="M0 0L34 -13A4 13 0 0 1 34 13Z"/></clipPath><linearGradient id="ld2-eg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD35C"/><stop offset="1" stop-color="#F59E0B"/></linearGradient></defs><g fill="none" stroke-linecap="round"><path d="M36 28C42 24 40 17 46 14S54 15 55 8" stroke="#FF6B9D" stroke-width="3"/><path d="M37 31C45 31 47 25 52 26S58 31 59 24" stroke="#FFD84A" stroke-width="3"/><path d="M34 25C34 19 29 17 29 11S33 5 36 4" stroke="#5BD0F5" stroke-width="3"/></g><g transform="translate(9 56) rotate(-45)"><path d="M0 0L34 -13A4 13 0 0 1 34 13Z" fill="url(#ld2-eg)"/><g clip-path="url(#ld2-ec)"><path d="M10 -3.82L15 -5.74Q18 0 15 5.74L10 3.82Q13 0 10 -3.82Z" fill="#FF6B9D"/><path d="M21 -8.03L27 -10.32Q30 0 27 10.32L21 8.03Q24 0 21 -8.03Z" fill="#7C5CFF"/></g><ellipse cx="34" cy="0" rx="4" ry="13" fill="#9A4B12"/></g><g><circle cx="50" cy="17" r="2.4" fill="#FF6B9D"/><circle cx="41" cy="9" r="2.1" fill="#FFD84A"/><circle cx="59" cy="16" r="1.8" fill="#5BD0F5"/><circle cx="22" cy="9" r="2.2" fill="#FFD84A"/><rect x="43" y="21" width="5" height="2.6" rx=".6" fill="#fff" transform="rotate(35 45 22)"/><circle cx="55" cy="45" r="2.6" fill="#5BD0F5"/><circle cx="14" cy="14" r="2" fill="#fff"/></g></svg>
+    <span>Fun Fact!</span>
+   </div>
+   <div class="ld2-sub">A little something to know</div>
+  </div>
+  <svg class="ld2-corner" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9.5 5.5C10 10.2 11.8 12 16.8 12.5 11.8 13 10 14.8 9.5 19.5 9 14.8 7.2 13 2.2 12.5 7.2 12 9 10.2 9.5 5.5Z"/><circle cx="18" cy="5.6" r="2"/></svg>
+ </div>
+ <p class="ld2-body">Your domain name and your web hosting are two different things. Think of the domain as your address and hosting as the space where your website's files live.</p>
+ <p class="ld2-foot">Now you know! <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3.5c.6 4.4 2.6 6.4 7 7-4.4.6-6.4 2.6-7 7-.6-4.4-2.6-6.4-7-7 4.4-.6 6.4-2.6 7-7z" fill="#FFD43B"/><path d="M18.2 12.6c.3 2 1.2 3 3.2 3.2-2 .3-2.9 1.2-3.2 3.2-.3-2-1.2-2.9-3.2-3.2 2-.2 2.9-1.2 3.2-3.2z" fill="#FFB020"/><path d="M18 2.4c.2 1.3.8 1.9 2.1 2.1-1.3.2-1.9.8-2.1 2.1-.2-1.3-.8-1.9-2.1-2.1 1.3-.2 1.9-.8 2.1-2.1z" fill="#FFE27A"/></svg></p>
+</div>
+
+<!-- ===================== WARNING ===================== -->
+<div class="ld2-card ld2-warn" role="note">
+ <svg class="ld2-fold" viewBox="0 0 30 30" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <defs><linearGradient id="ld2g-warn" gradientUnits="userSpaceOnUse" x1="30" y1="0" x2="15" y2="15"><stop offset="0" style="stop-color:var(--fl1)"/><stop offset="1" style="stop-color:var(--fl2)"/></linearGradient></defs>
+  <polygon points="0,0 30,0 30,30" fill="url(#ld2g-warn)"/>
+  <polyline points="0,0 30,0 30,30" fill="none" stroke="var(--bd)" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+  <line x1="0" y1="0" x2="30" y2="30" stroke="var(--bd)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+ </svg>
+ <div class="ld2-head">
+  <span class="ld2-tile"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+  <div class="ld2-titles">
+   <div class="ld2-title">
+    <svg class="ld2-emoji" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 21.4 19.6H2.6Z" fill="#FFC21A" stroke="#F0A000" stroke-width="2" stroke-linejoin="round"/><rect x="11" y="8.6" width="2" height="6.2" rx="1" fill="#1b1b1b"/><circle cx="12" cy="17" r="1.2" fill="#1b1b1b"/></svg>
+    <span>Warning!</span>
+   </div>
+   <div class="ld2-sub">Please don't skip this</div>
+  </div>
+ </div>
+ <p class="ld2-body">Don't choose a website platform before checking its limitations. A free plan might not include the customisation or features you need later.</p>
+</div>
+
+<!-- ===================== LITTLE NOTE ===================== -->
+<div class="ld2-card ld2-note" role="note">
+ <svg class="ld2-fold" viewBox="0 0 30 30" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <defs><linearGradient id="ld2g-note" gradientUnits="userSpaceOnUse" x1="30" y1="0" x2="15" y2="15"><stop offset="0" style="stop-color:var(--fl1)"/><stop offset="1" style="stop-color:var(--fl2)"/></linearGradient></defs>
+  <polygon points="0,0 30,0 30,30" fill="url(#ld2g-note)"/>
+  <polyline points="0,0 30,0 30,30" fill="none" stroke="var(--bd)" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+  <line x1="0" y1="0" x2="30" y2="30" stroke="var(--bd)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+ </svg>
+ <div class="ld2-head">
+  <span class="ld2-tile"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 3h14a2 2 0 0 1 2 2v9l-7 7H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M21 14h-5a2 2 0 0 0-2 2v5"/></svg></span>
+  <div class="ld2-titles">
+   <div class="ld2-title">
+    <svg class="ld2-emoji" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.6" y="2.6" width="13.6" height="18.4" rx="2" fill="#F2F4F7" stroke="#C3C9D2" stroke-width=".8"/><g stroke="#6B8FD6" stroke-width="1.2" stroke-linecap="round"><path d="M6.8 7H14"/><path d="M6.8 10.2H14"/><path d="M6.8 13.4H11"/></g><g transform="translate(17.2 12.6) rotate(40)"><rect x="-1.7" y="-4.2" width="3.4" height="1.9" rx=".7" fill="#F28B9B"/><rect x="-1.7" y="-2.3" width="3.4" height="9" fill="#FFC83D"/><path d="M-1.7 6.7h3.4L0 10Z" fill="#F6DDB4"/><path d="M-.6 8.9h1.2L0 10Z" fill="#3a3a3a"/></g></svg>
+    <span>Little Note</span>
+   </div>
+   <div class="ld2-sub">Keep this in mind</div>
+  </div>
+  <svg class="ld2-corner" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g transform="rotate(45 12 12)"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></g></svg>
+ </div>
+ <p class="ld2-body">You don't need to build every page before launching your website. Start with the essential pages, make sure they work properly, and expand as your needs grow.</p>
+</div>
+
