@@ -813,3 +813,37 @@ Story Preview:
   }
 })();
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Definition bubble 
+<span class="litdom-definition-wrap">
+  <button aria-controls="litdom-foundation-definition" aria-expanded="false" class="litdom-definition-trigger" type="button">
+    foundation
+  </button>
+
+  <span aria-label="Definition of foundation" class="litdom-definition-popup" hidden="" id="litdom-foundation-definition" role="region">
+    <span class="litdom-definition-heading">Foundation</span>
+    <span class="litdom-definition-text">
+      The essential base or starting structure that supports
+      everything built on top of it.
+    </span>
+    <button aria-label="Close definition" class="litdom-definition-close" type="button">
+      ×
+    </button>
+  </span>
+</span>
