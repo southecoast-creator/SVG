@@ -723,3 +723,93 @@ TOC
 Story Preview:
 <div class="litdom-story" data-preview-words="15">
   <div class="litdom-story-content"></div></div>
+<style>
+.litdom-story-content.litdom-story-collapsed {
+  display: none;
+}
+
+.litdom-story-preview {
+  margin: 0;
+}
+
+.litdom-story-toggle {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: #8C7625;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.litdom-story-toggle:focus-visible {
+  outline: 2px solid #D4AF37;
+  outline-offset: 3px;
+}
+</style>
+
+<script>
+(function () {
+  function setupStory(story) {
+    if (story.dataset.ready === "true") return;
+
+    var content = story.querySelector(".litdom-story-content");
+    if (!content) return;
+
+    var paragraphs = Array.from(content.querySelectorAll("p"));
+    var fullText = paragraphs.map(function (p) {
+      return p.textContent.trim();
+    }).join(" ");
+
+    var words = fullText.match(/\S+/g) || [];
+    if (words.length <= 15) return;
+
+    var preview = document.createElement("p");
+    preview.className = "litdom-story-preview";
+    preview.appendChild(
+      document.createTextNode(words.slice(0, 15).join(" ") + " ")
+    );
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "litdom-story-toggle";
+    button.textContent = "Read more";
+    button.setAttribute("aria-expanded", "false");
+
+    preview.appendChild(button);
+    content.parentNode.insertBefore(preview, content);
+
+    content.classList.add("litdom-story-collapsed");
+
+    button.addEventListener("click", function () {
+      var expanded = button.getAttribute("aria-expanded") === "true";
+
+      if (expanded) {
+        content.classList.add("litdom-story-collapsed");
+        preview.hidden = false;
+        button.textContent = "Read more";
+        button.setAttribute("aria-expanded", "false");
+      } else {
+        content.classList.remove("litdom-story-collapsed");
+        preview.hidden = true;
+        button.textContent = "Read less";
+        button.setAttribute("aria-expanded", "true");
+      }
+    });
+
+    story.dataset.ready = "true";
+  }
+
+  function init() {
+    document.querySelectorAll(".litdom-story").forEach(setupStory);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
