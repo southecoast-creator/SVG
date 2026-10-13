@@ -704,3 +704,262 @@ Notes
  <p class="ld2-body">You don't need to build every page before launching your website. Start with the essential pages, make sure they work properly, and expand as your needs grow.</p>
 </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Questions downloadable:
+
+<div id="litdom-qa">
+  <style>
+    #litdom-qa {
+      color: #F4D58D;
+      background: #0B0B0F;
+      padding: 18px;
+      border-radius: 12px;
+      font-family: Arial, sans-serif;
+      line-height: 1.7;
+    }
+    #litdom-qa h2 { color: #D4AF37; }
+    #litdom-qa .qa-question {
+      margin: 22px 0;
+      border-bottom: 1px solid #514522;
+      padding-bottom: 14px;
+    }
+    #litdom-qa summary {
+      cursor: pointer;
+      color: #F4D58D;
+      text-decoration: underline;
+      font-style: italic;
+      font-weight: 600;
+    }
+    #litdom-qa .qa-answer {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid #8C7625;
+      border-radius: 7px;
+      background: #17171C;
+      color: #FFF8E7;
+      font-size: 16px;
+    }
+    #litdom-qa textarea { min-height: 110px; resize: vertical; }
+    #litdom-qa button {
+      padding: 10px 14px;
+      margin: 10px 8px 4px 0;
+      border: 0;
+      border-radius: 6px;
+      background: #D4AF37;
+      color: #0B0B0F;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #litdom-qa .qa-status {
+      font-size: 14px;
+      color: #FFF8E7;
+    }
+    #litdom-qa .qa-note {
+      color: #FFF8E7;
+      font-size: 13px;
+    }
+  </style>
+
+  <h2>Purpose</h2>
+  <p><strong>Why does your website exist?</strong></p>
+
+  <p>When it comes to establishing your website's purpose, it is important to understand the bare purpose of your site and ask yourself: “What function does my site perform?”, “If a user landed on my site right now, what would they be able to do there?”</p>
+
+  <p>Answer these questions as you read. Open each question, enter your answer, and save it.</p>
+
+  <div class="qa-question">
+    <details>
+      <summary>What is the primary purpose of your website?</summary>
+      <label for="litdom-purpose-choice">Choose the option that best describes your website.</label>
+      <select class="qa-answer" id="litdom-purpose-choice">
+        <option value="">Select an answer</option>
+        <option>Share information or educate</option>
+        <option>Sell products or services</option>
+        <option>Publish stories or creative work</option>
+        <option>Build a community</option>
+        <option>Showcase a portfolio</option>
+        <option>Something else</option>
+      </select>
+      <button type="button" data-save="purpose-choice">Save answer</button>
+      <p class="qa-status" aria-live="polite"></p>
+    </details>
+  </div>
+
+  <div class="qa-question">
+    <details>
+      <summary>If someone visited your website today, what should they be able to do?</summary>
+      <label for="litdom-purpose-written">Write your answer in your own words.</label>
+      <textarea class="qa-answer" id="litdom-purpose-written" placeholder="Type your answer here..."></textarea>
+      <button type="button" data-save="purpose-written">Save answer</button>
+      <p class="qa-status" aria-live="polite"></p>
+    </details>
+  </div>
+
+  <hr style="border-color:#514522">
+
+  <h3>Your saved answers</h3>
+  <p id="litdom-qa-count">No answers saved yet.</p>
+  <button type="button" id="litdom-qa-pdf">Download answers as PDF</button>
+  <p class="qa-note">Your answers are saved in this browser for 24 hours after your most recent save. They are not sent to the website owner.</p>
+  <p id="litdom-qa-message" class="qa-status" aria-live="polite"></p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function () {
+  var root = document.getElementById('litdom-qa');
+  if (!root) return;
+
+  var storageKey = 'litdom-qa-v1:' + location.pathname;
+  var expiryPeriod = 24 * 60 * 60 * 1000;
+  var saved = {};
+
+  function readSaved() {
+    try {
+      var raw = localStorage.getItem(storageKey);
+      if (!raw) return {};
+      var data = JSON.parse(raw);
+      if (!data.expiresAt || Date.now() >= data.expiresAt) {
+        localStorage.removeItem(storageKey);
+        return {};
+      }
+      return data.answers || {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({
+        expiresAt: Date.now() + expiryPeriod,
+        answers: saved
+      }));
+      return true;
+    } catch (e) {
+      root.querySelector('#litdom-qa-message').textContent =
+        'Your browser could not save the answer. Check your browser storage settings.';
+      return false;
+    }
+  }
+
+  function questionLabel(id) {
+    var button = root.querySelector('[data-save="' + id + '"]');
+    return button.closest('details').querySelector('summary').textContent.trim();
+  }
+
+  function updateCount() {
+    var count = Object.keys(saved).length;
+    root.querySelector('#litdom-qa-count').textContent =
+      count === 0 ? 'No answers saved yet.' :
+      count + (count === 1 ? ' answer saved.' : ' answers saved.');
+  }
+
+  saved = readSaved();
+
+  Object.keys(saved).forEach(function (id) {
+    var input = root.querySelector('#litdom-' + id);
+    if (input) input.value = saved[id].value || '';
+  });
+
+  root.querySelectorAll('[data-save]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var id = button.getAttribute('data-save');
+      var input = root.querySelector('#litdom-' + id);
+      var status = button.closest('details').querySelector('.qa-status');
+      var value = input.value.trim();
+
+      if (!value) {
+        status.textContent = 'Please enter or select an answer first.';
+        return;
+      }
+
+      saved[id] = {
+        question: questionLabel(id),
+        value: value
+      };
+
+      if (persist()) {
+        status.textContent = 'Answer saved on this device.';
+        root.querySelector('#litdom-qa-message').textContent = '';
+        updateCount();
+      }
+    });
+  });
+
+  updateCount();
+
+  root.querySelector('#litdom-qa-pdf').addEventListener('click', function () {
+    var entries = Object.keys(saved).map(function (id) {
+      return saved[id];
+    });
+
+    if (!entries.length) {
+      root.querySelector('#litdom-qa-message').textContent =
+        'Save at least one answer before downloading your PDF.';
+      return;
+    }
+
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      root.querySelector('#litdom-qa-message').textContent =
+        'The PDF tool did not load. Check your internet connection and try again.';
+      return;
+    }
+
+    var pdf = new window.jspdf.jsPDF();
+    var y = 20;
+    var pageHeight = pdf.internal.pageSize.getHeight();
+    var margin = 18;
+    var width = pdf.internal.pageSize.getWidth() - margin * 2;
+
+    pdf.setFontSize(18);
+    pdf.text('My Website Purpose - Saved Answers', margin, y);
+    y += 14;
+
+    pdf.setFontSize(11);
+
+    entries.forEach(function (entry, index) {
+      var questionLines = pdf.splitTextToSize(
+        (index + 1) + '. ' + entry.question, width
+      );
+      var answerLines = pdf.splitTextToSize(
+        'Answer: ' + entry.value, width
+      );
+      var needed = (questionLines.length + answerLines.length) * 6 + 10;
+
+      if (y + needed > pageHeight - margin) {
+        pdf.addPage();
+        y = 20;
+      }
+
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(questionLines, margin, y);
+      y += questionLines.length * 6 + 3;
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(answerLines, margin, y);
+      y += answerLines.length * 6 + 10;
+    });
+
+    pdf.save('litdom-saved-answers.pdf');
+    root.querySelector('#litdom-qa-message').textContent =
+      'Your PDF download has been requested.';
+  });
+})();
+</script>
