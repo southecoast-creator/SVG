@@ -1,3 +1,5 @@
+THOUGHT BUBBLES 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +10,7 @@
 <!--
   HOW TO USE
   1. Mark any word:  <span class="thought-word" data-thought="Your thought here">mobile</span>
+
      (optional: data-thought-title="Custom heading")
   2. Paste the <style id="thought-bubble-css"> block into your theme CSS.
   3. Paste the <script id="thought-bubble-js"> block just before </body>.
@@ -342,3 +345,201 @@ body{margin:0;padding:28px 20px 140px;background:#0B0B0F;color:#E9E5D8;font:18px
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+TAKE 
+
+<style>
+  .litdom-takeaways {
+    background: #0B0B0F;
+    color: #FFF8E7;
+    border: 1px solid #8C7625;
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 24px 0;
+    font-family: inherit;
+  }
+
+  .litdom-takeaways summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .litdom-takeaways summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .litdom-takeaways .takeaway-label {
+    color: #D4AF37;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .litdom-takeaways .takeaway-heading {
+    color: #FFF8E7;
+    font-size: 22px;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+
+  .litdom-takeaways .takeaway-arrow {
+    color: #D4AF37;
+    font-size: 25px;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+
+  .litdom-takeaways[open] .takeaway-arrow {
+    transform: rotate(180deg);
+  }
+
+  .litdom-takeaways .takeaway-content {
+    padding: 0 20px 24px;
+  }
+
+  .litdom-takeaways .takeaway-eyebrow {
+    color: #D4AF37;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+  }
+
+  .litdom-takeaways .takeaway-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .litdom-takeaways .takeaway-star {
+    background: #17171C;
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #D4AF37;
+    font-size: 22px;
+  }
+
+  .litdom-takeaways .takeaway-number {
+    color: #D4AF37;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .litdom-takeaways .takeaway-title {
+    color: #FFF8E7;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .litdom-takeaways .takeaway-description {
+    color: #F4D58D;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 480px) {
+    .litdom-takeaways summary {
+      padding: 16px;
+    }
+
+    .litdom-takeaways .takeaway-heading {
+      font-size: 19px;
+    }
+
+    .litdom-takeaways .takeaway-content {
+      padding: 0 16px 20px;
+    }
+  }
+</style>
+
+<details class="litdom-takeaways">
+  <summary>
+    <span>
+      <span class="takeaway-label">LITDOM • THE ESSENTIALS</span>
+      <span class="takeaway-heading">Takeaways</span>
+    </span>
+    <span class="takeaway-arrow" aria-hidden="true">⌄</span>
+  </summary>
+
+  <div class="takeaway-content">
+    <div class="takeaway-eyebrow">FIVE THINGS TO REMEMBER</div>
+
+    <div class="takeaway-item">
+      <div class="takeaway-star">★</div>
+      <div>
+        <div class="takeaway-number">01</div>
+        <div class="takeaway-title">Start with a purpose</div>
+        <div class="takeaway-description">
+          Know what your website needs to achieve before choosing tools or designing pages.
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway-item">
+      <div class="takeaway-star">★</div>
+      <div>
+        <div class="takeaway-number">02</div>
+        <div class="takeaway-title">Build for your audience</div>
+        <div class="takeaway-description">
+          Make the content, structure and experience useful to the people you want to reach.
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway-item">
+      <div class="takeaway-star">★</div>
+      <div>
+        <div class="takeaway-number">03</div>
+        <div class="takeaway-title">Get the foundations right</div>
+        <div class="takeaway-description">
+          Choose suitable platforms, organise your pages and account for security, privacy and accessibility.
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway-item">
+      <div class="takeaway-star">★</div>
+      <div>
+        <div class="takeaway-number">04</div>
+        <div class="takeaway-title">Plan beyond launch day</div>
+        <div class="takeaway-description">
+          Think about maintenance, performance, measurement and how you'll keep the website useful.
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway-item">
+      <div class="takeaway-star">★</div>
+      <div>
+        <div class="takeaway-number">05</div>
+        <div class="takeaway-title">Work within your budget</div>
+        <div class="takeaway-description">
+          Prioritise what matters, use affordable tools wisely and improve as your resources grow.
+        </div>
+      </div>
+    </div>
+  </div>
+</details>
