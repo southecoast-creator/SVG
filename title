@@ -847,3 +847,248 @@ Definition bubble
     </button>
   </span>
 </span>
+
+
+<style>
+/* Thought bubble */
+.litdom-foundation-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: fit-content;
+  max-width: min(100%, 430px);
+  box-sizing: border-box;
+  margin: 18px 0;
+  padding: 13px 16px;
+  border: 1px solid rgba(212, 175, 55, .45);
+  border-radius: 22px 22px 22px 9px;
+  background: #17171C;
+  color: #FFF8E7;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, .12);
+}
+
+.litdom-cloud-icon {
+  width: 29px;
+  height: 23px;
+  flex: 0 0 29px;
+  margin-top: 2px;
+}
+
+.litdom-cloud-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* Definition trigger: preserves surrounding text colour */
+.litdom-definition-wrap {
+  position: relative;
+  display: inline;
+}
+
+.litdom-definition-trigger {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.litdom-definition-trigger:focus-visible {
+  outline: 2px solid #D4AF37;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Definition popup */
+.litdom-definition-popup {
+  position: absolute;
+  z-index: 999;
+  top: calc(100% + 10px);
+  left: 0;
+  display: block;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 36px));
+  box-sizing: border-box;
+  padding: 14px 35px 14px 15px;
+  border: 1px solid rgba(212, 175, 55, .65);
+  border-radius: 13px;
+  background: #0B0B0F;
+  color: #FFF8E7;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, .3);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.litdom-definition-popup[hidden] {
+  display: none;
+}
+
+.litdom-definition-heading {
+  display: block;
+  margin-bottom: 5px;
+  color: #F4D58D;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.litdom-definition-text {
+  display: block;
+}
+
+.litdom-definition-close {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #F4D58D;
+  font-size: 21px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .litdom-foundation-note {
+    max-width: 100%;
+    padding: 11px 12px;
+    gap: 7px;
+  }
+
+  .litdom-cloud-text {
+    font-size: 14px;
+  }
+
+  .litdom-definition-popup {
+    max-width: min(260px, calc(100vw - 28px));
+    padding: 12px 32px 12px 12px;
+  }
+}
+</style>
+
+<script>
+(function () {
+  function initLitdomDefinitions() {
+    document.querySelectorAll(".litdom-definition-wrap").forEach(function (wrap) {
+      if (wrap.dataset.initialized === "true") return;
+
+      var trigger = wrap.querySelector(".litdom-definition-trigger");
+      var popup = wrap.querySelector(".litdom-definition-popup");
+      var close = wrap.querySelector(".litdom-definition-close");
+
+      if (!trigger || !popup || !close) return;
+
+      function repositionPopup() {
+        popup.style.left = "0";
+        popup.style.right = "auto";
+
+        var rect = popup.getBoundingClientRect();
+        var margin = 14;
+
+        if (rect.right > window.innerWidth - margin) {
+          popup.style.left = "auto";
+          popup.style.right = "0";
+        }
+
+        rect = popup.getBoundingClientRect();
+
+        if (rect.left < margin) {
+          popup.style.left = "0";
+          popup.style.right = "auto";
+          popup.style.maxWidth =
+            "min(260px, calc(100vw - 28px))";
+        }
+
+        rect = popup.getBoundingClientRect();
+
+        if (rect.bottom > window.innerHeight - margin) {
+          popup.style.top = "auto";
+          popup.style.bottom = "calc(100% + 10px)";
+        } else {
+          popup.style.bottom = "auto";
+          popup.style.top = "calc(100% + 10px)";
+        }
+      }
+
+      function openPopup() {
+        popup.hidden = false;
+        trigger.setAttribute("aria-expanded", "true");
+        repositionPopup();
+      }
+
+      function closePopup() {
+        popup.hidden = true;
+        trigger.setAttribute("aria-expanded", "false");
+        popup.style.top = "";
+        popup.style.bottom = "";
+        popup.style.left = "";
+        popup.style.right = "";
+      }
+
+      trigger.addEventListener("click", function (event) {
+        event.stopPropagation();
+
+        if (popup.hidden) {
+          document.querySelectorAll(
+            ".litdom-definition-popup"
+          ).forEach(function (otherPopup) {
+            otherPopup.hidden = true;
+            var otherTrigger = document.querySelector(
+              '[aria-controls="' + otherPopup.id + '"]'
+            );
+            if (otherTrigger) {
+              otherTrigger.setAttribute("aria-expanded", "false");
+            }
+          });
+
+          openPopup();
+        } else {
+          closePopup();
+        }
+      });
+
+      close.addEventListener("click", function (event) {
+        event.stopPropagation();
+        closePopup();
+        trigger.focus();
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!wrap.contains(event.target)) closePopup();
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !popup.hidden) {
+          closePopup();
+          trigger.focus();
+        }
+      });
+
+      window.addEventListener("resize", function () {
+        if (!popup.hidden) repositionPopup();
+      });
+
+      wrap.dataset.initialized = "true";
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initLitdomDefinitions
+    );
+  } else {
+    initLitdomDefinitions();
+  }
+})();
+</script>
