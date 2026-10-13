@@ -1126,3 +1126,213 @@ Comment Bubbles
     You need a note and a pen here.
   </div>
 </div>
+
+
+<script id="thought-bubble-js">
+/* ===================== THOUGHT BUBBLE ===================== */
+(function () {
+  'use strict';
+
+  /* --- tuning knobs --- */
+  var R   = [3.5, 6, 10];   // radii of the 3 trail circles (small -> large)
+  var SW  = 2;              // outline thickness
+  var RC  = 16;             // thought-box corner radius
+  var DY1 = 0.5;            // first circle sits right under the first letter
+  var DX2 = 7.5, DY2 = 10.5;  // circle 1 -> circle 2 (diagonal step)
+  var DX3 = 11,  DY3 = 16;    // circle 2 -> circle 3 (diagonal step)
+  var MARGIN = 10;          // min gap to the screen edge
+  var MAXW = 300, MINW = 130;
+
+  var BULB = '<svg class="tb-bulb" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0B0B0F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>';
+  var XICON = '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>';
+  var SPARK = 'M0-6C.8-2 2-.8 6 0 2 .8.8 2 0 6-.8 2-2 .8-6 0-2-.8-.8-2 0-6Z';
+
+  var active = null, raf = 0;
+
+  /* rect of the first visible letter (so the trail starts under the "M") */
+  function firstCharRect(word) {
+    var walker = document.createTreeWalker(word, NodeFilter.SHOW_TEXT, null);
+    var t = walker.nextNode();
+    while (t && !/\S/.test(t.nodeValue)) t = walker.nextNode();
+    if (t) {
+      var i = t.nodeValue.search(/\S/);
+      var r = document.createRange();
+      r.setStart(t, i); r.setEnd(t, i + 1);
+      var b = r.getBoundingClientRect();
+      if (b.width || b.height) return b;
+    }
+    return word.getBoundingClientRect();
+  }
+
+  function setCircle(n, x, y, r) {
+    n.setAttribute('cx', x); n.setAttribute('cy', y); n.setAttribute('r', r);
+  }
+  function setRect(n, x, y, w, h, rx) {
+    n.setAttribute('x', x); n.setAttribute('y', y);
+    n.setAttribute('width', w); n.setAttribute('height', h); n.setAttribute('rx', rx);
+  }
+
+  function build(word) {
+    var scene = document.createElement('div');
+    scene.className = 'tb-scene';
+    scene.innerHTML =
+      '<svg class="tb-svg" width="1" height="1" aria-hidden="true" focusable="false">' +
+        '<g class="tb-c tb-c1"><circle class="o"/><circle class="f"/></g>' +
+        '<g class="tb-c tb-c2"><circle class="o"/><circle class="f"/></g>' +
+        '<g class="tb-merge"><g class="o"><rect/><circle/></g><g class="f"><rect/><circle/></g></g>' +
+        '<g class="sp-a"><path class="tb-spark" d="' + SPARK + '"/></g>' +
+        '<g class="sp-b"><path class="tb-spark tb-spark2" d="' + SPARK + '"/></g>' +
+      '</svg>' +
+      '<div class="tb-box" role="dialog" aria-label="Thought">' +
+        '<button type="button" class="tb-x" aria-label="Close thought">' + XICON + '</button>' +
+        '<div class="tb-inner"><div class="tb-head">' + BULB + '<span class="tb-title"></span></div>' +
+        '<div class="tb-text"></div></div>' +
+      '</div>';
+    scene.querySelector('.tb-title').textContent =
+      word.getAttribute('data-thought-title') || "A thought I'm having";
+    scene.querySelector('.tb-text').textContent = word.getAttribute('data-thought') || '';
+
+    var q = function (s) { return scene.querySelector(s); };
+    return {
+      word: word, scene: scene, box: q('.tb-box'),
+      c1: scene.querySelectorAll('.tb-c1 circle'),
+      c2: scene.querySelectorAll('.tb-c2 circle'),
+      merge: q('.tb-merge'),
+      mo: q('.tb-merge .o'), mf: q('.tb-merge .f'),
+      spA: q('.sp-a'), spB: q('.sp-b')
+    };
+  }
+
+  /* Positioning is measured from the live word every time (and on resize),
+     so it follows the word through line wraps and any screen size. */
+  function place(a, first) {
+    var box = a.box;
+    var fr  = firstCharRect(a.word);
+    var vw  = document.documentElement.clientWidth;
+    var sxv = fr.left + fr.width / 2;                 // viewport x under the "M"
+    var sx  = sxv + window.pageXOffset;
+    var sy  = fr.bottom + window.pageYOffset;         // just under the word
+
+    // 1. natural size of the box
+    box.style.maxWidth = Math.min(MAXW, vw - 2 * MARGIN) + 'px';
+    var w = box.offsetWidth;
+
+    // 2. choose the side with room (default: box hangs to the lower-left)
+    var cbx    = DX2 + DX3 - 1;                       // corner distance from the "M"
+    var spaceL = sxv - cbx - MARGIN;
+    var spaceR = vw - MARGIN - (sxv + cbx);
+    var sgn = spaceL >= w ? -1 : spaceR >= w ? 1 : (spaceL >= spaceR ? -1 : 1);
+    var space = sgn < 0 ? spaceL : spaceR;
+    if (space < w) {                                  // not enough room: wrap the text tighter
+      box.style.maxWidth = Math.max(space, MINW) + 'px';
+      w = box.offsetWidth;
+    }
+    var h = box.offsetHeight;
+
+    // 3. trail geometry, relative to the scene origin (under the "M")
+    var P1 = { x: 0, y: DY1 + R[0] };
+    var P2 = { x: sgn * DX2, y: P1.y + DY2 };
+    var P3 = { x: P2.x + sgn * DX3, y: P2.y + DY3 };
+    var C  = { x: P3.x - sgn, y: P3.y - 1 };          // box corner the big circle fuses with
+    var bx = sgn < 0 ? C.x - w : C.x;
+    var by = C.y;
+
+    a.scene.style.left = sx + 'px';
+    a.scene.style.top  = sy + 'px';
+    box.style.left = bx + 'px';
+    box.style.top  = by + 'px';
+    box.classList.toggle('tb-l', sgn < 0);
+
+    setCircle(a.c1[0], P1.x, P1.y, R[0] + SW); setCircle(a.c1[1], P1.x, P1.y, R[0]);
+    setCircle(a.c2[0], P2.x, P2.y, R[1] + SW); setCircle(a.c2[1], P2.x, P2.y, R[1]);
+
+    // box + big circle: outline layer first, fill layer on top = one merged shape
+    setRect(a.mo.firstChild, bx - SW, by - SW, w + 2 * SW, h + 2 * SW, RC + SW);
+    setCircle(a.mo.lastChild, P3.x, P3.y, R[2] + SW);
+    setRect(a.mf.firstChild, bx, by, w, h, RC);
+    setCircle(a.mf.lastChild, P3.x, P3.y, R[2]);
+    a.merge.style.transformOrigin = C.x + 'px ' + C.y + 'px';
+
+    // sparkles on the far side of the box
+    var ax = sgn < 0 ? bx + 10 : bx + w - 10;
+    var bxp = sgn < 0 ? bx + w * 0.6 : bx + w * 0.4;
+    a.spA.setAttribute('transform', 'translate(' + ax + ' ' + (by - 8) + ')');
+    a.spB.setAttribute('transform', 'translate(' + bxp + ' ' + (by + h + 8) + ') scale(.75)');
+
+    // keep the whole thing on screen vertically
+    if (first) {
+      var bottom = sy + by + h + 16;
+      var view = window.pageYOffset + window.innerHeight;
+      if (bottom > view) window.scrollBy({ top: bottom - view, behavior: 'smooth' });
+    }
+  }
+
+  function open(word) {
+    var a = build(word);
+    document.documentElement.appendChild(a.scene);
+    active = a;
+    word.setAttribute('aria-expanded', 'true');
+    place(a, true);
+  }
+
+  function close(immediate, refocus) {
+    var a = active;
+    if (!a) return;
+    active = null;
+    a.word.setAttribute('aria-expanded', 'false');
+    if (refocus) a.word.focus({ preventScroll: true });
+    if (immediate) { a.scene.remove(); return; }
+    a.scene.classList.add('tb-closing');
+    setTimeout(function () { a.scene.remove(); }, 230);
+  }
+
+  function toggle(word) {
+    if (active && active.word === word) { close(); return; }
+    close(true);
+    open(word);
+  }
+
+  /* --- events (delegated, so words added later also work) --- */
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var w = t.closest('.thought-word');
+    if (w) { e.preventDefault(); toggle(w); return; }
+    if (t.closest('.tb-x')) { close(false, true); return; }
+    if (active && !t.closest('.tb-scene')) close();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && active) { close(false, true); return; }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList &&
+        e.target.classList.contains('thought-word')) {
+      e.preventDefault(); toggle(e.target);
+    }
+  });
+
+  function reflow() {
+    if (!active || raf) return;
+    raf = requestAnimationFrame(function () {
+      raf = 0;
+      if (active) place(active, false);
+    });
+  }
+  window.addEventListener('resize', reflow);
+  window.addEventListener('orientationchange', reflow);
+  if (window.ResizeObserver) new ResizeObserver(reflow).observe(document.documentElement);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(reflow);
+
+  /* make trigger words keyboard/screen-reader friendly */
+  function enhance() {
+    var words = document.querySelectorAll('.thought-word');
+    for (var i = 0; i < words.length; i++) {
+      var w = words[i];
+      if (!w.hasAttribute('role')) w.setAttribute('role', 'button');
+      if (!w.hasAttribute('tabindex')) w.setAttribute('tabindex', '0');
+      if (!w.hasAttribute('aria-expanded')) w.setAttribute('aria-expanded', 'false');
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enhance);
+  else enhance();
+})();
+</script>
