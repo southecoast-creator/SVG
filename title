@@ -1336,3 +1336,488 @@ Comment Bubbles
   else enhance();
 })();
 </script>
+
+
+
+
+
+
+
+
+
+
+
+Questions 
+
+<!--Keep ONE outer wrapper around the article and all its questions.-->
+<div class="litdom-qa-post" data-litdom-article="website-guide">
+
+  <!--YOUR ARTICLE STARTS HERE-->
+
+  <h2>Purpose</h2>
+
+  <p>
+    Before building your website, you need to understand who you are,
+    what you want to accomplish, and why your website needs to exist.
+  </p>
+
+  <!--QUESTION TYPE 1: SHORT WRITTEN ANSWER-->
+
+  <div class="litdom-question" data-question-id="who-am-i">
+    <details>
+      <summary>Who am I?</summary>
+
+      <div class="litdom-answer-area">
+        <label>Write your answer in your own words.</label>
+
+        <textarea data-answer=""></textarea>
+
+        <button class="litdom-save" type="button">
+          Save answer
+        </button>
+
+        <p aria-live="polite" class="litdom-question-status"></p>
+      </div>
+    </details>
+  </div>
+
+  <p>
+    Now that you have considered who you are, think about the people
+    you want to reach and the reason your website exists.
+  </p>
+
+  <h2>Understanding your brand</h2>
+
+  <p>
+    Your brand should have a clear purpose. That purpose influences
+    the content you publish, the experience you create, and the
+    people you want to serve.
+  </p>
+
+  <!--QUESTION TYPE 2: DROPDOWN-->
+
+  <div class="litdom-question" data-question-id="brand-purpose">
+    <details>
+      <summary>What is my brand made for?</summary>
+
+      <div class="litdom-answer-area">
+        <label>Choose the option that best describes your brand.</label>
+
+        <select data-answer="">
+          <option value="">Choose an answer</option>
+          <option value="Educate">Educate</option>
+          <option value="Inform">Inform</option>
+          <option value="Entertain">Entertain</option>
+          <option value="Sell products or services">
+            Sell products or services
+          </option>
+          <option value="Build a community">Build a community</option>
+          <option value="Showcase creative work">
+            Showcase creative work
+          </option>
+          <option value="Other">Other</option>
+        </select>
+
+        <button class="litdom-save" type="button">
+          Save answer
+        </button>
+
+        <p aria-live="polite" class="litdom-question-status"></p>
+      </div>
+    </details>
+  </div>
+
+  <p>
+    Continue with the rest of your article. Insert more question
+    blocks wherever readers need to pause and reflect.
+  </p>
+  
+  <div class="litdom-question" data-question-id="cup-purpose">
+    <details>
+      <summary>What is my brand made for?</summary>
+
+      <div class="litdom-answer-area">
+        <label>Choose the option that best describes your brand.</label>
+
+        <select data-answer="">
+          <option value="">Choose an answer</option>
+          <option value="Educate">Educate</option>
+          <option value="Inform">Inform</option>
+          <option value="Entertain">Entertain</option>
+          <option value="Sell products or services">
+            Sell products or services
+          </option>
+          <option value="Build a community">Build a community</option>
+          <option value="Showcase creative work">
+            Showcase creative work
+          </option>
+          <option value="Other">Other</option>
+        </select>
+
+        <button class="litdom-save" type="button">
+          Save answer
+        </button>
+
+        <p aria-live="polite" class="litdom-question-status"></p>
+      </div>
+    </details>
+  </div>
+
+  <!--YOUR ARTICLE ENDS HERE-->
+
+  <!--ONE DOWNLOAD AREA AT THE END-->
+
+  <div class="litdom-download-area">
+    <h3>Keep your answers</h3>
+
+    <p>
+      Download the answers you saved while reading this article.
+    </p>
+
+    <button id="litdom-download-answers" type="button">
+      Download your answers
+    </button>
+
+    <p aria-live="polite" id="litdom-download-status"></p>
+
+    <p class="litdom-download-note">
+      Saved answers stay in this browser for 24 hours after your
+      most recent save. They are not sent to the website owner.
+    </p>
+  </div>
+
+</div>
+
+<!--PDF LIBRARY-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!--SHARED QUESTION, SAVING AND DOWNLOAD SCRIPT-->
+<script>
+(function () {
+  var script = document.currentScript;
+  var root = script && script.previousElementSibling;
+
+  /*
+   * Blogger may reposition scripts. Locate the article wrapper
+   * using the unique article identifier instead.
+   */
+  if (!root || !root.matches('.litdom-qa-post')) {
+    var wrappers = document.querySelectorAll(
+      '.litdom-qa-post[data-litdom-article="website-guide"]'
+    );
+    root = wrappers.length ? wrappers[wrappers.length - 1] : null;
+  }
+
+  if (!root) return;
+  if (root.dataset.litdomInitialized === 'true') return;
+  root.dataset.litdomInitialized = 'true';
+
+  var articleId = root.getAttribute('data-litdom-article');
+  var storageKey = 'litdom-answers-v3:' +
+    location.pathname + ':' + articleId;
+
+  var expiryPeriod = 24 * 60 * 60 * 1000;
+  var questions = Array.from(
+    root.querySelectorAll('.litdom-question')
+  );
+
+  var downloadButton = root.querySelector(
+    '#litdom-download-answers'
+  );
+  var downloadStatus = root.querySelector(
+    '#litdom-download-status'
+  );
+
+  var saved = {};
+
+  function getInput(block) {
+    return block.querySelector('[data-answer]');
+  }
+
+  function getQuestion(block) {
+    var summary = block.querySelector('summary');
+    return summary ? summary.textContent.trim() : 'Untitled question';
+  }
+
+  function getId(block) {
+    return block.getAttribute('data-question-id');
+  }
+
+  function readSaved() {
+    try {
+      var raw = localStorage.getItem(storageKey);
+      if (!raw) return {};
+
+      var data = JSON.parse(raw);
+
+      if (!data.expiresAt || Date.now() >= data.expiresAt) {
+        localStorage.removeItem(storageKey);
+        return {};
+      }
+
+      return data.answers || {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function writeSaved() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({
+        expiresAt: Date.now() + expiryPeriod,
+        answers: saved
+      }));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function setStatus(block, message) {
+    var status = block.querySelector('.litdom-question-status');
+    if (status) status.textContent = message;
+  }
+
+  function updateSavedInput(block) {
+    var id = getId(block);
+    var input = getInput(block);
+
+    if (!id || !input) return;
+
+    var value = input.value.trim();
+
+    if (!value) {
+      delete saved[id];
+      if (writeSaved()) {
+        setStatus(block, 'Saved answer cleared.');
+      } else {
+        setStatus(block, 'Browser storage is unavailable.');
+      }
+      return;
+    }
+
+    saved[id] = {
+      question: getQuestion(block),
+      value: value
+    };
+
+    if (writeSaved()) {
+      setStatus(block, 'Answer saved. You can continue reading.');
+    } else {
+      setStatus(block, 'Could not save. Check browser storage settings.');
+    }
+  }
+
+  saved = readSaved();
+
+  questions.forEach(function (block) {
+    var id = getId(block);
+    var input = getInput(block);
+    var saveButton = block.querySelector('.litdom-save');
+
+    if (!id || !input || !saveButton) return;
+
+    if (saved[id]) {
+      input.value = saved[id].value || '';
+      setStatus(block, 'Previously saved answer restored.');
+    }
+
+    saveButton.addEventListener('click', function () {
+      updateSavedInput(block);
+    });
+  });
+
+  if (!downloadButton) return;
+
+  downloadButton.addEventListener('click', function () {
+    /*
+     * Include only answers the reader explicitly saved.
+     * Unsaved edits will not silently overwrite saved answers.
+     */
+    saved = readSaved();
+
+    var entries = questions
+      .map(function (block) {
+        var id = getId(block);
+        if (!id || !saved[id]) return null;
+
+        return {
+          question: saved[id].question || getQuestion(block),
+          value: saved[id].value || ''
+        };
+      })
+      .filter(function (entry) {
+        return entry && entry.value.trim() !== '';
+      });
+
+    if (!entries.length) {
+      downloadStatus.textContent =
+        'Save at least one answer before downloading.';
+      return;
+    }
+
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      downloadStatus.textContent =
+        'The PDF library did not load. Check your connection and try again.';
+      return;
+    }
+
+    try {
+      var pdf = new window.jspdf.jsPDF();
+      var margin = 18;
+      var pageHeight = pdf.internal.pageSize.getHeight();
+      var width = pdf.internal.pageSize.getWidth() - margin * 2;
+      var y = 20;
+
+      pdf.setFontSize(18);
+      pdf.text('My Saved Answers', margin, y);
+      y += 12;
+
+      pdf.setFontSize(11);
+
+      entries.forEach(function (entry, index) {
+        var questionLines = pdf.splitTextToSize(
+          (index + 1) + '. ' + entry.question, width
+        );
+
+        var answerLines = pdf.splitTextToSize(
+          'Answer: ' + entry.value, width
+        );
+
+        var needed =
+          (questionLines.length + answerLines.length) * 6 + 12;
+
+        if (y + needed > pageHeight - margin) {
+          pdf.addPage();
+          y = 20;
+        }
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(questionLines, margin, y);
+        y += questionLines.length * 6 + 3;
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(answerLines, margin, y);
+        y += answerLines.length * 6 + 9;
+      });
+
+      pdf.save('litdom-my-answers.pdf');
+      downloadStatus.textContent =
+        'Your PDF download has been requested.';
+    } catch (error) {
+      downloadStatus.textContent =
+        'The PDF could not be created. Please try again.';
+    }
+  });
+})();
+</script>
+
+<style>
+.litdom-question {
+  margin: 8px 0;
+  font: inherit;
+}
+
+.litdom-question summary {
+  display: inline;
+  cursor: pointer;
+  color: #D4AF37;
+  font: inherit;
+  font-style: italic;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  list-style: none;
+}
+
+.litdom-question summary::-webkit-details-marker {
+  display: none;
+}
+
+.litdom-question .litdom-answer-area {
+  margin: 10px 0 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.litdom-question .litdom-answer-area label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.litdom-question .litdom-answer-area input,
+.litdom-question .litdom-answer-area select,
+.litdom-question .litdom-answer-area textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  margin: 4px 0 10px;
+  background: #17171C;
+  color: #FFF8E7;
+  border: 1px solid #8C7625;
+  border-radius: 5px;
+  font: inherit;
+}
+
+.litdom-question .litdom-answer-area textarea {
+  min-height: 80px;
+}
+
+.litdom-question .litdom-save {
+  padding: 8px 12px;
+  background: #D4AF37;
+  color: #0B0B0F;
+  border: 0;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.litdom-question .litdom-question-status {
+  font-size: 12px;
+  margin: 5px 0;
+}
+</style>
+
+
+<style>
+#litdom-download-answers {
+  display: inline-block;
+  padding: 11px 18px;
+  margin: 12px 0;
+  border: 1px solid #D4AF37;
+  border-radius: 5px;
+  background: #D4AF37;
+  color: #0B0B0F;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+#litdom-download-answers:hover {
+  background: #F4D58D;
+  border-color: #F4D58D;
+}
+
+#litdom-download-answers:focus-visible {
+  outline: 2px solid #D4AF37;
+  outline-offset: 3px;
+}
+
+#litdom-download-status {
+  margin: 6px 0;
+  color: #F4D58D;
+  font-size: 13px;
+}
+
+.litdom-download-note {
+  margin: 4px 0 16px;
+  color: #77716A;
+  font-size: 12px;
+}
+</style>
+
+<!--END OF LITDOM INTERACTIVE ARTICLE SYSTEM-->
